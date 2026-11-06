@@ -1,11 +1,67 @@
 services:
+  # ==============================================================================
+  # 1. CORE ULTRA-LIGHTWEIGHT BACKUP DAEMON (~18MB RAM)
+  # Chạy ngầm êm ái, bảo mật AES-256 Zero-Knowledge, 2-way Bot Remote Control
+  # Chỉ cần: TELEGRAM_BOT_TOKEN & TELEGRAM_CHAT_ID trong file .env
+  # ==============================================================================
+  televault:
+    build:
+      context: ./daemon
+      dockerfile: Dockerfile
+    container_name: televault_core_daemon
+    restart: unless-stopped
+    environment:
+      - TZ=${TIMEZONE:-Asia/Ho_Chi_Minh}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+      - NAS_SOURCE_PATH=/source_data
+      - ENCRYPTION_PASSWORD=${ENCRYPTION_PASSWORD:-}
+      - BW_LIMIT_MB=${BW_LIMIT_MB:-5.0}
+      - CHUNK_SIZE_MB=${CHUNK_SIZE_MB:-45}
+      - SCAN_INTERVAL_MIN=${SCAN_INTERVAL_MIN:-60}
+      - API_PORT=8089
+    volumes:
+      - ${NAS_SOURCE_PATH:-/volume1/Photos}:/source_data:ro
+      - ./data:/data
+      - ./logs:/logs
+      - ./.env:/app/.env
+    ports:
+      - "8089:8089"
+    networks:
+      - teldrive_net
+
+  # ==============================================================================
+  # 2. SYNOTELE VAULT PRO WEB DASHBOARD (NGINX EDGE-TO-EDGE UI)
+  # Tối ưu 100% không gian màn hình, File Station & Time Machine Explorer
+  # ==============================================================================
+  dashboard:
+    image: nginx:alpine
+    container_name: teldrive_dashboard
+    restart: unless-stopped
+    depends_on:
+      - televault
+    ports:
+      - "${DASHBOARD_PORT:-8088}:80"
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro
+      - ./dashboard/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - teldrive_net
+
+  # ==============================================================================
+  # 3. ENTERPRISE OPTIONAL SERVICES (Teldrive v2 + Rclone Crypt + Postgres)
+  # Khởi chạy chế độ này khi cần lưu trữ MTProto 2GB Part:
+  # docker compose --profile enterprise up -d
+  # ==============================================================================
   postgres:
     image: postgres:16-alpine
     container_name: teldrive_postgres
     restart: unless-stopped
+    profiles:
+      - enterprise
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-teldrive}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Please set POSTGRES_PASSWORD in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-teldrive_secure_pass}
       POSTGRES_DB: ${POSTGRES_DB:-teldrive}
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -21,6 +77,8 @@ services:
     image: ghcr.io/tgdrive/teldrive:2
     container_name: teldrive_server
     restart: unless-stopped
+    profiles:
+      - enterprise
     depends_on:
       postgres:
         condition: service_healthy
@@ -32,26 +90,12 @@ services:
     networks:
       - teldrive_net
 
-  # SynoTele Vault Pro Web Management UI
-  dashboard:
-    image: nginx:alpine
-    container_name: teldrive_dashboard
-    restart: unless-stopped
-    ports:
-      - "${DASHBOARD_PORT:-8088}:80"
-    volumes:
-      - ./dashboard:/usr/share/nginx/html:ro
-    networks:
-      - teldrive_net
-
-  # Optional: Containerized Rclone automated backup runner
-  # Run with: docker compose --profile backup up -d
   rclone-backup:
     image: rclone/rclone:latest
     container_name: teldrive_rclone_cron
     restart: unless-stopped
     profiles:
-      - backup
+      - enterprise
     depends_on:
       - teldrive
     environment:

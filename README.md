@@ -58,9 +58,50 @@ flowchart LR
 
 ---
 
-## ⚡ Hướng dẫn cài đặt nhanh trong 15 phút
+## ⚡ CÀI ĐẶT SIÊU TỐC 1 BƯỚC (CHỈ CẦN BOT TOKEN & CHAT ID) 🚀
 
-### Bước 1: Chuẩn bị thông tin Telegram
+> [!TIP]
+> **Không cần cài đặt PostgreSQL, Teldrive hay đăng nhập số điện thoại!**
+> Bạn chỉ cần điền **Bot Token** và **Chat ID**, hệ thống tự động khởi động **TeleVault Core Daemon** siêu nhẹ (~18MB RAM) chạy ngầm êm ái trên NAS (Synology, TrueNAS, Unraid, Linux) với bảo mật **AES-256 Zero-Knowledge**.
+
+### Cách 1: Chạy lệnh Quick-Start tự động (Khuyên dùng)
+```bash
+git clone https://github.com/thanhvo-agy/Telegram-Drive.git telegram-backup
+cd telegram-backup
+
+# Chạy script khởi tạo 1 bước (chỉ cần nhập Bot Token & Chat ID khi được hỏi)
+./scripts/quick_start.sh
+```
+
+### Cách 2: Điền vào `.env` và bật Docker
+1. Sao chép mẫu cấu hình:
+   ```bash
+   cp .env.example .env
+   ```
+2. Mở file `.env` và điền:
+   ```env
+   TELEGRAM_BOT_TOKEN=7123456789:AAH_abcXYZ...
+   TELEGRAM_CHAT_ID=-1001234567890
+   NAS_SOURCE_PATH=/volume1/Photos
+   ```
+3. Khởi động chạy ngầm:
+   ```bash
+   docker compose up -d
+   ```
+
+4. Truy cập giao diện quản trị 100% không gian màn hình:
+   👉 **`http://<IP_NAS_CỦA_BẠN>:8088`**
+5. Điều khiển từ xa qua ứng dụng Telegram trên điện thoại:
+   Nhắn tin trực tiếp cho Bot các lệnh:
+   * `/status`: Xem CPU, RAM, dung lượng NAS & số tệp đã backup
+   * `/backup`: Kích hoạt sao lưu tức thì
+   * `/speed 10`: Đổi giới hạn tốc độ thành 10 MB/s
+   * `/pause` & `/resume`: Tạm dừng hoặc tiếp tục
+
+---
+
+## 🏢 Cấu hình nâng cao: Enterprise Mode (Teldrive v2 + Rclone Crypt)
+*(Dành cho nhu cầu chia nhỏ file 2GB qua giao thức MTProto người dùng)*
 1. Đăng nhập vào [my.telegram.org](https://my.telegram.org), chọn **API development tools** để lấy `app-id` (số) và `app-hash` (chuỗi ký tự).
 2. Mở ứng dụng Telegram trên điện thoại/máy tính, tạo một **Kênh riêng tư (Private Channel)** mới (ví dụ đặt tên là `NAS_Backup_Vault`).
 3. *(Khuyên dùng)* Nên dùng một tài khoản phụ (Secondary/Burner Account) để chứa dữ liệu backup.
