@@ -259,6 +259,10 @@ class CryptoEngine:
                 h.update(chunk)
         return h.hexdigest()
 
+    @staticmethod
+    def sha256_bytes(b):
+        return hashlib.sha256(b).hexdigest()
+
 # ------------------------------------------------------------------------------
 # Manifest Manager (Local State & Telegram Sync Index)
 # ------------------------------------------------------------------------------
@@ -457,6 +461,8 @@ class BackupEngine:
                             self.current_part = part_num
 
                         # Write temp chunk
+                        raw_size = len(chunk_data)
+                        raw_hash = CryptoEngine.sha256_bytes(chunk_data)
                         with tempfile.NamedTemporaryFile("wb", delete=False) as f_raw, \
                              tempfile.NamedTemporaryFile("wb", delete=False) as f_enc:
                             f_raw.write(chunk_data)
@@ -503,9 +509,11 @@ class BackupEngine:
                             chunks_info.append({
                                 "part": part_num,
                                 "size": enc_size,
+                                "raw_size": raw_size,
                                 "msg_id": msg_id,
                                 "file_id": doc_id,
                                 "sha256": enc_hash,
+                                "raw_sha256": raw_hash,
                                 "uploaded_at": datetime.now().isoformat()
                             })
                             bytes_transferred += enc_size
