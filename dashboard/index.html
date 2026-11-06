@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SynoTele Vault Enterprise - Nền Tảng Sao Lưu Synology Đa Điểm</title>
+  <title>SynoTele Vault Enterprise - Synology File Station Backup & Cold Storage</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,7 +27,7 @@
       background: transparent;
     }
 
-    /* Standard Google-style Button System */
+    /* Standard Google Cloud / Workspace Button System */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -209,17 +209,17 @@
       <div class="space-y-1 px-3">
         <div class="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-[#9aa0a6]">Hệ Thống Sao Lưu</div>
 
-        <!-- 1. OVERVIEW -->
+        <!-- 1. FILE STATION BACKUP EXPLORER (CORE FEATURE) -->
+        <button onclick="setTab('filestation')" id="nav-filestation" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 transition-all whitespace-nowrap">
+          <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          <span class="flex-1 text-left truncate">File Station Sao Lưu</span>
+          <span class="chip chip-blue text-[10px] py-0.2">DSM</span>
+        </button>
+
+        <!-- 2. OVERVIEW -->
         <button onclick="setTab('overview')" id="nav-overview" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
           <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
           <span class="flex-1 text-left truncate">Tổng Quan</span>
-        </button>
-
-        <!-- 2. DRIVE EXPLORER & VERSION HISTORY (NEW FEATURE) -->
-        <button onclick="setTab('drive')" id="nav-drive" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 transition-all whitespace-nowrap">
-          <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-          <span class="flex-1 text-left truncate">Telegram Drive</span>
-          <span class="chip chip-blue text-[10px] py-0.2">DRIVE</span>
         </button>
 
         <!-- 3. TIME MACHINE 3D -->
@@ -229,42 +229,35 @@
           <span class="chip chip-yellow text-[10px] py-0.2">3D</span>
         </button>
 
-        <!-- 4. FOLDER TREE SELECTOR -->
-        <button onclick="setTab('tree-selector')" id="nav-tree-selector" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
-          <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-          <span class="flex-1 text-left truncate">Thư Mục NAS</span>
-          <span class="chip chip-gray text-[10px] py-0.2">Btrfs</span>
-        </button>
-
-        <!-- 5. MULTI-NAS PUSH & PULL -->
+        <!-- 4. MULTI-NAS PUSH & PULL -->
         <button onclick="setTab('multinas')" id="nav-multinas" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
           <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
           <span class="flex-1 text-left truncate">Đa NAS Push/Pull</span>
           <span class="chip chip-blue text-[10px] py-0.2">Mesh</span>
         </button>
 
-        <!-- 6. TELEGRAM BOT MESH -->
+        <!-- 5. TELEGRAM BOT MESH -->
         <button onclick="setTab('botmesh')" id="nav-botmesh" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
           <svg class="w-4 h-4 text-[#81c995] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
           <span class="flex-1 text-left truncate">Telegram Mesh</span>
           <span class="chip chip-green text-[10px] py-0.2">4 Bots</span>
         </button>
 
-        <!-- 7. TRICKLE QOS -->
+        <!-- 6. TRICKLE QOS -->
         <button onclick="setTab('trickle')" id="nav-trickle" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
           <svg class="w-4 h-4 text-[#fdd663] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           <span class="flex-1 text-left truncate">Điều Tốc QoS</span>
           <span class="chip chip-yellow text-[10px] py-0.2">24H</span>
         </button>
 
-        <!-- 8. AUDIT LOGS -->
+        <!-- 7. AUDIT LOGS -->
         <button onclick="setTab('logs')" id="nav-logs" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
           <svg class="w-4 h-4 text-[#bdc1c6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           <span class="flex-1 text-left truncate">Nhật Ký (Logs)</span>
         </button>
       </div>
 
-      <!-- COMPACT SYSTEM STATUS WIDGET -->
+      <!-- COMPACT SYSTEM STATUS WIDGET (STRICTLY NO WRAP) -->
       <div class="px-3.5 py-3 mx-3 bg-[#181a1d] border border-[#3c4043] rounded-xl space-y-2 text-[11px] shrink-0">
         <div class="flex justify-between items-center whitespace-nowrap">
           <span class="text-[#9aa0a6] flex items-center gap-1.5">
@@ -301,251 +294,205 @@
     <main class="flex-1 p-6 overflow-y-auto custom-scroll space-y-6">
 
       <!-- ============================================================== -->
-      <!-- TAB: TELEGRAM DRIVE & VERSION HISTORY (TÍNH NĂNG ĐƯỢC YÊU CẦU)   -->
+      <!-- TAB: FILE STATION SAO LƯU (SYNOLOGY STYLE VISUAL FILE MANAGER)  -->
       <!-- ============================================================== -->
-      <section id="content-drive" class="space-y-6">
+      <section id="content-filestation" class="space-y-4">
         
-        <!-- HEADER & RETENTION OVERVIEW -->
-        <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#3c4043]">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="chip chip-blue">Telegram Cloud Drive</span>
-                <h3 class="text-base font-semibold text-white">Quản Lý Thư Mục &amp; Lịch Sử Phiên Bản Tệp (CoW Retention)</h3>
-              </div>
-              <p class="text-xs text-[#9aa0a6] mt-1">
-                Xem chi tiết từng tệp tin đã sao lưu. Mỗi tệp được theo dõi số lượng phiên bản đã lưu theo cài đặt thời gian (Hàng giờ, Hàng ngày, Hàng tuần). Chỉ tạo phiên bản mới khi tệp có thay đổi nội dung.
-              </p>
-            </div>
-
-            <!-- ACTION TOOLBAR -->
-            <div class="flex items-center gap-2 shrink-0">
-              <button onclick="openVersionPolicyModal()" class="btn btn-secondary btn-sm">
-                <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span>Cài Đặt Phiên Bản</span>
-              </button>
-              <button onclick="refreshDriveView()" class="btn btn-secondary btn-sm">
-                <svg class="w-3.5 h-3.5 text-[#bdc1c6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span>Làm Mới</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- 4 PILLARS OF RETENTION SETTING -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+        <!-- TOP TOOLBAR & DIRECTORY BREADCRUMBS -->
+        <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             
-            <div class="p-3 bg-[#181a1d] border border-[#3c4043] rounded-xl">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-white">Quy Tắc CoW (Copy-On-Write)</span>
-                <span class="chip chip-green text-[10px] py-0.2">Kích Hoạt</span>
-              </div>
-              <p class="text-[11px] text-[#9aa0a6] mt-1.5 leading-relaxed">
-                Chỉ tạo phiên bản khi tệp có thay đổi nội dung (Hash SHA-256 khác). File không đổi = 0 Byte tốn thêm trên Telegram.
-              </p>
+            <!-- BREADCRUMBS -->
+            <div class="flex items-center gap-2 overflow-x-auto custom-scroll text-xs">
+              <span class="text-[#9aa0a6] flex items-center gap-1.5 font-semibold text-white">
+                <svg class="w-4 h-4 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+                <span>Synology DSM</span>
+              </span>
+              <span class="text-[#5f6368]">/</span>
+              <button onclick="navigateFs('/volume1')" class="hover:text-white font-mono text-[#bdc1c6]">volume1</button>
+              <span class="text-[#5f6368]">/</span>
+              <span id="fsBreadcrumbActive" class="chip chip-blue font-mono font-bold text-xs py-0.5">Photos</span>
             </div>
 
-            <div class="p-3 bg-[#181a1d] border border-[#3c4043] rounded-xl">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-white">Theo Giờ (Hourly)</span>
-                <span class="chip chip-blue text-[10px] py-0.2">24 Bản / 24h</span>
-              </div>
-              <p class="text-[11px] text-[#9aa0a6] mt-1.5 leading-relaxed">
-                Khi có chỉnh sửa trong ngày, hệ thống lưu tối đa 1 bản mỗi giờ và giữ lại toàn bộ trong 24 giờ gần nhất.
-              </p>
-            </div>
+            <!-- ACTION BUTTONS -->
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="openFolderPolicyModal()" class="btn btn-secondary btn-sm">
+                <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>Cài Đặt Phiên Bản Thư Mục</span>
+              </button>
 
-            <div class="p-3 bg-[#181a1d] border border-[#3c4043] rounded-xl">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-white">Theo Ngày (Daily)</span>
-                <span class="chip chip-yellow text-[10px] py-0.2">30 Ngày</span>
-              </div>
-              <p class="text-[11px] text-[#9aa0a6] mt-1.5 leading-relaxed">
-                Tự động chốt 1 bản snapshot vào lúc 02:00 AM mỗi ngày nếu tệp có biến động, lưu trữ liên tục 30 ngày.
-              </p>
-            </div>
+              <button onclick="triggerFolderBackup()" class="btn btn-primary btn-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <span>Sao Lưu Thư Mục Này</span>
+              </button>
 
-            <div class="p-3 bg-[#181a1d] border border-[#3c4043] rounded-xl">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-white">Theo Tuần &amp; Tháng</span>
-                <span class="chip chip-gray text-[10px] py-0.2">12 Tuần &amp; 1 Năm</span>
-              </div>
-              <p class="text-[11px] text-[#9aa0a6] mt-1.5 leading-relaxed">
-                Lưu 1 bản mỗi Chủ Nhật (giữ 12 tuần) và 1 bản vào ngày đầu tháng (giữ lưu trữ vĩnh viễn 12 tháng).
-              </p>
+              <button onclick="restoreCurrentFolder()" class="btn btn-secondary btn-sm">
+                <svg class="w-3.5 h-3.5 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span>Khôi Phục Về NAS</span>
+              </button>
             </div>
 
           </div>
         </div>
 
-        <!-- DRIVE EXPLORER CONTAINER: BREADCRUMBS + SEARCH + FILE TABLE -->
-        <div class="bg-[#24262a] border border-[#3c4043] rounded-xl overflow-hidden">
+        <!-- DUAL-PANE FILE STATION: LEFT TREE + RIGHT CONTENT EXPLORER -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
           
-          <!-- DRIVE TOOLBAR -->
-          <div class="p-4 border-b border-[#3c4043] flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#212327]">
-            <!-- BREADCRUMBS -->
-            <div class="flex items-center gap-1.5 text-xs text-[#9aa0a6] overflow-x-auto w-full sm:w-auto">
-              <button onclick="navigateDrive('/')" class="hover:text-white flex items-center gap-1">
-                <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                <span class="font-mono">Vault-Root</span>
-              </button>
-              <span>/</span>
-              <button onclick="navigateDrive('/volume1')" class="hover:text-white font-mono">volume1</button>
-              <span>/</span>
-              <button onclick="navigateDrive('/volume1/Photos')" class="hover:text-white font-mono font-semibold text-white">Photos</button>
-              <span>/</span>
-              <span class="text-[#8ab4f8] font-mono font-semibold">2026_Family_Holiday</span>
+          <!-- LEFT PANE: SYNOLOGY DSM FOLDER TREE (4 COLS) -->
+          <div class="lg:col-span-4 bg-[#24262a] border border-[#3c4043] rounded-xl p-3.5 space-y-2">
+            <div class="flex items-center justify-between pb-2 border-b border-[#3c4043] text-xs">
+              <span class="font-semibold text-white flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                <span>Cây Thư Mục Synology NAS</span>
+              </span>
+              <span class="text-[10px] text-[#9aa0a6] font-mono">2 Volumes</span>
             </div>
 
-            <!-- SEARCH FILTER IN DRIVE -->
-            <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
-              <div class="relative w-full sm:w-64">
-                <input type="text" id="driveSearchInput" onkeyup="filterDriveFiles()" placeholder="Tìm file hoặc phần mở rộng..." class="w-full bg-[#181a1d] border border-[#3c4043] rounded-lg px-3 py-1.5 pl-8 text-xs text-white focus:outline-none focus:border-[#8ab4f8] font-mono">
+            <div class="space-y-1 text-xs select-none" id="fsFolderTree">
+              
+              <!-- VOLUME 1 -->
+              <div>
+                <div onclick="navigateFs('/volume1')" class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer group">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                    <span class="font-mono font-bold text-white">/volume1</span>
+                  </div>
+                  <span class="chip chip-gray text-[10px] py-0.2">3.6 TB Btrfs</span>
+                </div>
+
+                <!-- SHARED FOLDERS INSIDE VOLUME 1 -->
+                <div class="pl-4 space-y-1 mt-1 border-l border-[#3c4043] ml-3.5">
+                  
+                  <!-- PHOTOS (ACTIVE) -->
+                  <div onclick="navigateFs('/volume1/Photos')" id="treeItem-photos" class="flex items-center justify-between p-2 rounded-lg bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 cursor-pointer font-medium">
+                    <div class="flex items-center gap-2 truncate">
+                      <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                      <span class="font-mono">Photos</span>
+                    </div>
+                    <span class="chip chip-green text-[10px] py-0.2">Đang Sao Lưu</span>
+                  </div>
+
+                  <!-- DOCUMENTS -->
+                  <div onclick="navigateFs('/volume1/Documents')" id="treeItem-documents" class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer text-[#bdc1c6]">
+                    <div class="flex items-center gap-2 truncate">
+                      <svg class="w-4 h-4 text-[#9aa0a6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                      <span class="font-mono">Documents</span>
+                    </div>
+                    <span class="chip chip-green text-[10px] py-0.2">Đang Sao Lưu</span>
+                  </div>
+
+                  <!-- HOMES -->
+                  <div onclick="navigateFs('/volume1/homes')" id="treeItem-homes" class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer text-[#bdc1c6]">
+                    <div class="flex items-center gap-2 truncate">
+                      <svg class="w-4 h-4 text-[#9aa0a6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                      <span class="font-mono">homes</span>
+                    </div>
+                    <span class="chip chip-green text-[10px] py-0.2">Đang Sao Lưu</span>
+                  </div>
+
+                  <!-- SURVEILLANCE -->
+                  <div onclick="navigateFs('/volume1/Surveillance')" id="treeItem-surveillance" class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer text-[#bdc1c6]">
+                    <div class="flex items-center gap-2 truncate">
+                      <svg class="w-4 h-4 text-[#9aa0a6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                      <span class="font-mono">Surveillance</span>
+                    </div>
+                    <span class="chip chip-gray text-[10px] py-0.2">Bỏ Qua</span>
+                  </div>
+
+                  <!-- DOCKER -->
+                  <div onclick="navigateFs('/volume1/docker')" id="treeItem-docker" class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer text-[#bdc1c6]">
+                    <div class="flex items-center gap-2 truncate">
+                      <svg class="w-4 h-4 text-[#9aa0a6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                      <span class="font-mono">docker</span>
+                    </div>
+                    <span class="chip chip-yellow text-[10px] py-0.2">Chờ Duyệt</span>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- VOLUME 2 -->
+              <div class="pt-1">
+                <div onclick="navigateFs('/volume2')" class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer group">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <svg class="w-4 h-4 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                    <span class="font-mono text-[#bdc1c6]">/volume2</span>
+                  </div>
+                  <span class="chip chip-gray text-[10px] py-0.2">8.0 TB HDD</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- EXCLUSION QUICK STATS -->
+            <div class="mt-4 pt-3 border-t border-[#3c4043] text-[11px] space-y-1.5 text-[#9aa0a6]">
+              <div class="flex justify-between items-center">
+                <span>Tự lọc thumbnails (@eaDir):</span>
+                <span class="text-[#81c995] font-mono font-medium">Bật</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Tự lọc thùng rác (#recycle):</span>
+                <span class="text-[#81c995] font-mono font-medium">Bật</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT PANE: FILE STATION CONTENT EXPLORER (8 COLS) -->
+          <div class="lg:col-span-8 bg-[#24262a] border border-[#3c4043] rounded-xl overflow-hidden flex flex-col">
+            
+            <!-- FOLDER HEADER INFO BANNER -->
+            <div class="p-4 border-b border-[#3c4043] bg-[#212327] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 id="fsActiveFolderTitle" class="text-sm font-bold text-white font-mono">/volume1/Photos</h4>
+                  <span id="fsActiveFolderStatusBadge" class="chip chip-green text-[10px]">Đang Sao Lưu Lên Telegram</span>
+                </div>
+                <p id="fsActiveFolderPolicyDesc" class="text-xs text-[#9aa0a6] mt-0.5">
+                  Chính sách: Hourly khi sửa (giữ 30 ngày) • Copy-On-Write SHA-256 kích hoạt
+                </p>
+              </div>
+
+              <!-- SEARCH IN FOLDER -->
+              <div class="relative w-full sm:w-56 shrink-0">
+                <input type="text" id="fsSearchInput" onkeyup="filterFsFiles()" placeholder="Lọc tệp trong thư mục..." class="w-full bg-[#181a1d] border border-[#3c4043] rounded-lg px-3 py-1.5 pl-8 text-xs text-white focus:outline-none focus:border-[#8ab4f8] font-mono">
                 <svg class="w-3.5 h-3.5 text-[#9aa0a6] absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
               </div>
-              <span class="chip chip-gray text-[11px]">8 Tệp Tin</span>
             </div>
+
+            <!-- FILE / SUBFOLDER TABLE -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-[#181a1d] text-[#9aa0a6] border-b border-[#3c4043] font-medium">
+                    <th class="p-3 pl-4">Tên Tệp / Thư Mục Con</th>
+                    <th class="p-3">Trạng Thái Telegram</th>
+                    <th class="p-3">Số Phiên Bản</th>
+                    <th class="p-3">Dung Lượng</th>
+                    <th class="p-3">Lần Sửa Cuối</th>
+                    <th class="p-3 pr-4 text-right">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody id="fsTableBody" class="divide-y divide-[#3c4043]">
+                  <!-- DYNAMICALLY POPULATED -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- FOLDER FOOTER SUMMARY -->
+            <div class="p-3.5 bg-[#181a1d] border-t border-[#3c4043] flex flex-col sm:flex-row items-center justify-between text-xs text-[#9aa0a6] gap-2">
+              <div id="fsFolderFooterSummary">
+                Tổng cộng: <strong class="text-white font-mono">4 Thư Mục Con • 4 Tệp Tin (540.2 GB)</strong>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[#81c995]"></span>
+                <span class="text-[#81c995] font-mono">Mã hoá AES-256 Zero-Knowledge • Sharded</span>
+              </div>
+            </div>
+
           </div>
 
-          <!-- DRIVE TABLE -->
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr class="bg-[#181a1d] text-[#9aa0a6] border-b border-[#3c4043] font-medium">
-                  <th class="p-3.5 pl-5">Tên Tệp / Thư Mục</th>
-                  <th class="p-3.5">Số Phiên Bản Đã Lưu</th>
-                  <th class="p-3.5">Chính Sách Áp Dụng</th>
-                  <th class="p-3.5">Dung Lượng</th>
-                  <th class="p-3.5">Lần Sửa Đổi Cuối</th>
-                  <th class="p-3.5 pr-5 text-right">Thao Tác</th>
-                </tr>
-              </thead>
-              <tbody id="driveTableBody" class="divide-y divide-[#3c4043]">
-                
-                <!-- FILE 1: RAW IMAGE WITH MULTIPLE EDITS -->
-                <tr class="hover:bg-[#282a2f] transition-colors group cursor-pointer" onclick="openVersionDrawer('DSC_4092_RawPhotos.cr3', 6, '45.8 MB', 'Hourly khi sửa', 'Ảnh RAW Lightroom')">
-                  <td class="p-3.5 pl-5 flex items-center gap-2.5 font-medium text-white">
-                    <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <span class="font-mono">DSC_4092_RawPhotos.cr3</span>
-                  </td>
-                  <td class="p-3.5">
-                    <span class="chip chip-blue font-bold">6 Phiên Bản (CoW)</span>
-                  </td>
-                  <td class="p-3.5 text-[#bdc1c6]">
-                    <span class="text-[11px] font-mono text-[#81c995]">Hourly khi sửa • Giữ 30 ngày</span>
-                  </td>
-                  <td class="p-3.5 font-mono text-white">45.8 MB</td>
-                  <td class="p-3.5 text-[#9aa0a6] text-[11px]">Hôm nay, 14:15 (Lightroom)</td>
-                  <td class="p-3.5 pr-5 text-right">
-                    <button onclick="event.stopPropagation(); openVersionDrawer('DSC_4092_RawPhotos.cr3', 6, '45.8 MB', 'Hourly khi sửa', 'Ảnh RAW Lightroom')" class="btn btn-secondary btn-sm">
-                      <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                      <span>Lịch Sử Bản</span>
-                    </button>
-                  </td>
-                </tr>
-
-                <!-- FILE 2: CATALOG DATABASE -->
-                <tr class="hover:bg-[#282a2f] transition-colors group cursor-pointer" onclick="openVersionDrawer('Lightroom_Catalog.lrcat', 14, '128.4 MB', 'Hourly khi sửa', 'Database Lightroom Catalog')">
-                  <td class="p-3.5 pl-5 flex items-center gap-2.5 font-medium text-white">
-                    <svg class="w-4 h-4 text-[#fdd663] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
-                    <span class="font-mono">Lightroom_Catalog.lrcat</span>
-                  </td>
-                  <td class="p-3.5">
-                    <span class="chip chip-blue font-bold">14 Phiên Bản (Hourly)</span>
-                  </td>
-                  <td class="p-3.5 text-[#bdc1c6]">
-                    <span class="text-[11px] font-mono text-[#81c995]">Hourly khi sửa • Giữ 14 ngày</span>
-                  </td>
-                  <td class="p-3.5 font-mono text-white">128.4 MB</td>
-                  <td class="p-3.5 text-[#9aa0a6] text-[11px]">Hôm nay, 15:00 (Auto-Sync)</td>
-                  <td class="p-3.5 pr-5 text-right">
-                    <button onclick="event.stopPropagation(); openVersionDrawer('Lightroom_Catalog.lrcat', 14, '128.4 MB', 'Hourly khi sửa', 'Database Lightroom Catalog')" class="btn btn-secondary btn-sm">
-                      <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                      <span>Lịch Sử Bản</span>
-                    </button>
-                  </td>
-                </tr>
-
-                <!-- FILE 3: 4K VIDEO -->
-                <tr class="hover:bg-[#282a2f] transition-colors group cursor-pointer" onclick="openVersionDrawer('Family_4K_Reel_Master.mp4', 2, '1.84 GB', 'Daily khi sửa', 'Video 4K Master')">
-                  <td class="p-3.5 pl-5 flex items-center gap-2.5 font-medium text-white">
-                    <svg class="w-4 h-4 text-[#f28b82] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    <span class="font-mono">Family_4K_Reel_Master.mp4</span>
-                  </td>
-                  <td class="p-3.5">
-                    <span class="chip chip-yellow font-bold">2 Phiên Bản (Daily)</span>
-                  </td>
-                  <td class="p-3.5 text-[#bdc1c6]">
-                    <span class="text-[11px] font-mono text-[#81c995]">Daily khi sửa • Giữ 60 ngày</span>
-                  </td>
-                  <td class="p-3.5 font-mono text-white">1.84 GB</td>
-                  <td class="p-3.5 text-[#9aa0a6] text-[11px]">Hôm qua, 18:30 (Export v2)</td>
-                  <td class="p-3.5 pr-5 text-right">
-                    <button onclick="event.stopPropagation(); openVersionDrawer('Family_4K_Reel_Master.mp4', 2, '1.84 GB', 'Daily khi sửa', 'Video 4K Master')" class="btn btn-secondary btn-sm">
-                      <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                      <span>Lịch Sử Bản</span>
-                    </button>
-                  </td>
-                </tr>
-
-                <!-- FILE 4: SCRIPT / METADATA -->
-                <tr class="hover:bg-[#282a2f] transition-colors group cursor-pointer" onclick="openVersionDrawer('ColorGrade_LUTs_Setting.xmp', 5, '34.2 KB', 'Hourly khi sửa', 'Adobe XMP Preset')">
-                  <td class="p-3.5 pl-5 flex items-center gap-2.5 font-medium text-white">
-                    <svg class="w-4 h-4 text-[#81c995] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span class="font-mono">ColorGrade_LUTs_Setting.xmp</span>
-                  </td>
-                  <td class="p-3.5">
-                    <span class="chip chip-blue font-bold">5 Phiên Bản (Hourly)</span>
-                  </td>
-                  <td class="p-3.5 text-[#bdc1c6]">
-                    <span class="text-[11px] font-mono text-[#81c995]">Hourly khi sửa • Giữ 30 ngày</span>
-                  </td>
-                  <td class="p-3.5 font-mono text-white">34.2 KB</td>
-                  <td class="p-3.5 text-[#9aa0a6] text-[11px]">Hôm nay, 13:40</td>
-                  <td class="p-3.5 pr-5 text-right">
-                    <button onclick="event.stopPropagation(); openVersionDrawer('ColorGrade_LUTs_Setting.xmp', 5, '34.2 KB', 'Hourly khi sửa', 'Adobe XMP Preset')" class="btn btn-secondary btn-sm">
-                      <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                      <span>Lịch Sử Bản</span>
-                    </button>
-                  </td>
-                </tr>
-
-                <!-- FILE 5: ARCHIVE -->
-                <tr class="hover:bg-[#282a2f] transition-colors group cursor-pointer" onclick="openVersionDrawer('Original_SDCard_Dump.tar.zst', 1, '28.4 GB', 'Gốc (Không sửa)', 'Archive gốc')">
-                  <td class="p-3.5 pl-5 flex items-center gap-2.5 font-medium text-white">
-                    <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                    <span class="font-mono">Original_SDCard_Dump.tar.zst</span>
-                  </td>
-                  <td class="p-3.5">
-                    <span class="chip chip-gray font-bold">1 Bản Gốc (Archive)</span>
-                  </td>
-                  <td class="p-3.5 text-[#bdc1c6]">
-                    <span class="text-[11px] font-mono text-[#9aa0a6]">Bảo lưu vĩnh viễn (WORM)</span>
-                  </td>
-                  <td class="p-3.5 font-mono text-white">28.4 GB</td>
-                  <td class="p-3.5 text-[#9aa0a6] text-[11px]">15/10/2026 09:12 (SD Import)</td>
-                  <td class="p-3.5 pr-5 text-right">
-                    <button onclick="event.stopPropagation(); openVersionDrawer('Original_SDCard_Dump.tar.zst', 1, '28.4 GB', 'Gốc (Không sửa)', 'Archive gốc')" class="btn btn-secondary btn-sm">
-                      <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                      <span>Lịch Sử Bản</span>
-                    </button>
-                  </td>
-                </tr>
-
-              </tbody>
-            </table>
-          </div>
-
-          <!-- FOOTER SUMMARY OF DRIVE -->
-          <div class="p-3.5 bg-[#181a1d] border-t border-[#3c4043] flex flex-col sm:flex-row items-center justify-between text-xs text-[#9aa0a6] gap-2">
-            <div>
-              <span>Đang hiển thị thư mục: </span>
-              <strong class="text-white font-mono">/volume1/Photos/2026_Family_Holiday/</strong>
-              <span class="ml-2 font-mono text-[#81c995]">(Tổng: 30.4 GB trên Telegram, Sharded qua 3 Channels)</span>
-            </div>
-            <div class="text-[11px] text-[#bdc1c6]">
-              Tất cả các tệp đều được mã hoá AES-256 Zero-Knowledge trước khi đẩy lên Telegram.
-            </div>
-          </div>
         </div>
 
       </section>
@@ -585,10 +532,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5 flex items-center justify-between">
             <div>
-              <h4 class="text-sm font-semibold text-white">Khám Phá Telegram Drive &amp; Phiên Bản</h4>
-              <p class="text-xs text-[#9aa0a6] mt-1">Duyệt cây file, xem số phiên bản của từng tài liệu theo giờ/ngày/tuần.</p>
+              <h4 class="text-sm font-semibold text-white">Mở File Station Sao Lưu</h4>
+              <p class="text-xs text-[#9aa0a6] mt-1">Duyệt trực quan cây thư mục NAS, quản lý trạng thái và phiên bản.</p>
             </div>
-            <button onclick="setTab('drive')" class="btn btn-primary btn-sm">Mở Drive</button>
+            <button onclick="setTab('filestation')" class="btn btn-primary btn-sm">Mở File Station</button>
           </div>
 
           <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5 flex items-center justify-between">
@@ -602,25 +549,28 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB: TIME MACHINE 3D SNAPSHOT EXPLORER                         -->
+            <!-- ============================================================== -->
+      <!-- TAB: TIME MACHINE 3D SNAPSHOT & DEEP SUBFOLDER/FILE EXPLORER    -->
       <!-- ============================================================== -->
       <section id="content-timemachine" class="hidden space-y-6">
+        
+        <!-- HEADER -->
         <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#3c4043]">
             <div>
               <div class="flex items-center gap-2">
                 <span class="chip chip-yellow">Time Machine Engine</span>
-                <h3 class="text-base font-semibold text-white">Cỗ Máy Khôi Phục Đa Mốc Thời Gian (Point-In-Time)</h3>
+                <h3 class="text-base font-semibold text-white">Khôi Phục Đa Mốc Thời Gian Tới Từng Thư Mục Con &amp; Tệp Tin</h3>
               </div>
               <p class="text-xs text-[#9aa0a6] mt-1">
-                Lựa chọn bất kỳ thời điểm nào trong quá khứ để xem và khôi phục nguyên trạng thư mục hoặc từng tệp tin riêng lẻ.
+                Tua lại mốc thời gian quá khứ, duyệt sâu vào từng thư mục con và tệp tin để khôi phục chính xác dữ liệu bạn cần mà không ghi đè toàn bộ NAS.
               </p>
             </div>
 
             <div class="flex items-center gap-2 shrink-0">
-              <button onclick="restoreFolderSnapshot()" class="btn btn-primary btn-sm">
+              <button onclick="restoreCurrentTmPath()" class="btn btn-primary btn-sm">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                <span>Khôi Phục Mốc Này Về NAS</span>
+                <span>Khôi Phục Toàn Bộ Thư Mục Đang Xem</span>
               </button>
             </div>
           </div>
@@ -628,7 +578,7 @@
           <!-- 3D CAROUSEL OF SNAPSHOTS -->
           <div class="mt-6">
             <div class="text-xs font-semibold text-white mb-2 flex items-center justify-between">
-              <span>Trục Thời Gian Snapshots (5 Điểm Khôi Phục Gần Nhất)</span>
+              <span>Trục Thời Gian Snapshots (Chọn Mốc Thời Gian Khôi Phục)</span>
               <span class="text-[#8ab4f8] font-mono text-[11px]" id="activeSnapshotLabel">Snapshot #141 — 05/11/2026 (02:00:00 AM) — Hôm Qua (Active)</span>
             </div>
 
@@ -655,7 +605,7 @@
               </div>
 
               <div onclick="selectSnapshot(4)" id="snap-card-4" class="timemachine-card active cursor-pointer bg-[#24262a] border border-[#8ab4f8] rounded-xl p-4 w-52 shrink-0 text-center shadow-lg">
-                <span class="chip chip-green text-[10px] mb-2">#141 • Đang Chọn</span>
+                <span class="chip chip-green text-[10px] mb-2">#141 • Đang Xem</span>
                 <div class="text-xs font-bold text-white">05/11/2026</div>
                 <div class="text-[11px] text-[#9aa0a6] font-mono mt-1">02:00 AM (Hôm qua)</div>
                 <div class="mt-2 text-[10px] text-[#81c995]">42,109 Files (842 GB)</div>
@@ -671,160 +621,124 @@
           </div>
 
           <!-- NOTIFICATION BANNER -->
-          <div id="tmAlertBanner" class="hidden mt-4 p-3 bg-[#13271f] border border-[#1e4634] rounded-xl text-xs text-[#81c995] flex items-center gap-2">
-            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            <span id="tmAlertMsg">Đang xử lý khôi phục...</span>
+          <div id="tmAlertBanner" class="hidden mt-3 p-3 bg-[#13271f] border border-[#1e4634] rounded-xl text-xs text-[#81c995] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span id="tmAlertMsg">Đang xử lý khôi phục...</span>
+            </div>
+            <button onclick="document.getElementById('tmAlertBanner').classList.add('hidden')" class="text-[#81c995] hover:text-white font-bold">&times;</button>
           </div>
         </div>
-      </section>
 
-      <!-- ============================================================== -->
-      <!-- TAB: BỘ CHỌN THƯ MỤC SYNOLOGY (TREE SELECTOR)                  -->
-      <!-- ============================================================== -->
-      <section id="content-tree-selector" class="hidden space-y-6">
-        <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#3c4043]">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="chip chip-blue">Btrfs Tree Explorer</span>
-                <h3 class="text-base font-semibold text-white">Bộ Chọn Thư Mục &amp; Bộ Lọc Rác Synology</h3>
-              </div>
-              <p class="text-xs text-[#9aa0a6] mt-1">
-                Tích hợp trực tiếp cây thư mục Btrfs của Synology DSM. Cho phép chọn từng Share, từng Folder con, kết hợp bộ lọc rác tự động.
-              </p>
+        <!-- POINT-IN-TIME DEEP FILE & SUBFOLDER EXPLORER (CORE USER REQUEST) -->
+        <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-4 space-y-4">
+          
+          <!-- BREADCRUMBS & SNAPSHOT CONTEXT -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#3c4043]">
+            <div class="flex items-center gap-2 overflow-x-auto text-xs">
+              <span class="chip chip-yellow font-bold" id="tmSnapshotChip">Snapshot #141 (05/11)</span>
+              <span class="text-[#5f6368]">/</span>
+              <span class="font-mono text-[#9aa0a6]">volume1</span>
+              <span class="text-[#5f6368]">/</span>
+              <button onclick="navigateTm('/volume1/Photos')" class="font-mono text-[#8ab4f8] hover:underline font-semibold">Photos</button>
+              <span id="tmBreadcrumbSub" class="text-white font-mono font-semibold">/ 2026_Family_Holiday</span>
             </div>
 
-            <!-- LIVE SELECTION SUMMARY CHIPS -->
-            <div class="flex flex-wrap items-center gap-2 bg-[#181a1d] px-3.5 py-2 rounded-xl border border-[#3c4043]">
-              <div class="text-xs">
-                <span class="text-[#9aa0a6]">Đã chọn:</span>
-                <strong class="text-white font-mono ml-1" id="selectedShareCount">3 Shares (42,109 tệp)</strong>
-              </div>
-              <span class="text-[#5f6368]">|</span>
-              <div class="text-xs">
-                <span class="text-[#9aa0a6]">Dung lượng gốc:</span>
-                <strong class="text-[#8ab4f8] font-mono ml-1">842.5 GB</strong>
-              </div>
-              <span class="text-[#5f6368]">|</span>
-              <div class="text-xs">
-                <span class="text-[#9aa0a6]">Dự kiến nén:</span>
-                <strong class="text-[#81c995] font-mono ml-1">~402.1 GB</strong>
-              </div>
+            <!-- SEARCH IN SNAPSHOT -->
+            <div class="relative w-full sm:w-56 shrink-0">
+              <input type="text" id="tmSearchInput" onkeyup="filterTmFiles()" placeholder="Tìm tệp trong snapshot..." class="w-full bg-[#181a1d] border border-[#3c4043] rounded-lg px-3 py-1.5 pl-8 text-xs text-white focus:outline-none focus:border-[#8ab4f8] font-mono">
+              <svg class="w-3.5 h-3.5 text-[#9aa0a6] absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
           </div>
 
-          <!-- DUAL PANE: TREE BROWSER & SMART EXCLUSION FILTERS -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+          <!-- DUAL PANE: SNAPSHOT TREE ON LEFT, FILES & SUBFOLDERS ON RIGHT -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             
-            <!-- LEFT PANE: SYNOLOGY TREE VIEW (7 COLS) -->
-            <div class="lg:col-span-7 bg-[#1a1c1e] border border-[#3c4043] rounded-xl p-4 space-y-2">
-              <div class="flex items-center justify-between pb-2 border-b border-[#3c4043] text-xs">
-                <span class="font-medium text-white flex items-center gap-1.5">
-                  <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                  <span>Cây Thư Mục Synology DSM</span>
-                </span>
-                <div class="flex gap-2 text-[11px]">
-                  <button onclick="toggleAllShares(true)" class="text-[#8ab4f8] hover:underline">Chọn tất cả</button>
-                  <span class="text-[#5f6368]">|</span>
-                  <button onclick="toggleAllShares(false)" class="text-[#9aa0a6] hover:underline">Bỏ chọn</button>
+            <!-- LEFT: SUBFOLDER TREE OF THIS SNAPSHOT (4 COLS) -->
+            <div class="lg:col-span-4 bg-[#1a1c1e] border border-[#3c4043] rounded-xl p-3.5 space-y-1.5 text-xs select-none">
+              <div class="text-[10px] font-bold uppercase tracking-wider text-[#9aa0a6] px-2 mb-2 flex items-center justify-between">
+                <span>Cây Thư Mục Tại Mốc Này</span>
+                <span class="chip chip-gray text-[10px] py-0.2">Snapshot View</span>
+              </div>
+
+              <!-- TREE ITEMS -->
+              <div onclick="navigateTm('/volume1/Photos')" id="tmTree-photos" class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer text-[#bdc1c6]">
+                <div class="flex items-center gap-2 truncate">
+                  <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                  <span class="font-mono font-medium">/volume1/Photos</span>
+                </div>
+                <span class="text-[10px] text-[#9aa0a6]">4 thư mục</span>
+              </div>
+
+              <div class="pl-4 space-y-1 border-l border-[#3c4043] ml-3.5">
+                <div onclick="navigateTm('/volume1/Photos/2026_Family_Holiday')" id="tmTree-holiday" class="flex items-center justify-between p-1.5 rounded-lg bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 cursor-pointer font-medium">
+                  <div class="flex items-center gap-2 truncate">
+                    <svg class="w-3.5 h-3.5 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <span class="font-mono text-[11px]">2026_Family_Holiday</span>
+                  </div>
+                  <span class="chip chip-blue text-[10px] py-0.2">Đang Xem</span>
+                </div>
+
+                <div onclick="navigateTm('/volume1/Photos/Drone_Footage_RAW')" id="tmTree-drone" class="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#282a2f] cursor-pointer text-[#bdc1c6]">
+                  <div class="flex items-center gap-2 truncate">
+                    <svg class="w-3.5 h-3.5 text-[#9aa0a6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <span class="font-mono text-[11px]">Drone_Footage_RAW</span>
+                  </div>
+                  <span class="text-[10px] text-[#9aa0a6]">12 files</span>
+                </div>
+
+                <div onclick="navigateTm('/volume1/Photos/Lightroom_Catalog')" id="tmTree-lr" class="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#282a2f] cursor-pointer text-[#bdc1c6]">
+                  <div class="flex items-center gap-2 truncate">
+                    <svg class="w-3.5 h-3.5 text-[#9aa0a6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <span class="font-mono text-[11px]">Lightroom_Catalog</span>
+                  </div>
+                  <span class="text-[10px] text-[#9aa0a6]">v4 Catalog</span>
                 </div>
               </div>
 
-              <!-- TREE NODES -->
-              <div class="space-y-1 font-mono text-xs pt-1 select-none">
-                <div class="tree-node">
-                  <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer group">
-                    <div class="flex items-center gap-2">
-                      <svg class="w-3.5 h-3.5 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                      <input type="checkbox" checked class="accent-[#1a73e8] rounded">
-                      <span class="text-sm font-bold text-white">/volume1</span>
-                      <span class="chip chip-gray text-[10px] py-0.2">Btrfs Volume</span>
-                    </div>
-                    <span class="text-[11px] text-[#9aa0a6]">1.8 TB / 3.6 TB</span>
-                  </div>
-
-                  <!-- CHILDREN OF VOLUME 1 -->
-                  <div class="pl-6 space-y-1 mt-1 border-l border-[#3c4043] ml-3">
-                    <div class="flex items-center justify-between p-1.5 rounded hover:bg-[#282a2f]">
-                      <div class="flex items-center gap-2">
-                        <input type="checkbox" id="check-photos" checked onchange="updateTreeCalc()" class="accent-[#1a73e8] rounded">
-                        <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-                        <span class="text-white font-medium">/volume1/Photos</span>
-                      </div>
-                      <span class="text-[11px] text-[#81c995]">540.2 GB (Selected)</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-1.5 rounded hover:bg-[#282a2f]">
-                      <div class="flex items-center gap-2">
-                        <input type="checkbox" id="check-docs" checked onchange="updateTreeCalc()" class="accent-[#1a73e8] rounded">
-                        <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-                        <span class="text-white font-medium">/volume1/Documents</span>
-                      </div>
-                      <span class="text-[11px] text-[#81c995]">210.8 GB (Selected)</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-1.5 rounded hover:bg-[#282a2f]">
-                      <div class="flex items-center gap-2">
-                        <input type="checkbox" id="check-homes" checked onchange="updateTreeCalc()" class="accent-[#1a73e8] rounded">
-                        <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-                        <span class="text-white font-medium">/volume1/homes</span>
-                      </div>
-                      <span class="text-[11px] text-[#81c995]">91.5 GB (Selected)</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-1.5 rounded hover:bg-[#282a2f]">
-                      <div class="flex items-center gap-2">
-                        <input type="checkbox" id="check-docker" onchange="updateTreeCalc()" class="accent-[#1a73e8] rounded">
-                        <svg class="w-4 h-4 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-                        <span class="text-[#9aa0a6]">/volume1/docker</span>
-                      </div>
-                      <span class="text-[11px] text-[#9aa0a6]">45.2 GB (Ignored)</span>
-                    </div>
-                  </div>
+              <div onclick="navigateTm('/volume1/Documents')" id="tmTree-docs" class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer text-[#bdc1c6] mt-2">
+                <div class="flex items-center gap-2 truncate">
+                  <svg class="w-4 h-4 text-[#9aa0a6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                  <span class="font-mono font-medium">/volume1/Documents</span>
                 </div>
+                <span class="text-[10px] text-[#9aa0a6]">2 thư mục</span>
               </div>
             </div>
 
-            <!-- RIGHT PANE: EXCLUSION PRESETS (5 COLS) -->
-            <div class="lg:col-span-5 bg-[#1a1c1e] border border-[#3c4043] rounded-xl p-4 space-y-4">
-              <div class="pb-2 border-b border-[#3c4043]">
-                <h4 class="text-xs font-semibold text-white">Bộ Lọc Loại Trừ Tự Động (Synology Filters)</h4>
-                <p class="text-[11px] text-[#9aa0a6] mt-0.5">Bảo vệ băng thông bằng cách loại bỏ các thư mục rác và thumbnails của DSM.</p>
+            <!-- RIGHT: FILES & SUBFOLDERS AT THIS SNAPSHOT MOMENT (8 COLS) -->
+            <div class="lg:col-span-8 bg-[#1a1c1e] border border-[#3c4043] rounded-xl overflow-hidden flex flex-col">
+              <div class="p-3 bg-[#181a1d] border-b border-[#3c4043] flex items-center justify-between text-xs">
+                <span class="font-semibold text-white">Danh Sách Tệp &amp; Thư Mục Con Tại Mốc Này</span>
+                <span class="text-[11px] text-[#9aa0a6]" id="tmItemsCountText">Hiển thị 6 mục</span>
               </div>
 
-              <div class="space-y-2 text-xs">
-                <label class="flex items-center justify-between p-2 rounded bg-[#24262a] border border-[#3c4043] cursor-pointer">
-                  <span class="flex items-center gap-2 text-white">
-                    <input type="checkbox" checked class="accent-[#1a73e8] rounded">
-                    <span>Loại bỏ thư mục Thumbnail (@eaDir/**)</span>
-                  </span>
-                  <span class="chip chip-green text-[10px]">Tiết kiệm 18 GB</span>
-                </label>
-
-                <label class="flex items-center justify-between p-2 rounded bg-[#24262a] border border-[#3c4043] cursor-pointer">
-                  <span class="flex items-center gap-2 text-white">
-                    <input type="checkbox" checked class="accent-[#1a73e8] rounded">
-                    <span>Bỏ qua Thùng rác Synology (#recycle/**)</span>
-                  </span>
-                  <span class="chip chip-green text-[10px]">Tiết kiệm 45 GB</span>
-                </label>
-
-                <label class="flex items-center justify-between p-2 rounded bg-[#24262a] border border-[#3c4043] cursor-pointer">
-                  <span class="flex items-center gap-2 text-white">
-                    <input type="checkbox" checked class="accent-[#1a73e8] rounded">
-                    <span>Bỏ qua tệp tạm hệ điều hành (@tmp, .DS_Store)</span>
-                  </span>
-                  <span class="chip chip-green text-[10px]">Tiết kiệm 2 GB</span>
-                </label>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="bg-[#141517] text-[#9aa0a6] border-b border-[#3c4043]">
+                      <th class="p-3 pl-4">Tên Mục</th>
+                      <th class="p-3">Trạng Thái Snapshot</th>
+                      <th class="p-3">Dung Lượng</th>
+                      <th class="p-3">Thời Điểm Sửa</th>
+                      <th class="p-3 pr-4 text-right">Khôi Phục Riêng Lẻ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tmTableBody" class="divide-y divide-[#3c4043]">
+                    <!-- DYNAMICALLY POPULATED -->
+                  </tbody>
+                </table>
               </div>
 
-              <button onclick="saveFolderSelection()" class="btn btn-primary w-full mt-4">
-                <span>Lưu Cấu Hình Thư Mục</span>
-              </button>
+              <div class="p-3 bg-[#141517] border-t border-[#3c4043] text-[11px] text-[#9aa0a6] flex items-center justify-between">
+                <span>Bạn có thể khôi phục chỉ riêng 1 tệp hoặc 1 thư mục con mà không cần khôi phục cả ổ đĩa.</span>
+                <span class="chip chip-green text-[10px]">Zero Data Loss</span>
+              </div>
             </div>
 
           </div>
+
         </div>
+
       </section>
 
       <!-- ============================================================== -->
@@ -848,13 +762,13 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <!-- MODE 1: PUSH -->
-            <div onclick="updateNodeRole('PUSH')" class="p-4 bg-[#1a1c1e] border-2 border-[#1a73e8] rounded-xl cursor-pointer hover:border-[#8ab4f8] transition-all">
+            <div onclick="updateNodeRole('PUSH')" id="cardRolePush" class="p-4 bg-[#1a1c1e] border-2 border-[#1a73e8] rounded-xl cursor-pointer hover:border-[#8ab4f8] transition-all">
               <div class="flex items-center justify-between">
                 <span class="text-sm font-bold text-white flex items-center gap-2">
                   <svg class="w-4 h-4 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
                   <span>Chế Độ PUSH (Source Master)</span>
                 </span>
-                <span class="chip chip-green text-[10px]">Đang Dùng</span>
+                <span class="chip chip-green text-[10px]" id="rolePushBadge">Đang Dùng</span>
               </div>
               <p class="text-xs text-[#9aa0a6] mt-2 leading-relaxed">
                 Dành cho NAS chính (Văn phòng / Nhà riêng). Tự động quét vi sai các thư mục cục bộ, mã hoá AES-256 và đẩy lên Telegram Cloud.
@@ -862,13 +776,13 @@
             </div>
 
             <!-- MODE 2: PULL -->
-            <div onclick="updateNodeRole('PULL')" class="p-4 bg-[#1a1c1e] border border-[#3c4043] rounded-xl cursor-pointer hover:border-[#8ab4f8] transition-all opacity-80 hover:opacity-100">
+            <div onclick="updateNodeRole('PULL')" id="cardRolePull" class="p-4 bg-[#1a1c1e] border border-[#3c4043] rounded-xl cursor-pointer hover:border-[#8ab4f8] transition-all opacity-80 hover:opacity-100">
               <div class="flex items-center justify-between">
                 <span class="text-sm font-bold text-white flex items-center gap-2">
                   <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
                   <span>Chế Độ PULL (Replica Receiver)</span>
                 </span>
-                <span class="chip chip-gray text-[10px]">Dự Phòng</span>
+                <span class="chip chip-gray text-[10px]" id="rolePullBadge">Dự Phòng</span>
               </div>
               <p class="text-xs text-[#9aa0a6] mt-2 leading-relaxed">
                 Dành cho NAS phụ tại chi nhánh hoặc cơ quan. Chỉ lắng nghe và kéo các tệp mới từ Telegram về để nhân bản dữ liệu 1-1.
@@ -876,19 +790,36 @@
             </div>
           </div>
 
-          <!-- PULL STRATEGY & CONFIGURATION FORM -->
-          <div class="mt-6 bg-[#181a1d] p-4 rounded-xl border border-[#3c4043] space-y-4">
-            <h4 class="text-xs font-semibold text-white">Cấu Hình Đường Dẫn &amp; Chiến Lược Đồng Bộ</h4>
+          <!-- PULL STRATEGY & VISUAL FOLDER SELECTION FORM -->
+          <div class="mt-6 bg-[#181a1d] p-5 rounded-xl border border-[#3c4043] space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-[#3c4043]">
+              <h4 class="text-xs font-semibold text-white">Cấu Hình Thư Mục &amp; Chiến Lược Đồng Bộ</h4>
+              <span class="text-[11px] text-[#9aa0a6]">Chọn trực tiếp trên cây thư mục NAS — Không cần gõ tay</span>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="text-[11px] text-[#9aa0a6] block mb-1">Đường dẫn thư mục cục bộ (Local Volume Path):</label>
-                <input type="text" id="nodeLocalPathInput" value="/volume1/Photos" class="w-full bg-[#141517] border border-[#3c4043] rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+              <!-- VISUAL FOLDER SELECTOR INSTEAD OF TEXT INPUT -->
+              <div class="space-y-1.5">
+                <label class="text-[11px] text-[#9aa0a6] block font-medium">Thư mục Synology NAS được chỉ định:</label>
+                <div class="flex items-center gap-2">
+                  <div class="flex-1 flex items-center gap-2 bg-[#141517] border border-[#3c4043] rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+                    <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <span id="selectedNodePathDisplay" class="font-bold text-white truncate">/volume1/Photos</span>
+                    <input type="hidden" id="nodeLocalPathInput" value="/volume1/Photos">
+                  </div>
+                  <button onclick="setTab('filestation')" class="btn btn-primary btn-sm">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    <span>Xem Trên File Station</span>
+                  </button>
+                </div>
               </div>
-              <div>
-                <label class="text-[11px] text-[#9aa0a6] block mb-1">Chiến Lược PULL (Khi chạy ở Node phụ):</label>
-                <select id="nodePullStrategySelect" class="w-full bg-[#141517] border border-[#3c4043] rounded-lg px-3 py-1.5 text-xs text-white">
-                  <option value="SYNC">rclone sync (Bản sao hoàn hảo 1:1, xoá file nếu nguồn xoá)</option>
-                  <option value="COPY">rclone copy (An toàn tích luỹ, chỉ nhận thêm không xoá file cũ)</option>
+
+              <!-- STRATEGY SELECTOR -->
+              <div class="space-y-1.5">
+                <label class="text-[11px] text-[#9aa0a6] block font-medium">Chiến Lược PULL (Khi chạy ở Node phụ):</label>
+                <select id="nodePullStrategySelect" class="w-full bg-[#141517] border border-[#3c4043] rounded-lg px-3 py-1.5 text-xs text-white h-9">
+                  <option value="SYNC">Mirror Sync (Đồng bộ đối xứng 1:1, tự động dọn file nếu nguồn xoá)</option>
+                  <option value="COPY">Accumulative Copy (Chỉ kéo thêm tệp mới, giữ nguyên file cũ)</option>
                 </select>
               </div>
             </div>
@@ -1092,14 +1023,14 @@
   <!-- ============================================================== -->
   <!-- MODAL: CÀI ĐẶT QUY TẮC LƯU PHIÊN BẢN (VERSION POLICY MODAL)     -->
   <!-- ============================================================== -->
-  <div id="versionPolicyModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+  <div id="folderPolicyModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="w-full max-w-lg bg-[#212327] border border-[#3c4043] rounded-xl p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-[#3c4043]">
         <h3 class="text-sm font-semibold text-white flex items-center gap-2">
           <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          <span>Cấu Hình Quy Tắc Lưu Giữ Phiên Bản (Version Policy)</span>
+          <span>Cài Đặt Phiên Bản Cho Thư Mục: <span id="policyModalFolderTarget" class="text-[#8ab4f8] font-mono">/Photos</span></span>
         </h3>
-        <button onclick="closeVersionPolicyModal()" class="btn btn-ghost btn-sm p-1">
+        <button onclick="closeFolderPolicyModal()" class="btn btn-ghost btn-sm p-1">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
@@ -1116,10 +1047,10 @@
         <div>
           <label class="text-[#9aa0a6] block mb-1">Chu kỳ phát hiện phiên bản mới:</label>
           <select class="w-full bg-[#181a1d] border border-[#3c4043] rounded-lg px-3 py-2 text-xs text-white">
-            <option>Mỗi 1 giờ (Khuyên dùng - Cân bằng tốt)</option>
-            <option>Mỗi 15 phút (Dành cho dự án tài liệu cần theo sát)</option>
-            <option>Mỗi 6 giờ (Tiết kiệm tài nguyên)</option>
-            <option>Hằng ngày (Chỉ lưu 1 bản snapshot cuối ngày)</option>
+            <option>Mỗi 1 giờ khi có sửa đổi (Khuyên dùng)</option>
+            <option>Mỗi 15 phút (Dành cho tài liệu làm việc liên tục)</option>
+            <option>Mỗi ngày 1 lần (02:00 AM)</option>
+            <option>Chỉ lưu thủ công</option>
           </select>
         </div>
 
@@ -1147,8 +1078,8 @@
       </div>
 
       <div class="flex justify-end gap-2 pt-3 border-t border-[#3c4043]">
-        <button onclick="closeVersionPolicyModal()" class="btn btn-secondary btn-sm">Hủy</button>
-        <button onclick="saveVersionPolicy()" class="btn btn-primary btn-sm">Áp Dụng Quy Tắc</button>
+        <button onclick="closeFolderPolicyModal()" class="btn btn-secondary btn-sm">Hủy</button>
+        <button onclick="saveFolderPolicy()" class="btn btn-primary btn-sm">Áp Dụng Cho Thư Mục</button>
       </div>
     </div>
   </div>
@@ -1156,7 +1087,7 @@
   <!-- JAVASCRIPT LOGIC -->
   <script>
     function setTab(name) {
-      const tabs = ['overview', 'drive', 'timemachine', 'tree-selector', 'multinas', 'botmesh', 'trickle', 'logs'];
+      const tabs = ['filestation', 'overview', 'timemachine', 'multinas', 'botmesh', 'trickle', 'logs'];
       tabs.forEach(t => {
         const content = document.getElementById('content-' + t);
         const nav = document.getElementById('nav-' + t);
@@ -1173,16 +1104,344 @@
       }
     }
 
-    // Snapshot selection in Time Machine
-    const snapshotDates = [
-      "Snapshot #01 — 07/10/2026 (02:00:00 AM) — 30 Ngày Trước",
-      "Snapshot #68 — 22/10/2026 (02:00:00 AM) — 15 Ngày Trước",
-      "Snapshot #112 — 29/10/2026 (02:00:00 AM) — 7 Ngày Trước",
-      "Snapshot #141 — 05/11/2026 (02:00:00 AM) — Hôm Qua (Active)",
-      "Head State — 06/11/2026 (Live Now) — Hiện Tại"
-    ];
+    // =========================================================================
+    // SYNOLOGY FILE STATION BACKUP EXPLORER DATA & LOGIC
+    // =========================================================================
+    const fsData = {
+      "/volume1/Photos": {
+        title: "/volume1/Photos",
+        status: "Đang Sao Lưu Lên Telegram",
+        statusType: "chip-green",
+        policy: "Chính sách: Hourly khi sửa (giữ 30 ngày) • Copy-On-Write SHA-256 kích hoạt",
+        summary: "Tổng cộng: 4 Thư Mục Con • 4 Tệp Tin (540.2 GB)",
+        items: [
+          { type: "folder", name: "2026_Family_Holiday", size: "30.4 GB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "24 Bản tổng", policy: "Hourly khi sửa", modified: "Hôm nay, 14:15", path: "/volume1/Photos/2026_Family_Holiday" },
+          { type: "folder", name: "2025_Archive", size: "185.0 GB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "52 Bản tổng", policy: "Daily khi sửa", modified: "01/11/2026", path: "/volume1/Photos/2025_Archive" },
+          { type: "folder", name: "Lightroom_Catalog", size: "45.2 GB", status: "Đang Trickle", statusClass: "chip-yellow", versions: "14 Bản", policy: "Hourly khi sửa", modified: "Hôm nay, 15:00", path: "/volume1/Photos/Lightroom_Catalog" },
+          { type: "folder", name: "Mobile_Backup", size: "120.0 GB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "30 Bản", policy: "Daily khi sửa", modified: "Hôm qua, 22:10", path: "/volume1/Photos/Mobile_Backup" },
+          { type: "file", name: "DSC_4092_RawPhotos.cr3", size: "45.8 MB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "6 Bản (CoW)", policy: "Hourly khi sửa", modified: "Hôm nay, 14:15", desc: "Ảnh RAW Lightroom" },
+          { type: "file", name: "Family_4K_Reel_Master.mp4", size: "1.84 GB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "2 Bản (Daily)", policy: "Daily khi sửa", modified: "Hôm qua, 18:30", desc: "Video 4K Master" },
+          { type: "file", name: "ColorGrade_LUTs.xmp", size: "34.2 KB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "5 Bản (Hourly)", policy: "Hourly khi sửa", modified: "Hôm nay, 13:40", desc: "Adobe XMP Preset" },
+          { type: "file", name: "Original_SDCard_Dump.tar.zst", size: "28.4 GB", status: "Lưu Trữ Gốc", statusClass: "chip-gray", versions: "1 Bản Gốc", policy: "Bảo lưu vĩnh viễn", modified: "15/10/2026", desc: "Archive gốc" }
+        ]
+      },
+      "/volume1/Photos/2026_Family_Holiday": {
+        title: "/volume1/Photos/2026_Family_Holiday",
+        status: "Đang Sao Lưu Lên Telegram",
+        statusType: "chip-green",
+        policy: "Thừa kế chính sách từ /Photos: Hourly khi sửa (giữ 30 ngày)",
+        summary: "Tổng cộng: 0 Thư Mục Con • 5 Tệp Tin (30.4 GB)",
+        items: [
+          { type: "up", name: ".. (Quay lại /Photos)", path: "/volume1/Photos" },
+          { type: "file", name: "IMG_001_Beach_Sunset.cr3", size: "48.2 MB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "4 Bản (CoW)", policy: "Hourly khi sửa", modified: "Hôm nay, 12:00", desc: "Ảnh RAW" },
+          { type: "file", name: "IMG_002_Family_Dinner.cr3", size: "46.1 MB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "3 Bản (CoW)", policy: "Hourly khi sửa", modified: "Hôm qua, 20:15", desc: "Ảnh RAW" },
+          { type: "file", name: "4K_Drone_Flight.mp4", size: "2.10 GB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "1 Bản (Daily)", policy: "Daily khi sửa", modified: "04/11/2026", desc: "Video 4K" },
+          { type: "file", name: "Lightroom_Edits.xmp", size: "18.5 KB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "8 Bản (Hourly)", policy: "Hourly khi sửa", modified: "Hôm nay, 14:10", desc: "Metadata" },
+          { type: "file", name: "Holiday_FullPackage.zip", size: "28.2 GB", status: "Lưu Trữ Gốc", statusClass: "chip-gray", versions: "1 Bản Gốc", policy: "Bảo lưu vĩnh viễn", modified: "02/11/2026", desc: "Archive nén" }
+        ]
+      },
+      "/volume1/Documents": {
+        title: "/volume1/Documents",
+        status: "Đang Sao Lưu Lên Telegram",
+        statusType: "chip-green",
+        policy: "Chính sách: Hourly khi sửa (giữ 90 ngày) • Mã hoá AES-256 cao cấp",
+        summary: "Tổng cộng: 2 Thư Mục Con • 3 Tệp Tin (210.8 GB)",
+        items: [
+          { type: "folder", name: "Hop_Dong_Kinh_Doanh_2026", size: "12.4 GB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "38 Bản", policy: "Hourly khi sửa", modified: "Hôm nay, 11:00", path: "/volume1/Documents" },
+          { type: "folder", name: "Tai_Chinh_Quy_Bao_Cao", size: "45.0 GB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "62 Bản", policy: "Daily khi sửa", modified: "Hôm qua, 17:30", path: "/volume1/Documents" },
+          { type: "file", name: "Ke_Hoach_Tai_Chinh_2027.xlsx", size: "4.8 MB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "18 Bản (CoW)", policy: "Hourly khi sửa", modified: "Hôm nay, 14:00", desc: "Bảng tính Excel" },
+          { type: "file", name: "Dieu_Le_Cong_Ty_Signed.pdf", size: "12.1 MB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "2 Bản Gốc", policy: "WORM lưu trữ", modified: "10/10/2026", desc: "PDF Pháp lý" },
+          { type: "file", name: "Database_Backup_Postgres.sql.gz", size: "890 MB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "30 Bản (Daily)", policy: "Daily 02:00", modified: "Hôm nay, 02:00", desc: "SQL Database Dump" }
+        ]
+      },
+      "/volume1/homes": {
+        title: "/volume1/homes",
+        status: "Đang Sao Lưu Lên Telegram",
+        statusType: "chip-green",
+        policy: "Chính sách: Daily snapshot lúc 02:00 AM (giữ 30 ngày)",
+        summary: "Tổng cộng: 3 Thư Mục Con (91.5 GB)",
+        items: [
+          { type: "folder", name: "admin_user", size: "24.5 GB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "15 Bản", policy: "Daily khi sửa", modified: "Hôm qua, 02:00", path: "/volume1/homes" },
+          { type: "folder", name: "family_shared_drive", size: "52.0 GB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "22 Bản", policy: "Daily khi sửa", modified: "Hôm qua, 02:00", path: "/volume1/homes" },
+          { type: "folder", name: "guest_transfer", size: "15.0 GB", status: "Đang Trickle", statusClass: "chip-yellow", versions: "3 Bản", policy: "Daily khi sửa", modified: "Hôm nay, 08:30", path: "/volume1/homes" }
+        ]
+      },
+      "/volume1/Surveillance": {
+        title: "/volume1/Surveillance",
+        status: "Đã Bị Loại Trừ Khỏi Sao Lưu",
+        statusType: "chip-gray",
+        policy: "Chính sách: Không sao lưu camera giám sát (tiết kiệm băng thông Telegram)",
+        summary: "Tổng cộng: 8 Cameras • 1,200 Clips (1.2 TB)",
+        items: [
+          { type: "folder", name: "Cam_San_Truoc_4K", size: "320 GB", status: "Loại Trừ", statusClass: "chip-gray", versions: "0 Bản", policy: "Không backup", modified: "Vừa xong", path: "/volume1/Surveillance" },
+          { type: "folder", name: "Cam_San_Sau_1080P", size: "180 GB", status: "Loại Trừ", statusClass: "chip-gray", versions: "0 Bản", policy: "Không backup", modified: "Vừa xong", path: "/volume1/Surveillance" },
+          { type: "folder", name: "Cam_Phong_Khach", size: "240 GB", status: "Loại Trừ", statusClass: "chip-gray", versions: "0 Bản", policy: "Không backup", modified: "Vừa xong", path: "/volume1/Surveillance" }
+        ]
+      },
+      "/volume1/docker": {
+        title: "/volume1/docker",
+        status: "Đang Chờ Cấu Hình",
+        statusType: "chip-yellow",
+        policy: "Chính sách: Khuyên dùng sao lưu file cấu hình .yml và database SQLite",
+        summary: "Tổng cộng: 6 Containers (45.2 GB)",
+        items: [
+          { type: "folder", name: "teldrive_v2_data", size: "120 MB", status: "Đã Đồng Bộ", statusClass: "chip-green", versions: "12 Bản (Daily)", policy: "Daily 02:00", modified: "Hôm nay, 02:00", path: "/volume1/docker" },
+          { type: "folder", name: "postgres16_data", size: "1.4 GB", status: "Đang Trickle", statusClass: "chip-yellow", versions: "7 Bản (Daily)", policy: "Daily 02:00", modified: "Hôm nay, 02:00", path: "/volume1/docker" },
+          { type: "folder", name: "plex_cache", size: "42.0 GB", status: "Loại Trừ (Cache)", statusClass: "chip-gray", versions: "0 Bản", policy: "Không backup cache", modified: "Vừa xong", path: "/volume1/docker" }
+        ]
+      }
+    };
+
+    let currentFsDir = "/volume1/Photos";
+
+    function navigateFs(path) {
+      if (!fsData[path]) return;
+      currentFsDir = path;
+      const data = fsData[path];
+
+      // Update breadcrumb
+      document.getElementById('fsBreadcrumbActive').innerText = path.replace('/volume1/', '');
+      document.getElementById('fsActiveFolderTitle').innerText = data.title;
+      document.getElementById('fsActiveFolderStatusBadge').className = 'chip text-[10px] ' + data.statusType;
+      document.getElementById('fsActiveFolderStatusBadge').innerText = data.status;
+      document.getElementById('fsActiveFolderPolicyDesc').innerText = data.policy;
+      document.getElementById('fsFolderFooterSummary').innerHTML = data.summary;
+
+      // Update tree active highlight
+      const treeKeys = ['photos', 'documents', 'homes', 'surveillance', 'docker'];
+      treeKeys.forEach(k => {
+        const el = document.getElementById('treeItem-' + k);
+        if (el) {
+          if (path.toLowerCase().includes(k)) {
+            el.className = 'flex items-center justify-between p-2 rounded-lg bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 cursor-pointer font-medium';
+          } else {
+            el.className = 'flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer text-[#bdc1c6]';
+          }
+        }
+      });
+
+      renderFsTable(data.items);
+    }
+
+    function renderFsTable(items) {
+      const tbody = document.getElementById('fsTableBody');
+      tbody.innerHTML = '';
+
+      items.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-[#282a2f] transition-colors cursor-pointer group";
+
+        if (item.type === 'up') {
+          tr.onclick = () => navigateFs(item.path);
+          tr.innerHTML = `
+            <td colspan="6" class="p-3 pl-4 text-xs font-semibold text-[#8ab4f8] flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>
+              <span>${item.name}</span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+          return;
+        }
+
+        if (item.type === 'folder') {
+          tr.onclick = () => {
+            if (item.path && fsData[item.path]) {
+              navigateFs(item.path);
+            } else {
+              alert("Đang mở thư mục: " + item.name);
+            }
+          };
+          tr.innerHTML = `
+            <td class="p-3 pl-4 flex items-center gap-2.5 font-medium text-white">
+              <svg class="w-4 h-4 text-[#fdd663] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+              <span class="font-mono">${item.name}</span>
+            </td>
+            <td class="p-3">
+              <span class="chip ${item.statusClass} text-[10px]">${item.status}</span>
+            </td>
+            <td class="p-3 text-[#bdc1c6] font-mono">${item.versions}</td>
+            <td class="p-3 font-mono text-white font-semibold">${item.size}</td>
+            <td class="p-3 text-[#9aa0a6] text-[11px]">${item.modified}</td>
+            <td class="p-3 pr-4 text-right">
+              <button onclick="event.stopPropagation(); navigateFs('${item.path || currentFsDir}')" class="btn btn-secondary btn-sm">
+                <span>Duyệt Thư Mục ></span>
+              </button>
+            </td>
+          `;
+        } else {
+          // File item
+          tr.onclick = () => openVersionDrawer(item.name, parseInt(item.versions) || 3, item.size, item.policy, item.desc || "Tệp dữ liệu");
+          tr.innerHTML = `
+            <td class="p-3 pl-4 flex items-center gap-2.5 font-medium text-white">
+              <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span class="font-mono">${item.name}</span>
+            </td>
+            <td class="p-3">
+              <span class="chip ${item.statusClass} text-[10px]">${item.status}</span>
+            </td>
+            <td class="p-3">
+              <span class="chip chip-blue font-bold text-[10px]">${item.versions}</span>
+            </td>
+            <td class="p-3 font-mono text-white">${item.size}</td>
+            <td class="p-3 text-[#9aa0a6] text-[11px]">${item.modified}</td>
+            <td class="p-3 pr-4 text-right">
+              <button onclick="event.stopPropagation(); openVersionDrawer('${item.name}', ${parseInt(item.versions) || 3}, '${item.size}', '${item.policy}', '${item.desc || "Tệp dữ liệu"}')" class="btn btn-secondary btn-sm">
+                <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Xem Phiên Bản</span>
+              </button>
+            </td>
+          `;
+        }
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterFsFiles() {
+      const q = document.getElementById('fsSearchInput').value.toLowerCase();
+      const rows = document.getElementById('fsTableBody').getElementsByTagName('tr');
+      for (let i = 0; i < rows.length; i++) {
+        const text = rows[i].innerText.toLowerCase();
+        rows[i].style.display = text.includes(q) ? '' : 'none';
+      }
+    }
+
+    function triggerFolderBackup() {
+      alert("Đang khởi động tiến trình sao lưu vi sai cho thư mục " + currentFsDir + " lên Telegram Vault!");
+    }
+
+    function restoreCurrentFolder() {
+      alert("Đang gửi lệnh khôi phục toàn vẹn dữ liệu thư mục " + currentFsDir + " từ Telegram về NAS!");
+    }
+
+    function openFolderPolicyModal() {
+      document.getElementById('policyModalFolderTarget').innerText = currentFsDir;
+      document.getElementById('folderPolicyModal').classList.remove('hidden');
+    }
+
+    function closeFolderPolicyModal() {
+      document.getElementById('folderPolicyModal').classList.add('hidden');
+    }
+
+    function saveFolderPolicy() {
+      closeFolderPolicyModal();
+      alert("Đã cập nhật quy tắc lưu phiên bản CoW cho thư mục " + currentFsDir + " thành công!");
+    }
+
+    // Initialize File Station table on load
+    navigateFs('/volume1/Photos');
+
+    // =========================================================================
+    // TIME MACHINE DEEP POINT-IN-TIME EXPLORER (SUBFOLDERS & INDIVIDUAL FILES)
+    // =========================================================================
+    const tmSnapshotData = {
+      4: {
+        chip: "Snapshot #141 (05/11/2026 02:00 AM)",
+        label: "Snapshot #141 — 05/11/2026 (02:00:00 AM) — Hôm Qua (Active)",
+        paths: {
+          "/volume1/Photos": [
+            { type: "folder", name: "2026_Family_Holiday", size: "30.4 GB", status: "Nguyên vẹn", statusClass: "chip-green", modified: "04/11 18:20", path: "/volume1/Photos/2026_Family_Holiday" },
+            { type: "folder", name: "Drone_Footage_RAW", size: "8.4 GB", status: "Nguyên vẹn", statusClass: "chip-green", modified: "03/11 15:10", path: "/volume1/Photos/Drone_Footage_RAW" },
+            { type: "folder", name: "Lightroom_Catalog", size: "45.2 GB", status: "Bản sửa đổi v4", statusClass: "chip-blue", modified: "04/11 21:00", path: "/volume1/Photos/Lightroom_Catalog" },
+            { type: "file", name: "DSC_4092_RawPhotos.cr3", size: "43.1 MB", status: "Bản snapshot v4", statusClass: "chip-blue", modified: "04/11 18:20", desc: "Ảnh RAW Lightroom (Snapshot v4)" },
+            { type: "file", name: "Family_4K_Reel_Master.mp4", size: "1.84 GB", status: "Bản snapshot v2", statusClass: "chip-yellow", modified: "04/11 14:00", desc: "Video 4K Master" },
+            { type: "file", name: "ColorGrade_LUTs_Setting.xmp", size: "34.2 KB", status: "Đã sửa đổi", statusClass: "chip-blue", modified: "04/11 17:30", desc: "Adobe XMP" },
+            { type: "file", name: "Deleted_Accidentally_Photo.jpg", size: "24.0 MB", status: "ĐÃ BỊ XOÁ Ở HIỆN TẠI (Có Trong Snapshot)", statusClass: "chip-yellow font-bold", modified: "03/11 10:15", desc: "Tệp bị xoá nhầm cần khôi phục!" }
+          ],
+          "/volume1/Photos/2026_Family_Holiday": [
+            { type: "up", name: ".. (Quay lại /Photos)", path: "/volume1/Photos" },
+            { type: "file", name: "IMG_001_Beach_Sunset.cr3", size: "48.2 MB", status: "Nguyên vẹn", statusClass: "chip-green", modified: "04/11 12:00", desc: "Ảnh RAW" },
+            { type: "file", name: "IMG_002_Family_Dinner.cr3", size: "46.1 MB", status: "Nguyên vẹn", statusClass: "chip-green", modified: "04/11 19:15", desc: "Ảnh RAW" },
+            { type: "file", name: "Deleted_Accidentally_Photo.jpg", size: "24.0 MB", status: "ĐÃ BỊ XOÁ Ở HIỆN TẠI (Có Trong Snapshot)", statusClass: "chip-yellow font-bold", modified: "03/11 10:15", desc: "Tệp bị xoá nhầm cần khôi phục!" },
+            { type: "file", name: "4K_Drone_Flight.mp4", size: "2.10 GB", status: "Nguyên vẹn", statusClass: "chip-green", modified: "03/11 16:00", desc: "Video 4K" },
+            { type: "folder", name: "RAW_Originals", size: "18.2 GB", status: "Thư mục con (14 tệp)", statusClass: "chip-gray", modified: "02/11 14:00", path: "/volume1/Photos/2026_Family_Holiday" }
+          ],
+          "/volume1/Photos/Drone_Footage_RAW": [
+            { type: "up", name: ".. (Quay lại /Photos)", path: "/volume1/Photos" },
+            { type: "file", name: "Clip_01_Sunset_Coast.mov", size: "4.2 GB", status: "Nguyên vẹn", statusClass: "chip-green", modified: "03/11 15:00", desc: "QuickTime Apple ProRes" },
+            { type: "file", name: "Clip_02_Mountain_View.mov", size: "4.2 GB", status: "Nguyên vẹn", statusClass: "chip-green", modified: "03/11 15:10", desc: "QuickTime Apple ProRes" }
+          ],
+          "/volume1/Photos/Lightroom_Catalog": [
+            { type: "up", name: ".. (Quay lại /Photos)", path: "/volume1/Photos" },
+            { type: "file", name: "Catalog_Snapshot_v4.lrcat", size: "45.2 GB", status: "Bản sửa đổi v4", statusClass: "chip-blue", modified: "04/11 21:00", desc: "SQLite Catalog" }
+          ],
+          "/volume1/Documents": [
+            { type: "folder", name: "Hop_Dong_2026", size: "12.4 GB", status: "Nguyên vẹn", statusClass: "chip-green", modified: "04/11 11:00", path: "/volume1/Documents" },
+            { type: "file", name: "Ke_Hoach_Tai_Chinh_2027.xlsx", size: "4.8 MB", status: "Bản v4", statusClass: "chip-blue", modified: "04/11 14:00", desc: "Bảng tính" },
+            { type: "file", name: "Dieu_Le_Cong_Ty.pdf", size: "12.1 MB", status: "Gốc", statusClass: "chip-gray", modified: "10/10 09:00", desc: "PDF" }
+          ]
+        }
+      },
+      3: {
+        chip: "Snapshot #112 (29/10/2026 02:00 AM)",
+        label: "Snapshot #112 — 29/10/2026 (02:00:00 AM) — 7 Ngày Trước",
+        paths: {
+          "/volume1/Photos": [
+            { type: "folder", name: "2026_Family_Holiday", size: "28.1 GB", status: "Bản 7 ngày trước", statusClass: "chip-blue", modified: "28/10 14:00", path: "/volume1/Photos/2026_Family_Holiday" },
+            { type: "folder", name: "2025_Archive", size: "185.0 GB", status: "Nguyên vẹn", statusClass: "chip-green", modified: "01/10 08:00", path: "/volume1/Photos/2025_Archive" },
+            { type: "file", name: "DSC_4092_RawPhotos.cr3", size: "38.2 MB", status: "Bản snapshot v2 (Cũ hơn)", statusClass: "chip-yellow", modified: "28/10 09:00", desc: "Ảnh RAW Lightroom (Bản cũ 7 ngày trước)" },
+            { type: "file", name: "Deleted_Accidentally_Photo.jpg", size: "24.0 MB", status: "Tồn tại trong bản này", statusClass: "chip-green", modified: "27/10 10:15", desc: "Ảnh gia đình" },
+            { type: "file", name: "Ke_Hoach_Chuyen_Di.txt", size: "15 KB", status: "Tệp cũ (Đã xoá ở Head)", statusClass: "chip-yellow font-bold", modified: "26/10 11:00", desc: "Text note" }
+          ],
+          "/volume1/Photos/2026_Family_Holiday": [
+            { type: "up", name: ".. (Quay lại /Photos)", path: "/volume1/Photos" },
+            { type: "file", name: "IMG_001_Beach_Sunset.cr3", size: "48.2 MB", status: "Bản gốc", statusClass: "chip-gray", modified: "25/10 12:00", desc: "Ảnh RAW" },
+            { type: "file", name: "Deleted_Accidentally_Photo.jpg", size: "24.0 MB", status: "Tồn tại trong bản này", statusClass: "chip-green", modified: "27/10 10:15", desc: "Ảnh gia đình" },
+            { type: "file", name: "Ke_Hoach_Chuyen_Di.txt", size: "15 KB", status: "Tệp cũ (Đã xoá ở Head)", statusClass: "chip-yellow font-bold", modified: "26/10 11:00", desc: "Text note" }
+          ]
+        }
+      },
+      2: {
+        chip: "Snapshot #68 (22/10/2026 02:00 AM)",
+        label: "Snapshot #68 — 22/10/2026 (02:00:00 AM) — 15 Ngày Trước",
+        paths: {
+          "/volume1/Photos": [
+            { type: "file", name: "DSC_4092_RawPhotos.cr3", size: "38.2 MB", status: "Bản snapshot v1", statusClass: "chip-gray", modified: "15/10 09:12", desc: "Ảnh RAW Lightroom (Gốc)" },
+            { type: "file", name: "Deleted_Accidentally_Photo.jpg", size: "24.0 MB", status: "Tồn tại", statusClass: "chip-green", modified: "15/10 09:12", desc: "Ảnh gia đình" }
+          ],
+          "/volume1/Photos/2026_Family_Holiday": [
+            { type: "up", name: ".. (Quay lại /Photos)", path: "/volume1/Photos" },
+            { type: "file", name: "Deleted_Accidentally_Photo.jpg", size: "24.0 MB", status: "Tồn tại", statusClass: "chip-green", modified: "15/10 09:12", desc: "Ảnh gia đình" }
+          ]
+        }
+      },
+      1: {
+        chip: "Snapshot #01 (07/10/2026 02:00 AM)",
+        label: "Snapshot #01 — 07/10/2026 (02:00:00 AM) — 30 Ngày Trước (Khởi tạo)",
+        paths: {
+          "/volume1/Photos": [
+            { type: "file", name: "DSC_4092_RawPhotos.cr3", size: "38.2 MB", status: "Bản khởi tạo gốc (v1)", statusClass: "chip-gray", modified: "07/10 02:00", desc: "Ảnh RAW gốc" }
+          ],
+          "/volume1/Photos/2026_Family_Holiday": [
+            { type: "up", name: ".. (Quay lại /Photos)", path: "/volume1/Photos" },
+            { type: "file", name: "DSC_4092_RawPhotos.cr3", size: "38.2 MB", status: "Bản khởi tạo gốc (v1)", statusClass: "chip-gray", modified: "07/10 02:00", desc: "Ảnh RAW gốc" }
+          ]
+        }
+      },
+      5: {
+        chip: "Head State (Trực Tiếp)",
+        label: "Head State — 06/11/2026 (Live Now) — Hiện Tại",
+        paths: {
+          "/volume1/Photos": [
+            { type: "folder", name: "2026_Family_Holiday", size: "30.4 GB", status: "Live", statusClass: "chip-blue", modified: "Hôm nay 14:15", path: "/volume1/Photos/2026_Family_Holiday" },
+            { type: "file", name: "DSC_4092_RawPhotos.cr3", size: "45.8 MB", status: "Live v6 (Mới nhất)", statusClass: "chip-green", modified: "Hôm nay 14:15", desc: "Ảnh RAW Lightroom mới nhất" },
+            { type: "file", name: "Family_4K_Reel_Master.mp4", size: "1.84 GB", status: "Live", statusClass: "chip-green", modified: "Hôm qua 18:30", desc: "Video 4K Master" }
+          ],
+          "/volume1/Photos/2026_Family_Holiday": [
+            { type: "up", name: ".. (Quay lại /Photos)", path: "/volume1/Photos" },
+            { type: "file", name: "IMG_001_Beach_Sunset.cr3", size: "48.2 MB", status: "Live", statusClass: "chip-green", modified: "Hôm nay 12:00", desc: "Ảnh RAW" },
+            { type: "file", name: "IMG_002_Family_Dinner.cr3", size: "46.1 MB", status: "Live", statusClass: "chip-green", modified: "Hôm qua 20:15", desc: "Ảnh RAW" },
+            { type: "file", name: "4K_Drone_Flight.mp4", size: "2.10 GB", status: "Live", statusClass: "chip-green", modified: "04/11 16:00", desc: "Video 4K" }
+          ]
+        }
+      }
+    };
+
+    let currentTmSnapshot = 4;
+    let currentTmPath = "/volume1/Photos/2026_Family_Holiday";
 
     function selectSnapshot(id) {
+      currentTmSnapshot = id;
       for (let i = 1; i <= 5; i++) {
         const card = document.getElementById('snap-card-' + i);
         if (card) {
@@ -1193,40 +1452,136 @@
           }
         }
       }
-      const label = document.getElementById('activeSnapshotLabel');
-      if (label) label.innerText = snapshotDates[id - 1];
+
+      const snapInfo = tmSnapshotData[id];
+      if (snapInfo) {
+        document.getElementById('activeSnapshotLabel').innerText = snapInfo.label;
+        document.getElementById('tmSnapshotChip').innerText = snapInfo.chip;
+      }
+
+      renderTmExplorer();
     }
 
-    function updateTreeCalc() {
-      const p = document.getElementById('check-photos').checked;
-      const d = document.getElementById('check-docs').checked;
-      const h = document.getElementById('check-homes').checked;
-      const k = document.getElementById('check-docker').checked;
-      let count = (p ? 1 : 0) + (d ? 1 : 0) + (h ? 1 : 0) + (k ? 1 : 0);
-      document.getElementById('selectedShareCount').innerText = count + " Shares Đã Chọn";
+    function navigateTm(path) {
+      currentTmPath = path;
+      document.getElementById('tmBreadcrumbSub').innerText = path.replace('/volume1/Photos', '') || '/';
+      renderTmExplorer();
     }
 
-    function toggleAllShares(state) {
-      document.getElementById('check-photos').checked = state;
-      document.getElementById('check-docs').checked = state;
-      document.getElementById('check-homes').checked = state;
-      document.getElementById('check-docker').checked = state;
-      updateTreeCalc();
+    function renderTmExplorer() {
+      const snap = tmSnapshotData[currentTmSnapshot] || tmSnapshotData[4];
+      let items = (snap.paths && snap.paths[currentTmPath]) ? snap.paths[currentTmPath] : [];
+
+      if (items.length === 0 && snap.paths["/volume1/Photos"]) {
+        currentTmPath = "/volume1/Photos";
+        items = snap.paths["/volume1/Photos"];
+        document.getElementById('tmBreadcrumbSub').innerText = '/';
+      }
+
+      const tbody = document.getElementById('tmTableBody');
+      tbody.innerHTML = '';
+
+      document.getElementById('tmItemsCountText').innerText = "Hiển thị " + items.length + " mục tại mốc này";
+
+      items.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-[#282a2f] transition-colors cursor-pointer";
+
+        if (item.type === 'up') {
+          tr.onclick = () => navigateTm(item.path);
+          tr.innerHTML = `
+            <td colspan="5" class="p-3 pl-4 text-xs font-semibold text-[#8ab4f8] flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>
+              <span>${item.name}</span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+          return;
+        }
+
+        if (item.type === 'folder') {
+          tr.onclick = () => navigateTm(item.path);
+          tr.innerHTML = `
+            <td class="p-3 pl-4 flex items-center gap-2.5 font-medium text-white">
+              <svg class="w-4 h-4 text-[#fdd663] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+              <span class="font-mono">${item.name}</span>
+            </td>
+            <td class="p-3">
+              <span class="chip ${item.statusClass} text-[10px]">${item.status}</span>
+            </td>
+            <td class="p-3 font-mono text-white font-semibold">${item.size}</td>
+            <td class="p-3 text-[#9aa0a6] text-[11px]">${item.modified}</td>
+            <td class="p-3 pr-4 text-right flex items-center justify-end gap-1.5">
+              <button onclick="event.stopPropagation(); restoreTmItem('${item.name}', 'thư mục con', '${currentTmPath}/${item.name}')" class="btn btn-secondary btn-sm">
+                <svg class="w-3.5 h-3.5 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <span>Khôi Phục Thư Mục Này</span>
+              </button>
+              <button onclick="event.stopPropagation(); navigateTm('${item.path}')" class="btn btn-ghost btn-sm text-[11px]">
+                <span>Mở ></span>
+              </button>
+            </td>
+          `;
+        } else {
+          // File
+          tr.innerHTML = `
+            <td class="p-3 pl-4 flex items-center gap-2.5 font-medium text-white">
+              <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <div>
+                <div class="font-mono text-white">${item.name}</div>
+                <div class="text-[10px] text-[#9aa0a6]">${item.desc}</div>
+              </div>
+            </td>
+            <td class="p-3">
+              <span class="chip ${item.statusClass} text-[10px]">${item.status}</span>
+            </td>
+            <td class="p-3 font-mono text-white">${item.size}</td>
+            <td class="p-3 text-[#9aa0a6] text-[11px]">${item.modified}</td>
+            <td class="p-3 pr-4 text-right">
+              <button onclick="event.stopPropagation(); restoreTmItem('${item.name}', 'tệp tin', '${currentTmPath}')" class="btn btn-primary btn-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <span>Khôi Phục Tệp Này</span>
+              </button>
+            </td>
+          `;
+        }
+
+        tbody.appendChild(tr);
+      });
     }
 
-    function saveFolderSelection() {
-      alert("Đã lưu danh sách thư mục sao lưu Synology vào hệ thống!");
+    function filterTmFiles() {
+      const q = document.getElementById('tmSearchInput').value.toLowerCase();
+      const rows = document.getElementById('tmTableBody').getElementsByTagName('tr');
+      for (let i = 0; i < rows.length; i++) {
+        const text = rows[i].innerText.toLowerCase();
+        rows[i].style.display = text.includes(q) ? '' : 'none';
+      }
     }
 
-    function restoreFolderSnapshot() {
+    function restoreTmItem(name, typeName, path) {
       const banner = document.getElementById('tmAlertBanner');
       const msg = document.getElementById('tmAlertMsg');
-      msg.innerText = "Đang gửi lệnh giải mã và khôi phục toàn bộ thư mục về Synology DSM...";
+      const snapTitle = tmSnapshotData[currentTmSnapshot] ? tmSnapshotData[currentTmSnapshot].chip : "Snapshot";
+      msg.innerText = "Đang giải mã và khôi phục " + typeName + " [" + name + "] từ " + snapTitle + " về " + path + " trên Synology NAS...";
       banner.classList.remove('hidden');
       setTimeout(() => {
-        msg.innerText = "Khôi phục thành công toàn bộ thư mục về /volume1/Restore_Output/!";
+        msg.innerText = "Khôi phục thành công " + typeName + " [" + name + "] về Synology NAS!";
+      }, 1500);
+    }
+
+    function restoreCurrentTmPath() {
+      const banner = document.getElementById('tmAlertBanner');
+      const msg = document.getElementById('tmAlertMsg');
+      const snapTitle = tmSnapshotData[currentTmSnapshot] ? tmSnapshotData[currentTmSnapshot].chip : "Snapshot";
+      msg.innerText = "Đang khôi phục toàn bộ cấu trúc thư mục con và tệp của " + currentTmPath + " từ " + snapTitle + " về NAS...";
+      banner.classList.remove('hidden');
+      setTimeout(() => {
+        msg.innerText = "Đã khôi phục hoàn tất toàn bộ thư mục " + currentTmPath + " về NAS!";
       }, 2000);
     }
+
+    // Initialize Time Machine Explorer on first load
+    selectSnapshot(4);
 
     // VERSION DRAWER INTERACTION
     function openVersionDrawer(fileName, versionCount, fileSize, policy, fileDesc) {
@@ -1279,36 +1634,6 @@
       alert("Đang tải & khôi phục tệp " + file + " (" + ver + ") từ Telegram về thư mục /volume1/Photos/...");
     }
 
-    function openVersionPolicyModal() {
-      document.getElementById('versionPolicyModal').classList.remove('hidden');
-    }
-
-    function closeVersionPolicyModal() {
-      document.getElementById('versionPolicyModal').classList.add('hidden');
-    }
-
-    function saveVersionPolicy() {
-      closeVersionPolicyModal();
-      alert("Đã cập nhật chính sách lưu giữ phiên bản CoW Retention thành công!");
-    }
-
-    function filterDriveFiles() {
-      const q = document.getElementById('driveSearchInput').value.toLowerCase();
-      const rows = document.getElementById('driveTableBody').getElementsByTagName('tr');
-      for (let i = 0; i < rows.length; i++) {
-        const text = rows[i].innerText.toLowerCase();
-        rows[i].style.display = text.includes(q) ? '' : 'none';
-      }
-    }
-
-    function navigateDrive(path) {
-      alert("Đang mở thư mục: " + path);
-    }
-
-    function refreshDriveView() {
-      alert("Đã đồng bộ danh mục tệp và số lượng phiên bản từ Telegram Cloud!");
-    }
-
     function showAddBotPrompt() {
       const token = prompt("Nhập Bot Token Telegram mới (từ @BotFather):");
       if (token) {
@@ -1316,22 +1641,49 @@
       }
     }
 
+    // MULTI-NAS ROLE SELECTION
     function updateNodeRole(role) {
       const badge = document.getElementById('currentNodeRoleBadge');
       const input = document.getElementById('nodeLocalPathInput');
+      const display = document.getElementById('selectedNodePathDisplay');
+      const cardPush = document.getElementById('cardRolePush');
+      const cardPull = document.getElementById('cardRolePull');
+      const badgePush = document.getElementById('rolePushBadge');
+      const badgePull = document.getElementById('rolePullBadge');
+
       if (role === 'PUSH') {
         badge.innerText = "NODE_MODE=PUSH (Source Master)";
         badge.className = "chip chip-green";
         input.value = "/volume1/Photos";
+        display.innerText = "/volume1/Photos";
+
+        cardPush.className = "p-4 bg-[#1a1c1e] border-2 border-[#1a73e8] rounded-xl cursor-pointer hover:border-[#8ab4f8] transition-all";
+        cardPull.className = "p-4 bg-[#1a1c1e] border border-[#3c4043] rounded-xl cursor-pointer hover:border-[#8ab4f8] transition-all opacity-80 hover:opacity-100";
+        badgePush.className = "chip chip-green text-[10px]";
+        badgePush.innerText = "Đang Dùng";
+        badgePull.className = "chip chip-gray text-[10px]";
+        badgePull.innerText = "Dự Phòng";
       } else {
         badge.innerText = "NODE_MODE=PULL (Replica Receiver)";
         badge.className = "chip chip-blue";
         input.value = "/volume1/replica_photos";
+        display.innerText = "/volume1/replica_photos";
+
+        cardPull.className = "p-4 bg-[#1a1c1e] border-2 border-[#1a73e8] rounded-xl cursor-pointer hover:border-[#8ab4f8] transition-all";
+        cardPush.className = "p-4 bg-[#1a1c1e] border border-[#3c4043] rounded-xl cursor-pointer hover:border-[#8ab4f8] transition-all opacity-80 hover:opacity-100";
+        badgePull.className = "chip chip-blue text-[10px]";
+        badgePull.innerText = "Đang Dùng";
+        badgePush.className = "chip chip-gray text-[10px]";
+        badgePush.innerText = "Dự Phòng";
       }
     }
 
     function saveNodeRoleConfig() {
-      alert("Đã lưu cấu hình Multi-NAS vào file .env!");
+      const p = document.getElementById('nodeLocalPathInput').value;
+      const s = document.getElementById('nodePullStrategySelect').value;
+      alert("Đã lưu cấu hình Multi-NAS vào file .env!
+Thư mục: " + p + "
+Chiến lược: " + s);
     }
 
     function triggerInstantSync() {
