@@ -25,22 +25,67 @@ try:
 except Exception:
     pass
 
+try:
+    pid = os.getpid()
+    subprocess.run(["ionice", "-c", "3", "-p", str(pid)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+except Exception:
+    pass
+
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 ENV_FILE = os.path.join(ROOT_DIR, ".env")
 MANIFEST_FILE = os.path.join(DATA_DIR, "vault_manifest.json")
+CHECKPOINT_FILE = os.path.join(DATA_DIR, "vault_checkpoint.json")
 LOG_FILE = os.path.join(LOGS_DIR, "daemon.log")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(LOGS_DIR, exist_ok=True)
 
 # ------------------------------------------------------------------------------
-# Logging & Ring Buffer for Dashboard UI
+# Logging & Ring Buffer for Dashboard UI (with Auto-Rotation)
 # ------------------------------------------------------------------------------
 LOG_RING = []
 LOG_LOCK = threading.Lock()
 MAX_LOG_ENTRIES = 200
+MAX_LOG_BYTES = 5 * 1024 * 1024  # Giới hạn 5MB/log chống phình ổ cứng
+MAX_LOG_BACKUPS = 3
+
+def rotate_log_if_needed():
+    try:
+        if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > MAX_LOG_BYTES:
+            for i in range(MAX_LOG_BACKUPS - 1, 0, -1):
+                src = f"{LOG_FILE}.{i}"
+                dst = f"{LOG_FILE}.{i+1}"
+                if os.path.exists(src):
+                    os.replace(src, dst)
+            os.replace(LOG_FILE, f"{LOG_FILE}.1")
+    except Exception:
+        pass
+
+def cleanup_temp_orphans():
+    """Tự động dọn rác tệp tạm mồ côi do mất điện / reboot đột ngột để chống phình ổ cứng"""
+    temp_dir = tempfile.gettempdir()
+    count = 0
+    bytes_freed = 0
+    now = time.time()
+    try:
+        for fname in os.listdir(temp_dir):
+            if fname.endswith(".enc") or fname.endswith(".raw") or fname.endswith(".vault_tmp") or (fname.startswith("tmp") and (".part" in fname or ".enc" in fname)):
+                fpath = os.path.join(temp_dir, fname)
+                try:
+                    stat = os.stat(fpath)
+                    if now - stat.st_mtime > 1800:
+                        size = stat.st_size
+                        os.unlink(fpath)
+                        count += 1
+                        bytes_freed += size
+                except Exception:
+                    pass
+    except Exception:
+        pass
+    if count > 0:
+        log(f"🧹 Đã dọn dẹp {count} tệp tạm mồ côi ({bytes_freed / (1024*1024):.2f} MB) để giải phóng dung lượng ổ cứng.")
 
 def log(msg, level="INFO"):
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -51,10 +96,67 @@ def log(msg, level="INFO"):
         if len(LOG_RING) > MAX_LOG_ENTRIES:
             LOG_RING.pop(0)
     try:
+        rotate_log_if_needed()
         with open(LOG_FILE, "a", encoding="utf-8") as f:
             f.write(entry + "\n")
     except Exception:
         pass
+
+# ------------------------------------------------------------------------------
+# In-Flight Checkpoint Manager (Khôi phục điểm dừng khi Reboot / Mất điện)
+# ------------------------------------------------------------------------------
+class CheckpointManager:
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.data = {}
+        self.load()
+
+    def load(self):
+        with self.lock:
+            if os.path.exists(CHECKPOINT_FILE):
+                try:
+                    with open(CHECKPOINT_FILE, "r", encoding="utf-8") as f:
+                        self.data = json.load(f)
+                except Exception:
+                    self.data = {}
+
+    def get_in_flight(self, rel_path, file_size, mtime):
+        with self.lock:
+            entry = self.data.get(rel_path)
+            if entry and entry.get("size") == file_size and entry.get("mtime") == mtime:
+                return entry.get("chunks", [])
+            return None
+
+    def record_chunk(self, rel_path, file_size, mtime, total_parts, chunk_info):
+        with self.lock:
+            if rel_path not in self.data or self.data[rel_path].get("mtime") != mtime:
+                self.data[rel_path] = {
+                    "size": file_size,
+                    "mtime": mtime,
+                    "total_parts": total_parts,
+                    "chunks": []
+                }
+            existing_parts = {c.get("part") for c in self.data[rel_path]["chunks"]}
+            if chunk_info.get("part") not in existing_parts:
+                self.data[rel_path]["chunks"].append(chunk_info)
+            self._save()
+
+    def finish_file(self, rel_path):
+        with self.lock:
+            if rel_path in self.data:
+                del self.data[rel_path]
+                self._save()
+
+    def _save(self):
+        try:
+            tmp_path = CHECKPOINT_FILE + ".tmp"
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                json.dump(self.data, f, indent=2)
+            os.replace(tmp_path, CHECKPOINT_FILE)
+        except Exception as e:
+            log(f"Error saving checkpoint: {e}", "WARN")
+
+checkpoint_mgr = CheckpointManager()
 
 # ------------------------------------------------------------------------------
 # Configuration Manager
@@ -402,6 +504,9 @@ class BackupEngine:
 
         log(f"📂 Found {len(files_to_check)} files in {source_dir}")
 
+        # Dọn dẹp tệp tạm mồ côi nếu chu trình trước bị ngắt do mất điện/reboot
+        cleanup_temp_orphans()
+
         uploaded_count = 0
         skipped_count = 0
         error_count = 0
@@ -442,9 +547,15 @@ class BackupEngine:
                 log(f"📦 Processing [{rel_path}] ({file_size / (1024*1024):.2f} MB)...")
                 file_sha256 = CryptoEngine.sha256_file(full_path)
 
-                # Split and encrypt chunks
-                chunks_info = []
+                # Kiểm tra điểm dừng dở dang (In-flight Checkpoint) nếu vừa Reboot NAS
                 total_parts = max(1, (file_size + chunk_size_bytes - 1) // chunk_size_bytes)
+                cached_chunks = checkpoint_mgr.get_in_flight(rel_path, file_size, mtime) or []
+                uploaded_parts = {c.get("part") for c in cached_chunks}
+                chunks_info = [c for c in cached_chunks if c.get("part") in uploaded_parts]
+
+                if uploaded_parts:
+                    log(f"⚡ [Reboot Recovery] Tiếp tục tệp [{rel_path}]: Đã có sẵn {len(uploaded_parts)}/{total_parts} mảnh trên Telegram. Không tải lại!")
+
                 with self.lock:
                     self.total_parts = total_parts
 
@@ -459,6 +570,13 @@ class BackupEngine:
 
                         with self.lock:
                             self.current_part = part_num
+
+                        # Nếu mảnh này đã được upload thành công trước khi reboot, bỏ qua!
+                        if part_num in uploaded_parts:
+                            part_num += 1
+                            if part_num > total_parts:
+                                break
+                            continue
 
                         # Write temp chunk
                         raw_size = len(chunk_data)
@@ -482,7 +600,6 @@ class BackupEngine:
                                 f"Part: `{part_num}/{total_parts}` | Size: `{enc_size/(1024*1024):.2f}MB`\n"
                                 f"AES-256-GCM Zero-Knowledge | SHA-256: `{enc_hash[:16]}...`"
                             )
-                            # Custom filename for Telegram document
                             safe_name = rel_path.replace("/", "_").replace("\\", "_")
                             named_enc_path = os.path.join(tempfile.gettempdir(), f"{safe_name}.part{part_num:03d}.enc")
                             shutil.copyfile(enc_chunk_path, named_enc_path)
@@ -506,7 +623,7 @@ class BackupEngine:
                             msg_id = upload_res["result"]["message_id"]
                             doc_id = upload_res["result"]["document"]["file_id"]
 
-                            chunks_info.append({
+                            chunk_entry = {
                                 "part": part_num,
                                 "size": enc_size,
                                 "raw_size": raw_size,
@@ -515,7 +632,9 @@ class BackupEngine:
                                 "sha256": enc_hash,
                                 "raw_sha256": raw_hash,
                                 "uploaded_at": datetime.now().isoformat()
-                            })
+                            }
+                            chunks_info.append(chunk_entry)
+                            checkpoint_mgr.record_chunk(rel_path, file_size, mtime, total_parts, chunk_entry)
                             bytes_transferred += enc_size
 
                         finally:
@@ -542,12 +661,17 @@ class BackupEngine:
                         "updated_at": datetime.now().isoformat()
                     }
                     manifest.save()
+                    checkpoint_mgr.finish_file(rel_path)
                     uploaded_count += 1
                     log(f"✅ Successfully backed up [{rel_path}] ({total_parts} parts) to Telegram.")
 
             except Exception as e:
                 log(f"❌ Error processing file {rel_path}: {e}", "ERROR")
                 error_count += 1
+            finally:
+                # Thu gom rác bộ nhớ tức thì để RAM NAS không bao giờ phình to
+                import gc
+                gc.collect()
 
         with self.lock:
             self.state = "IDLE"
