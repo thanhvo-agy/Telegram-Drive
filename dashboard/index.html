@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SynoTele Vault Enterprise - Next-Gen Synology Backup</title>
+  <title>SynoTele Vault Enterprise - Nền Tảng Sao Lưu Synology Đa Điểm</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto+Mono:wght@400;500&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -26,170 +26,668 @@
     .custom-scroll::-webkit-scrollbar-track {
       background: transparent;
     }
+
+    /* Standard Google-style Button System */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      height: 2.25rem;
+      padding: 0 1rem;
+      border-radius: 0.5rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.15s ease-in-out;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn-sm {
+      height: 1.875rem;
+      padding: 0 0.75rem;
+      font-size: 0.6875rem;
+      border-radius: 0.375rem;
+      gap: 0.375rem;
+    }
+    .btn-primary {
+      background-color: #1a73e8;
+      color: #ffffff;
+      border: 1px solid #1a73e8;
+    }
+    .btn-primary:hover {
+      background-color: #1b66ca;
+      border-color: #1b66ca;
+    }
+    .btn-secondary {
+      background-color: #282a2f;
+      color: #e3e3e3;
+      border: 1px solid #3c4043;
+    }
+    .btn-secondary:hover {
+      background-color: #353940;
+      color: #ffffff;
+      border-color: #5f6368;
+    }
+    .btn-ghost {
+      background-color: transparent;
+      color: #9aa0a6;
+      border: 1px solid transparent;
+    }
+    .btn-ghost:hover {
+      background-color: #282a2f;
+      color: #ffffff;
+    }
+    .btn-success {
+      background-color: #13271f;
+      color: #81c995;
+      border: 1px solid #1e4634;
+    }
+    .btn-success:hover {
+      background-color: #1a382b;
+    }
+    .btn-danger {
+      background-color: #2d1a1b;
+      color: #f28b82;
+      border: 1px solid #5c2526;
+    }
+    .btn-danger:hover {
+      background-color: #3d2123;
+    }
+
+    /* Standard Chip / Badge System */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.6875rem;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 500;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.375rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .chip-blue {
+      background-color: rgba(26, 115, 232, 0.15);
+      color: #8ab4f8;
+      border: 1px solid rgba(26, 115, 232, 0.35);
+    }
+    .chip-green {
+      background-color: rgba(129, 201, 149, 0.15);
+      color: #81c995;
+      border: 1px solid rgba(129, 201, 149, 0.35);
+    }
+    .chip-yellow {
+      background-color: rgba(253, 214, 99, 0.15);
+      color: #fdd663;
+      border: 1px solid rgba(253, 214, 99, 0.35);
+    }
+    .chip-gray {
+      background-color: #282a2f;
+      color: #bdc1c6;
+      border: 1px solid #3c4043;
+    }
+
+    /* Time Machine 3D Carousel Cards */
     .timemachine-stack {
       perspective: 1200px;
     }
     .timemachine-card {
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .timemachine-card.active {
-      transform: translateZ(40px) scale(1.02);
+      transform: translateZ(30px) scale(1.02);
       border-color: #8ab4f8;
-      box-shadow: 0 20px 40px -15px rgba(26, 115, 232, 0.35);
+      box-shadow: 0 15px 35px -10px rgba(26, 115, 232, 0.35);
     }
     .timemachine-card.inactive {
-      opacity: 0.45;
-      transform: translateZ(-30px) scale(0.96);
+      opacity: 0.5;
+      transform: translateZ(-20px) scale(0.97);
     }
   </style>
 </head>
 <body class="bg-[#1a1c1e] text-[#e3e3e3] antialiased min-h-screen flex flex-col custom-scroll selection:bg-[#8ab4f8] selection:text-[#202124]">
 
-  <!-- TOP GOOGLE CLOUD APP BAR -->
-  <header class="h-14 bg-[#212327] border-b border-[#3c4043] flex items-center justify-between px-4 sticky top-0 z-50 shadow-sm">
-    <div class="flex items-center gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#1a73e8] to-[#8ab4f8] flex items-center justify-center text-white shadow-md font-bold">
+  <!-- TOP APP BAR -->
+  <header class="h-14 bg-[#212327] border-b border-[#3c4043] flex items-center justify-between px-4 sticky top-0 z-50 shadow-sm shrink-0 overflow-x-auto custom-scroll">
+    <div class="flex items-center gap-3 shrink-0">
+      <!-- BRAND LOGO & TITLE -->
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#1a73e8] to-[#8ab4f8] flex items-center justify-center text-white shadow-md shrink-0">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
           </svg>
         </div>
-        <div class="flex items-baseline gap-2">
-          <span class="text-base font-bold text-white tracking-tight">SynoTele</span>
-          <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 font-semibold">Vault Master Pro</span>
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="text-sm font-bold text-white tracking-tight whitespace-nowrap">SynoTele Vault</span>
+          <span class="chip chip-blue text-[10px] py-0.5">v2.4 Pro</span>
         </div>
       </div>
 
-      <div class="h-5 w-px bg-[#3c4043] mx-1"></div>
+      <div class="h-4 w-px bg-[#3c4043] mx-1 shrink-0"></div>
 
-      <!-- SYNOLOGY CLUSTER SWITCHER -->
-      <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#282a2f] border border-[#3c4043] text-xs font-medium cursor-pointer hover:border-[#8ab4f8] transition-all">
-        <span class="w-2 h-2 rounded-full bg-[#81c995] animate-pulse"></span>
-        <span class="text-white font-semibold">Synology-DS920-Main</span>
-        <span class="text-[#9aa0a6] font-mono text-[11px]">(DSM 7.2.2-64570)</span>
-        <span class="text-[10px] px-1.5 py-0.2 bg-[#3c4043] rounded text-[#bdc1c6]">4 Bays Btrfs</span>
+      <!-- ACTIVE CLUSTER CHIP -->
+      <div class="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#282a2f] border border-[#3c4043] text-xs shrink-0 cursor-pointer hover:border-[#8ab4f8] transition-colors">
+        <span class="w-2 h-2 rounded-full bg-[#81c995] shrink-0 animate-pulse"></span>
+        <span class="text-white font-medium whitespace-nowrap">Synology-DS920-Main</span>
+        <span class="text-[#9aa0a6] text-[11px] font-mono whitespace-nowrap">DSM 7.2</span>
+        <span class="text-[10px] px-1.5 py-0.2 bg-[#3c4043] rounded text-[#bdc1c6] whitespace-nowrap">Btrfs Pool 1</span>
       </div>
     </div>
 
-    <!-- QUICK ACTIONS & TRICKLE CONTROLS -->
-    <div class="flex items-center gap-3">
-      <!-- TRICKLE MODE INDICATOR -->
-      <div class="flex items-center gap-2 px-3 py-1 bg-[#13271f] border border-[#1e4634] text-[#81c995] rounded-full text-xs font-medium">
-        <span class="w-2 h-2 rounded-full bg-[#81c995] animate-ping"></span>
-        <span class="w-2 h-2 rounded-full bg-[#81c995] -ml-3"></span>
-        <span>Trickle QoS: 4.8 MB/s (Chạy êm ái)</span>
+    <!-- QUICK ACTIONS & TRICKLE METRICS -->
+    <div class="flex items-center gap-2.5 shrink-0 pl-3">
+      <!-- TRICKLE INDICATOR -->
+      <div class="chip chip-green flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#81c995] animate-ping"></span>
+        <span>Trickle: 5.0 MB/s</span>
       </div>
 
-      <!-- BOT MESH STATUS -->
-      <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-[#282a2f] border border-[#3c4043] rounded-lg text-xs font-mono text-[#8ab4f8]">
-        <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      <!-- MESH BOT STATUS -->
+      <div class="chip chip-gray hidden md:inline-flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         <span>4 Bots Mesh</span>
         <span class="text-[#5f6368]">|</span>
-        <span>3 Channels Sharded</span>
+        <span>3 Channels</span>
       </div>
 
-      <button onclick="triggerInstantSync()" class="px-3.5 py-1.5 bg-[#1a73e8] hover:bg-[#1b66ca] text-white text-xs font-medium rounded-lg shadow-sm transition-all flex items-center gap-1.5">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-        <span>Backup Ngay</span>
+      <!-- PRIMARY ACTION BUTTON -->
+      <button onclick="triggerInstantSync()" class="btn btn-primary btn-sm">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        <span>Sao Lưu Ngay</span>
       </button>
     </div>
   </header>
 
-  <!-- BODY WITH LEFT NAVIGATION RAIL -->
+  <!-- WORKSPACE BODY WITH SIDEBAR RAIL -->
   <div class="flex flex-1 overflow-hidden">
     
     <!-- LEFT SIDEBAR -->
-    <aside class="w-64 bg-[#212327] border-r border-[#3c4043] flex flex-col justify-between py-4 select-none shrink-0">
+    <aside class="w-64 bg-[#212327] border-r border-[#3c4043] flex flex-col justify-between py-4 select-none shrink-0 overflow-y-auto custom-scroll">
       <div class="space-y-1 px-3">
         <div class="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-[#9aa0a6]">Hệ Thống Sao Lưu</div>
-        
-        <button onclick="setTab('tree-selector')" id="nav-tree-selector" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all">
-          <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-          <span class="flex-1 text-left">Bộ Chọn Thư Mục NAS</span>
-          <span class="px-1.5 py-0.2 bg-[#8ab4f8]/20 text-[#8ab4f8] text-[10px] rounded font-bold font-mono">TREE</span>
+
+        <!-- 1. OVERVIEW -->
+        <button onclick="setTab('overview')" id="nav-overview" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
+          <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span class="flex-1 text-left truncate">Tổng Quan</span>
         </button>
 
-        <button onclick="setTab('timemachine')" id="nav-timemachine" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all">
-          <svg class="w-4 h-4 text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          <span class="flex-1 text-left">Time Machine Snapshots</span>
-          <span class="px-1.5 py-0.2 bg-[#f28b82]/20 text-[#f28b82] text-[10px] rounded font-bold font-mono">3D</span>
+        <!-- 2. DRIVE EXPLORER & VERSION HISTORY (NEW FEATURE) -->
+        <button onclick="setTab('drive')" id="nav-drive" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 transition-all whitespace-nowrap">
+          <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+          <span class="flex-1 text-left truncate">Telegram Drive</span>
+          <span class="chip chip-blue text-[10px] py-0.2">DRIVE</span>
         </button>
 
-        <button onclick="setTab('multinas')" id="nav-multinas" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all">
-          <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-          <span class="flex-1 text-left">Đa NAS PUSH &amp; PULL</span>
-          <span class="px-1.5 py-0.2 bg-[#8ab4f8]/20 text-[#8ab4f8] text-[10px] rounded font-bold font-mono">MESH</span>
+        <!-- 3. TIME MACHINE 3D -->
+        <button onclick="setTab('timemachine')" id="nav-timemachine" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
+          <svg class="w-4 h-4 text-[#f28b82] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="flex-1 text-left truncate">Time Machine</span>
+          <span class="chip chip-yellow text-[10px] py-0.2">3D</span>
         </button>
 
-        <button onclick="setTab('botmesh')" id="nav-botmesh" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all">
-          <svg class="w-4 h-4 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-          <span class="flex-1 text-left">Bot Mesh &amp; ChatID Shards</span>
-          <span class="px-1.5 py-0.2 bg-[#81c995]/20 text-[#81c995] text-[10px] rounded font-bold font-mono">4 BOTS</span>
+        <!-- 4. FOLDER TREE SELECTOR -->
+        <button onclick="setTab('tree-selector')" id="nav-tree-selector" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
+          <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          <span class="flex-1 text-left truncate">Thư Mục NAS</span>
+          <span class="chip chip-gray text-[10px] py-0.2">Btrfs</span>
         </button>
 
-        <button onclick="setTab('trickle')" id="nav-trickle" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all">
-          <svg class="w-4 h-4 text-[#fdd663]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-          <span class="flex-1 text-left">Trickle QoS (Chạy ngầm)</span>
-          <span class="px-1.5 py-0.2 bg-[#fdd663]/20 text-[#fdd663] text-[10px] rounded font-bold font-mono">24H</span>
+        <!-- 5. MULTI-NAS PUSH & PULL -->
+        <button onclick="setTab('multinas')" id="nav-multinas" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
+          <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+          <span class="flex-1 text-left truncate">Đa NAS Push/Pull</span>
+          <span class="chip chip-blue text-[10px] py-0.2">Mesh</span>
         </button>
 
-        <button onclick="setTab('overview')" id="nav-overview" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 transition-all">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-          <span class="flex-1 text-left">Dashboard &amp; Thống Kê</span>
+        <!-- 6. TELEGRAM BOT MESH -->
+        <button onclick="setTab('botmesh')" id="nav-botmesh" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
+          <svg class="w-4 h-4 text-[#81c995] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <span class="flex-1 text-left truncate">Telegram Mesh</span>
+          <span class="chip chip-green text-[10px] py-0.2">4 Bots</span>
         </button>
 
-        <button onclick="setTab('logs')" id="nav-logs" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all">
-          <svg class="w-4 h-4 text-[#bdc1c6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-          <span class="flex-1 text-left">Cloud Shell Logs</span>
+        <!-- 7. TRICKLE QOS -->
+        <button onclick="setTab('trickle')" id="nav-trickle" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
+          <svg class="w-4 h-4 text-[#fdd663] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span class="flex-1 text-left truncate">Điều Tốc QoS</span>
+          <span class="chip chip-yellow text-[10px] py-0.2">24H</span>
+        </button>
+
+        <!-- 8. AUDIT LOGS -->
+        <button onclick="setTab('logs')" id="nav-logs" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap">
+          <svg class="w-4 h-4 text-[#bdc1c6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span class="flex-1 text-left truncate">Nhật Ký (Logs)</span>
         </button>
       </div>
 
-      <!-- SYSTEM METRICS SUMMARY -->
-      <div class="px-4 py-3 mx-3 bg-[#181a1d] border border-[#3c4043] rounded-xl space-y-2 text-[11px]">
-        <div class="flex justify-between items-center text-[#9aa0a6]">
-          <span class="flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-            <span>NAS CPU Load:</span>
+      <!-- COMPACT SYSTEM STATUS WIDGET -->
+      <div class="px-3.5 py-3 mx-3 bg-[#181a1d] border border-[#3c4043] rounded-xl space-y-2 text-[11px] shrink-0">
+        <div class="flex justify-between items-center whitespace-nowrap">
+          <span class="text-[#9aa0a6] flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[#81c995] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+            <span>CPU NAS:</span>
           </span>
-          <span class="text-[#81c995] font-mono font-medium">1.2% (nice -n 19)</span>
+          <span class="text-[#81c995] font-mono font-medium">1.2% (nice 19)</span>
         </div>
-        <div class="flex justify-between items-center text-[#9aa0a6]">
-          <span class="flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-            <span>NAS Disk I/O:</span>
+        <div class="flex justify-between items-center whitespace-nowrap">
+          <span class="text-[#9aa0a6] flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[#81c995] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+            <span>I/O Ổ Đĩa:</span>
           </span>
           <span class="text-[#81c995] font-mono font-medium">ionice -c 3 (Idle)</span>
         </div>
-        <div class="flex justify-between items-center text-[#9aa0a6]">
-          <span class="flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        <div class="flex justify-between items-center whitespace-nowrap">
+          <span class="text-[#9aa0a6] flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
             <span>Mã hoá:</span>
           </span>
-          <span class="text-[#8ab4f8] font-mono font-medium">AES-256-GCM CAS</span>
+          <span class="text-[#8ab4f8] font-mono font-medium">AES-256-GCM</span>
         </div>
-        <div class="flex justify-between items-center text-[#9aa0a6]">
-          <span class="flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-[#fdd663]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-            <span>Khử trùng lặp:</span>
+        <div class="flex justify-between items-center whitespace-nowrap">
+          <span class="text-[#9aa0a6] flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[#fdd663] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span>Nén &amp; CAS:</span>
           </span>
-          <span class="text-[#fdd663] font-mono font-medium">2.1x (Tiết kiệm 52%)</span>
+          <span class="text-[#fdd663] font-mono font-medium">Tiết kiệm 52%</span>
         </div>
       </div>
     </aside>
 
-    <!-- MAIN CONTENT VIEW -->
+    <!-- MAIN VIEW AREA -->
     <main class="flex-1 p-6 overflow-y-auto custom-scroll space-y-6">
 
       <!-- ============================================================== -->
-      <!-- TAB 1: BỘ CHỌN THƯ MỤC SYNOLOGY (TREE SELECTOR)                -->
+      <!-- TAB: TELEGRAM DRIVE & VERSION HISTORY (TÍNH NĂNG ĐƯỢC YÊU CẦU)   -->
+      <!-- ============================================================== -->
+      <section id="content-drive" class="space-y-6">
+        
+        <!-- HEADER & RETENTION OVERVIEW -->
+        <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#3c4043]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="chip chip-blue">Telegram Cloud Drive</span>
+                <h3 class="text-base font-semibold text-white">Quản Lý Thư Mục &amp; Lịch Sử Phiên Bản Tệp (CoW Retention)</h3>
+              </div>
+              <p class="text-xs text-[#9aa0a6] mt-1">
+                Xem chi tiết từng tệp tin đã sao lưu. Mỗi tệp được theo dõi số lượng phiên bản đã lưu theo cài đặt thời gian (Hàng giờ, Hàng ngày, Hàng tuần). Chỉ tạo phiên bản mới khi tệp có thay đổi nội dung.
+              </p>
+            </div>
+
+            <!-- ACTION TOOLBAR -->
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="openVersionPolicyModal()" class="btn btn-secondary btn-sm">
+                <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>Cài Đặt Phiên Bản</span>
+              </button>
+              <button onclick="refreshDriveView()" class="btn btn-secondary btn-sm">
+                <svg class="w-3.5 h-3.5 text-[#bdc1c6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span>Làm Mới</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 PILLARS OF RETENTION SETTING -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+            
+            <div class="p-3 bg-[#181a1d] border border-[#3c4043] rounded-xl">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-white">Quy Tắc CoW (Copy-On-Write)</span>
+                <span class="chip chip-green text-[10px] py-0.2">Kích Hoạt</span>
+              </div>
+              <p class="text-[11px] text-[#9aa0a6] mt-1.5 leading-relaxed">
+                Chỉ tạo phiên bản khi tệp có thay đổi nội dung (Hash SHA-256 khác). File không đổi = 0 Byte tốn thêm trên Telegram.
+              </p>
+            </div>
+
+            <div class="p-3 bg-[#181a1d] border border-[#3c4043] rounded-xl">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-white">Theo Giờ (Hourly)</span>
+                <span class="chip chip-blue text-[10px] py-0.2">24 Bản / 24h</span>
+              </div>
+              <p class="text-[11px] text-[#9aa0a6] mt-1.5 leading-relaxed">
+                Khi có chỉnh sửa trong ngày, hệ thống lưu tối đa 1 bản mỗi giờ và giữ lại toàn bộ trong 24 giờ gần nhất.
+              </p>
+            </div>
+
+            <div class="p-3 bg-[#181a1d] border border-[#3c4043] rounded-xl">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-white">Theo Ngày (Daily)</span>
+                <span class="chip chip-yellow text-[10px] py-0.2">30 Ngày</span>
+              </div>
+              <p class="text-[11px] text-[#9aa0a6] mt-1.5 leading-relaxed">
+                Tự động chốt 1 bản snapshot vào lúc 02:00 AM mỗi ngày nếu tệp có biến động, lưu trữ liên tục 30 ngày.
+              </p>
+            </div>
+
+            <div class="p-3 bg-[#181a1d] border border-[#3c4043] rounded-xl">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-white">Theo Tuần &amp; Tháng</span>
+                <span class="chip chip-gray text-[10px] py-0.2">12 Tuần &amp; 1 Năm</span>
+              </div>
+              <p class="text-[11px] text-[#9aa0a6] mt-1.5 leading-relaxed">
+                Lưu 1 bản mỗi Chủ Nhật (giữ 12 tuần) và 1 bản vào ngày đầu tháng (giữ lưu trữ vĩnh viễn 12 tháng).
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- DRIVE EXPLORER CONTAINER: BREADCRUMBS + SEARCH + FILE TABLE -->
+        <div class="bg-[#24262a] border border-[#3c4043] rounded-xl overflow-hidden">
+          
+          <!-- DRIVE TOOLBAR -->
+          <div class="p-4 border-b border-[#3c4043] flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#212327]">
+            <!-- BREADCRUMBS -->
+            <div class="flex items-center gap-1.5 text-xs text-[#9aa0a6] overflow-x-auto w-full sm:w-auto">
+              <button onclick="navigateDrive('/')" class="hover:text-white flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span class="font-mono">Vault-Root</span>
+              </button>
+              <span>/</span>
+              <button onclick="navigateDrive('/volume1')" class="hover:text-white font-mono">volume1</button>
+              <span>/</span>
+              <button onclick="navigateDrive('/volume1/Photos')" class="hover:text-white font-mono font-semibold text-white">Photos</button>
+              <span>/</span>
+              <span class="text-[#8ab4f8] font-mono font-semibold">2026_Family_Holiday</span>
+            </div>
+
+            <!-- SEARCH FILTER IN DRIVE -->
+            <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+              <div class="relative w-full sm:w-64">
+                <input type="text" id="driveSearchInput" onkeyup="filterDriveFiles()" placeholder="Tìm file hoặc phần mở rộng..." class="w-full bg-[#181a1d] border border-[#3c4043] rounded-lg px-3 py-1.5 pl-8 text-xs text-white focus:outline-none focus:border-[#8ab4f8] font-mono">
+                <svg class="w-3.5 h-3.5 text-[#9aa0a6] absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              </div>
+              <span class="chip chip-gray text-[11px]">8 Tệp Tin</span>
+            </div>
+          </div>
+
+          <!-- DRIVE TABLE -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-[#181a1d] text-[#9aa0a6] border-b border-[#3c4043] font-medium">
+                  <th class="p-3.5 pl-5">Tên Tệp / Thư Mục</th>
+                  <th class="p-3.5">Số Phiên Bản Đã Lưu</th>
+                  <th class="p-3.5">Chính Sách Áp Dụng</th>
+                  <th class="p-3.5">Dung Lượng</th>
+                  <th class="p-3.5">Lần Sửa Đổi Cuối</th>
+                  <th class="p-3.5 pr-5 text-right">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="driveTableBody" class="divide-y divide-[#3c4043]">
+                
+                <!-- FILE 1: RAW IMAGE WITH MULTIPLE EDITS -->
+                <tr class="hover:bg-[#282a2f] transition-colors group cursor-pointer" onclick="openVersionDrawer('DSC_4092_RawPhotos.cr3', 6, '45.8 MB', 'Hourly khi sửa', 'Ảnh RAW Lightroom')">
+                  <td class="p-3.5 pl-5 flex items-center gap-2.5 font-medium text-white">
+                    <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span class="font-mono">DSC_4092_RawPhotos.cr3</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="chip chip-blue font-bold">6 Phiên Bản (CoW)</span>
+                  </td>
+                  <td class="p-3.5 text-[#bdc1c6]">
+                    <span class="text-[11px] font-mono text-[#81c995]">Hourly khi sửa • Giữ 30 ngày</span>
+                  </td>
+                  <td class="p-3.5 font-mono text-white">45.8 MB</td>
+                  <td class="p-3.5 text-[#9aa0a6] text-[11px]">Hôm nay, 14:15 (Lightroom)</td>
+                  <td class="p-3.5 pr-5 text-right">
+                    <button onclick="event.stopPropagation(); openVersionDrawer('DSC_4092_RawPhotos.cr3', 6, '45.8 MB', 'Hourly khi sửa', 'Ảnh RAW Lightroom')" class="btn btn-secondary btn-sm">
+                      <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      <span>Lịch Sử Bản</span>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- FILE 2: CATALOG DATABASE -->
+                <tr class="hover:bg-[#282a2f] transition-colors group cursor-pointer" onclick="openVersionDrawer('Lightroom_Catalog.lrcat', 14, '128.4 MB', 'Hourly khi sửa', 'Database Lightroom Catalog')">
+                  <td class="p-3.5 pl-5 flex items-center gap-2.5 font-medium text-white">
+                    <svg class="w-4 h-4 text-[#fdd663] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                    <span class="font-mono">Lightroom_Catalog.lrcat</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="chip chip-blue font-bold">14 Phiên Bản (Hourly)</span>
+                  </td>
+                  <td class="p-3.5 text-[#bdc1c6]">
+                    <span class="text-[11px] font-mono text-[#81c995]">Hourly khi sửa • Giữ 14 ngày</span>
+                  </td>
+                  <td class="p-3.5 font-mono text-white">128.4 MB</td>
+                  <td class="p-3.5 text-[#9aa0a6] text-[11px]">Hôm nay, 15:00 (Auto-Sync)</td>
+                  <td class="p-3.5 pr-5 text-right">
+                    <button onclick="event.stopPropagation(); openVersionDrawer('Lightroom_Catalog.lrcat', 14, '128.4 MB', 'Hourly khi sửa', 'Database Lightroom Catalog')" class="btn btn-secondary btn-sm">
+                      <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      <span>Lịch Sử Bản</span>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- FILE 3: 4K VIDEO -->
+                <tr class="hover:bg-[#282a2f] transition-colors group cursor-pointer" onclick="openVersionDrawer('Family_4K_Reel_Master.mp4', 2, '1.84 GB', 'Daily khi sửa', 'Video 4K Master')">
+                  <td class="p-3.5 pl-5 flex items-center gap-2.5 font-medium text-white">
+                    <svg class="w-4 h-4 text-[#f28b82] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span class="font-mono">Family_4K_Reel_Master.mp4</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="chip chip-yellow font-bold">2 Phiên Bản (Daily)</span>
+                  </td>
+                  <td class="p-3.5 text-[#bdc1c6]">
+                    <span class="text-[11px] font-mono text-[#81c995]">Daily khi sửa • Giữ 60 ngày</span>
+                  </td>
+                  <td class="p-3.5 font-mono text-white">1.84 GB</td>
+                  <td class="p-3.5 text-[#9aa0a6] text-[11px]">Hôm qua, 18:30 (Export v2)</td>
+                  <td class="p-3.5 pr-5 text-right">
+                    <button onclick="event.stopPropagation(); openVersionDrawer('Family_4K_Reel_Master.mp4', 2, '1.84 GB', 'Daily khi sửa', 'Video 4K Master')" class="btn btn-secondary btn-sm">
+                      <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      <span>Lịch Sử Bản</span>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- FILE 4: SCRIPT / METADATA -->
+                <tr class="hover:bg-[#282a2f] transition-colors group cursor-pointer" onclick="openVersionDrawer('ColorGrade_LUTs_Setting.xmp', 5, '34.2 KB', 'Hourly khi sửa', 'Adobe XMP Preset')">
+                  <td class="p-3.5 pl-5 flex items-center gap-2.5 font-medium text-white">
+                    <svg class="w-4 h-4 text-[#81c995] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span class="font-mono">ColorGrade_LUTs_Setting.xmp</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="chip chip-blue font-bold">5 Phiên Bản (Hourly)</span>
+                  </td>
+                  <td class="p-3.5 text-[#bdc1c6]">
+                    <span class="text-[11px] font-mono text-[#81c995]">Hourly khi sửa • Giữ 30 ngày</span>
+                  </td>
+                  <td class="p-3.5 font-mono text-white">34.2 KB</td>
+                  <td class="p-3.5 text-[#9aa0a6] text-[11px]">Hôm nay, 13:40</td>
+                  <td class="p-3.5 pr-5 text-right">
+                    <button onclick="event.stopPropagation(); openVersionDrawer('ColorGrade_LUTs_Setting.xmp', 5, '34.2 KB', 'Hourly khi sửa', 'Adobe XMP Preset')" class="btn btn-secondary btn-sm">
+                      <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      <span>Lịch Sử Bản</span>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- FILE 5: ARCHIVE -->
+                <tr class="hover:bg-[#282a2f] transition-colors group cursor-pointer" onclick="openVersionDrawer('Original_SDCard_Dump.tar.zst', 1, '28.4 GB', 'Gốc (Không sửa)', 'Archive gốc')">
+                  <td class="p-3.5 pl-5 flex items-center gap-2.5 font-medium text-white">
+                    <svg class="w-4 h-4 text-[#8ab4f8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                    <span class="font-mono">Original_SDCard_Dump.tar.zst</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="chip chip-gray font-bold">1 Bản Gốc (Archive)</span>
+                  </td>
+                  <td class="p-3.5 text-[#bdc1c6]">
+                    <span class="text-[11px] font-mono text-[#9aa0a6]">Bảo lưu vĩnh viễn (WORM)</span>
+                  </td>
+                  <td class="p-3.5 font-mono text-white">28.4 GB</td>
+                  <td class="p-3.5 text-[#9aa0a6] text-[11px]">15/10/2026 09:12 (SD Import)</td>
+                  <td class="p-3.5 pr-5 text-right">
+                    <button onclick="event.stopPropagation(); openVersionDrawer('Original_SDCard_Dump.tar.zst', 1, '28.4 GB', 'Gốc (Không sửa)', 'Archive gốc')" class="btn btn-secondary btn-sm">
+                      <svg class="w-3.5 h-3.5 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      <span>Lịch Sử Bản</span>
+                    </button>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- FOOTER SUMMARY OF DRIVE -->
+          <div class="p-3.5 bg-[#181a1d] border-t border-[#3c4043] flex flex-col sm:flex-row items-center justify-between text-xs text-[#9aa0a6] gap-2">
+            <div>
+              <span>Đang hiển thị thư mục: </span>
+              <strong class="text-white font-mono">/volume1/Photos/2026_Family_Holiday/</strong>
+              <span class="ml-2 font-mono text-[#81c995]">(Tổng: 30.4 GB trên Telegram, Sharded qua 3 Channels)</span>
+            </div>
+            <div class="text-[11px] text-[#bdc1c6]">
+              Tất cả các tệp đều được mã hoá AES-256 Zero-Knowledge trước khi đẩy lên Telegram.
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB: TỔNG QUAN (OVERVIEW)                                      -->
+      <!-- ============================================================== -->
+      <section id="content-overview" class="hidden space-y-6">
+        <!-- 4 KPI CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-4">
+            <div class="text-xs text-[#9aa0a6] font-medium">Tổng Dung Lượng Trên Telegram</div>
+            <div class="text-2xl font-bold text-white mt-1.5 tracking-tight font-mono">2.41 TB</div>
+            <div class="mt-2 text-xs text-[#81c995]">Đã nén từ 4.8 TB dữ liệu gốc (50% tiết kiệm)</div>
+          </div>
+
+          <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-4">
+            <div class="text-xs text-[#9aa0a6] font-medium">Tốc Độ Điều Tiết QoS</div>
+            <div class="text-2xl font-bold text-white mt-1.5 tracking-tight font-mono" id="overviewSpeed">5.0 MB/s</div>
+            <div class="mt-2 text-xs text-[#9aa0a6]">Chế độ ngầm êm ái, nhường mạng gia đình</div>
+          </div>
+
+          <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-4">
+            <div class="text-xs text-[#9aa0a6] font-medium">Tài Nguyên Synology NAS</div>
+            <div class="text-2xl font-bold text-[#81c995] mt-1.5 tracking-tight font-mono">1.2% CPU</div>
+            <div class="mt-2 text-xs text-[#9aa0a6]">42 MB RAM (nice -n 19, ionice -c 3)</div>
+          </div>
+
+          <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-4">
+            <div class="text-xs text-[#9aa0a6] font-medium">Trạng Thái Telegram Mesh</div>
+            <div class="text-2xl font-bold text-[#81c995] mt-1.5 tracking-tight font-mono">4/4 Bots Ready</div>
+            <div class="mt-2 text-xs text-[#9aa0a6]">0 lỗi Flood-Wait (Phân phối xoay vòng)</div>
+          </div>
+        </div>
+
+        <!-- QUICK ACCESS ROW -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5 flex items-center justify-between">
+            <div>
+              <h4 class="text-sm font-semibold text-white">Khám Phá Telegram Drive &amp; Phiên Bản</h4>
+              <p class="text-xs text-[#9aa0a6] mt-1">Duyệt cây file, xem số phiên bản của từng tài liệu theo giờ/ngày/tuần.</p>
+            </div>
+            <button onclick="setTab('drive')" class="btn btn-primary btn-sm">Mở Drive</button>
+          </div>
+
+          <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5 flex items-center justify-between">
+            <div>
+              <h4 class="text-sm font-semibold text-white">Khôi Phục Time Machine 3D</h4>
+              <p class="text-xs text-[#9aa0a6] mt-1">Trượt mốc thời gian để tua lại toàn bộ cấu trúc thư mục NAS trong quá khứ.</p>
+            </div>
+            <button onclick="setTab('timemachine')" class="btn btn-secondary btn-sm">Mở Time Machine</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB: TIME MACHINE 3D SNAPSHOT EXPLORER                         -->
+      <!-- ============================================================== -->
+      <section id="content-timemachine" class="hidden space-y-6">
+        <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#3c4043]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="chip chip-yellow">Time Machine Engine</span>
+                <h3 class="text-base font-semibold text-white">Cỗ Máy Khôi Phục Đa Mốc Thời Gian (Point-In-Time)</h3>
+              </div>
+              <p class="text-xs text-[#9aa0a6] mt-1">
+                Lựa chọn bất kỳ thời điểm nào trong quá khứ để xem và khôi phục nguyên trạng thư mục hoặc từng tệp tin riêng lẻ.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="restoreFolderSnapshot()" class="btn btn-primary btn-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <span>Khôi Phục Mốc Này Về NAS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3D CAROUSEL OF SNAPSHOTS -->
+          <div class="mt-6">
+            <div class="text-xs font-semibold text-white mb-2 flex items-center justify-between">
+              <span>Trục Thời Gian Snapshots (5 Điểm Khôi Phục Gần Nhất)</span>
+              <span class="text-[#8ab4f8] font-mono text-[11px]" id="activeSnapshotLabel">Snapshot #141 — 05/11/2026 (02:00:00 AM) — Hôm Qua (Active)</span>
+            </div>
+
+            <div class="flex gap-3 overflow-x-auto pb-4 custom-scroll timemachine-stack pt-2">
+              <div onclick="selectSnapshot(1)" id="snap-card-1" class="timemachine-card inactive cursor-pointer bg-[#181a1d] border border-[#3c4043] rounded-xl p-4 w-44 shrink-0 text-center hover:opacity-100">
+                <span class="chip chip-gray text-[10px] mb-2">#01 • 30 Ngày</span>
+                <div class="text-xs font-bold text-white">07/10/2026</div>
+                <div class="text-[11px] text-[#9aa0a6] font-mono mt-1">02:00 AM</div>
+                <div class="mt-2 text-[10px] text-[#81c995]">12,410 Files</div>
+              </div>
+
+              <div onclick="selectSnapshot(2)" id="snap-card-2" class="timemachine-card inactive cursor-pointer bg-[#181a1d] border border-[#3c4043] rounded-xl p-4 w-44 shrink-0 text-center hover:opacity-100">
+                <span class="chip chip-gray text-[10px] mb-2">#68 • 15 Ngày</span>
+                <div class="text-xs font-bold text-white">22/10/2026</div>
+                <div class="text-[11px] text-[#9aa0a6] font-mono mt-1">02:00 AM</div>
+                <div class="mt-2 text-[10px] text-[#81c995]">24,800 Files</div>
+              </div>
+
+              <div onclick="selectSnapshot(3)" id="snap-card-3" class="timemachine-card inactive cursor-pointer bg-[#181a1d] border border-[#3c4043] rounded-xl p-4 w-44 shrink-0 text-center hover:opacity-100">
+                <span class="chip chip-gray text-[10px] mb-2">#112 • 7 Ngày</span>
+                <div class="text-xs font-bold text-white">29/10/2026</div>
+                <div class="text-[11px] text-[#9aa0a6] font-mono mt-1">02:00 AM</div>
+                <div class="mt-2 text-[10px] text-[#81c995]">38,120 Files</div>
+              </div>
+
+              <div onclick="selectSnapshot(4)" id="snap-card-4" class="timemachine-card active cursor-pointer bg-[#24262a] border border-[#8ab4f8] rounded-xl p-4 w-52 shrink-0 text-center shadow-lg">
+                <span class="chip chip-green text-[10px] mb-2">#141 • Đang Chọn</span>
+                <div class="text-xs font-bold text-white">05/11/2026</div>
+                <div class="text-[11px] text-[#9aa0a6] font-mono mt-1">02:00 AM (Hôm qua)</div>
+                <div class="mt-2 text-[10px] text-[#81c995]">42,109 Files (842 GB)</div>
+              </div>
+
+              <div onclick="selectSnapshot(5)" id="snap-card-5" class="timemachine-card inactive cursor-pointer bg-[#181a1d] border border-[#3c4043] rounded-xl p-4 w-44 shrink-0 text-center hover:opacity-100">
+                <span class="chip chip-blue text-[10px] mb-2">Head • Hiện Tại</span>
+                <div class="text-xs font-bold text-white">06/11/2026</div>
+                <div class="text-[11px] text-[#9aa0a6] font-mono mt-1">Trực Tiếp (Live)</div>
+                <div class="mt-2 text-[10px] text-[#81c995]">Đang Trickle Sync</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NOTIFICATION BANNER -->
+          <div id="tmAlertBanner" class="hidden mt-4 p-3 bg-[#13271f] border border-[#1e4634] rounded-xl text-xs text-[#81c995] flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span id="tmAlertMsg">Đang xử lý khôi phục...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB: BỘ CHỌN THƯ MỤC SYNOLOGY (TREE SELECTOR)                  -->
       <!-- ============================================================== -->
       <section id="content-tree-selector" class="hidden space-y-6">
         <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#3c4043]">
             <div>
               <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded bg-[#8ab4f8]/20 text-[#8ab4f8] text-[11px] font-bold">Synology Tree Explorer</span>
-                <h3 class="text-base font-semibold text-white">Bộ Chọn Thư Mục &amp; Lọc Dữ Liệu Thông Minh</h3>
+                <span class="chip chip-blue">Btrfs Tree Explorer</span>
+                <h3 class="text-base font-semibold text-white">Bộ Chọn Thư Mục &amp; Bộ Lọc Rác Synology</h3>
               </div>
               <p class="text-xs text-[#9aa0a6] mt-1">
                 Tích hợp trực tiếp cây thư mục Btrfs của Synology DSM. Cho phép chọn từng Share, từng Folder con, kết hợp bộ lọc rác tự động.
@@ -209,7 +707,7 @@
               </div>
               <span class="text-[#5f6368]">|</span>
               <div class="text-xs">
-                <span class="text-[#9aa0a6]">Dự kiến nén/dedup:</span>
+                <span class="text-[#9aa0a6]">Dự kiến nén:</span>
                 <strong class="text-[#81c995] font-mono ml-1">~402.1 GB</strong>
               </div>
             </div>
@@ -222,7 +720,7 @@
             <div class="lg:col-span-7 bg-[#1a1c1e] border border-[#3c4043] rounded-xl p-4 space-y-2">
               <div class="flex items-center justify-between pb-2 border-b border-[#3c4043] text-xs">
                 <span class="font-medium text-white flex items-center gap-1.5">
-                  <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                  <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                   <span>Cây Thư Mục Synology DSM</span>
                 </span>
                 <div class="flex gap-2 text-[11px]">
@@ -234,148 +732,95 @@
 
               <!-- TREE NODES -->
               <div class="space-y-1 font-mono text-xs pt-1 select-none">
-                
-                <!-- VOLUME 1 -->
                 <div class="tree-node">
                   <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer group">
                     <div class="flex items-center gap-2">
-                      <svg class="w-3.5 h-3.5 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                      <svg class="w-3.5 h-3.5 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                       <input type="checkbox" checked class="accent-[#1a73e8] rounded">
                       <span class="text-sm font-bold text-white">/volume1</span>
-                      <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#3c4043] text-[#bdc1c6]">Btrfs Volume</span>
+                      <span class="chip chip-gray text-[10px] py-0.2">Btrfs Volume</span>
                     </div>
                     <span class="text-[11px] text-[#9aa0a6]">1.8 TB / 3.6 TB</span>
                   </div>
 
                   <!-- CHILDREN OF VOLUME 1 -->
-                  <div class="pl-6 border-l border-[#3c4043] ml-3 my-1 space-y-1">
-                    
-                    <!-- PHOTOS SHARE -->
-                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer">
+                  <div class="pl-6 space-y-1 mt-1 border-l border-[#3c4043] ml-3">
+                    <div class="flex items-center justify-between p-1.5 rounded hover:bg-[#282a2f]">
                       <div class="flex items-center gap-2">
-                        <input type="checkbox" checked id="check-photos" class="accent-[#1a73e8] rounded" onchange="updateTreeCalc()">
-                        <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <input type="checkbox" id="check-photos" checked onchange="updateTreeCalc()" class="accent-[#1a73e8] rounded">
+                        <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
                         <span class="text-white font-medium">/volume1/Photos</span>
-                        <span class="text-[10px] text-[#81c995] bg-[#13271f] border border-[#1e4634] px-1 rounded">Vault #1</span>
                       </div>
-                      <div class="text-right text-[11px]">
-                        <div class="text-white font-medium">420.5 GB</div>
-                        <div class="text-[10px] text-[#9aa0a6]">28,401 tệp</div>
-                      </div>
+                      <span class="text-[11px] text-[#81c995]">540.2 GB (Selected)</span>
                     </div>
 
-                    <!-- DOCUMENTS SHARE -->
-                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer">
+                    <div class="flex items-center justify-between p-1.5 rounded hover:bg-[#282a2f]">
                       <div class="flex items-center gap-2">
-                        <input type="checkbox" checked id="check-docs" class="accent-[#1a73e8] rounded" onchange="updateTreeCalc()">
-                        <svg class="w-4 h-4 text-[#fdd663]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <input type="checkbox" id="check-docs" checked onchange="updateTreeCalc()" class="accent-[#1a73e8] rounded">
+                        <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
                         <span class="text-white font-medium">/volume1/Documents</span>
-                        <span class="text-[10px] text-[#81c995] bg-[#13271f] border border-[#1e4634] px-1 rounded">Vault #2</span>
                       </div>
-                      <div class="text-right text-[11px]">
-                        <div class="text-white font-medium">110.0 GB</div>
-                        <div class="text-[10px] text-[#9aa0a6]">8,908 tệp</div>
-                      </div>
+                      <span class="text-[11px] text-[#81c995]">210.8 GB (Selected)</span>
                     </div>
 
-                    <!-- HOMES SHARE -->
-                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer">
+                    <div class="flex items-center justify-between p-1.5 rounded hover:bg-[#282a2f]">
                       <div class="flex items-center gap-2">
-                        <input type="checkbox" checked id="check-homes" class="accent-[#1a73e8] rounded" onchange="updateTreeCalc()">
-                        <svg class="w-4 h-4 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <input type="checkbox" id="check-homes" checked onchange="updateTreeCalc()" class="accent-[#1a73e8] rounded">
+                        <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
                         <span class="text-white font-medium">/volume1/homes</span>
-                        <span class="text-[10px] text-[#81c995] bg-[#13271f] border border-[#1e4634] px-1 rounded">Vault #2</span>
                       </div>
-                      <div class="text-right text-[11px]">
-                        <div class="text-white font-medium">312.0 GB</div>
-                        <div class="text-[10px] text-[#9aa0a6]">4,800 tệp</div>
-                      </div>
+                      <span class="text-[11px] text-[#81c995]">91.5 GB (Selected)</span>
                     </div>
 
-                    <!-- DOCKER SHARE (UNCHECKED BY DEFAULT) -->
-                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer opacity-70">
+                    <div class="flex items-center justify-between p-1.5 rounded hover:bg-[#282a2f]">
                       <div class="flex items-center gap-2">
-                        <input type="checkbox" id="check-docker" class="accent-[#1a73e8] rounded" onchange="updateTreeCalc()">
-                        <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        <span class="text-[#bdc1c6]">/volume1/docker</span>
-                        <span class="text-[10px] text-[#fdd663] bg-[#fdd663]/10 px-1 rounded">Hot State</span>
+                        <input type="checkbox" id="check-docker" onchange="updateTreeCalc()" class="accent-[#1a73e8] rounded">
+                        <svg class="w-4 h-4 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                        <span class="text-[#9aa0a6]">/volume1/docker</span>
                       </div>
-                      <div class="text-right text-[11px]">
-                        <div class="text-[#bdc1c6]">48.2 GB</div>
-                        <div class="text-[10px] text-[#9aa0a6]">12,190 tệp</div>
-                      </div>
+                      <span class="text-[11px] text-[#9aa0a6]">45.2 GB (Ignored)</span>
                     </div>
-
                   </div>
                 </div>
-
-                <!-- VOLUME 2 -->
-                <div class="tree-node pt-2">
-                  <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[#282a2f] cursor-pointer opacity-60">
-                    <div class="flex items-center gap-2">
-                      <svg class="w-3.5 h-3.5 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                      <input type="checkbox" class="accent-[#1a73e8] rounded">
-                      <span class="text-sm font-bold text-[#bdc1c6]">/volume2 (Media Drive)</span>
-                    </div>
-                    <span class="text-[11px] text-[#9aa0a6]">3.2 TB / 8.0 TB</span>
-                  </div>
-                </div>
-
               </div>
             </div>
 
-            <!-- RIGHT PANE: SMART INCLUSION / EXCLUSION ENGINE (5 COLS) -->
-            <div class="lg:col-span-5 bg-[#1a1c1e] border border-[#3c4043] rounded-xl p-4 flex flex-col justify-between space-y-4">
-              <div>
-                <h4 class="text-xs font-semibold text-white flex items-center gap-2 pb-2 border-b border-[#3c4043]">
-                  <svg class="w-4 h-4 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                  <span>Bộ Lọc Rác &amp; Quy Tắc Loại Trừ (Smart Exclusions)</span>
-                </h4>
-
-                <!-- PRESET BUTTONS -->
-                <div class="space-y-3 mt-3">
-                  <label class="flex items-start gap-2.5 p-2.5 bg-[#24262a] rounded-lg border border-[#3c4043] cursor-pointer hover:border-[#8ab4f8] transition-all">
-                    <input type="checkbox" checked class="mt-1 accent-[#8ab4f8]">
-                    <div class="text-xs">
-                      <strong class="text-white">Synology DSM System Clean</strong>
-                      <p class="text-[11px] text-[#9aa0a6] mt-0.5">Tự loại bỏ tệp thumbnail ngầm <code>@eaDir/**</code>, thùng rác <code>#recycle/**</code>, tài nguyên <code>@SynoResource/**</code>.</p>
-                    </div>
-                  </label>
-
-                  <label class="flex items-start gap-2.5 p-2.5 bg-[#24262a] rounded-lg border border-[#3c4043] cursor-pointer hover:border-[#8ab4f8] transition-all">
-                    <input type="checkbox" checked class="mt-1 accent-[#8ab4f8]">
-                    <div class="text-xs">
-                      <strong class="text-white">OS Junk &amp; Temporary Files</strong>
-                      <p class="text-[11px] text-[#9aa0a6] mt-0.5">Bỏ qua <code>.DS_Store</code> (macOS), <code>Thumbs.db</code> (Windows), <code>*.tmp</code>, <code>*.crdownload</code>.</p>
-                    </div>
-                  </label>
-
-                  <label class="flex items-start gap-2.5 p-2.5 bg-[#24262a] rounded-lg border border-[#3c4043] cursor-pointer hover:border-[#8ab4f8] transition-all">
-                    <input type="checkbox" checked class="mt-1 accent-[#8ab4f8]">
-                    <div class="text-xs">
-                      <strong class="text-white">Developer Code Cache</strong>
-                      <p class="text-[11px] text-[#9aa0a6] mt-0.5">Bỏ qua <code>node_modules/**</code>, <code>.git/**</code>, <code>target/**</code>, <code>vendor/**</code> để tránh hàng triệu tệp nhỏ.</p>
-                    </div>
-                  </label>
-                </div>
-
-                <!-- CUSTOM PATTERN INPUT -->
-                <div class="mt-4">
-                  <label class="text-[11px] font-medium text-[#bdc1c6] block mb-1">Quy tắc tuỳ biến mở rộng (Glob syntax):</label>
-                  <textarea rows="2" class="w-full bg-[#181a1d] text-xs font-mono text-white p-2.5 rounded-lg border border-[#3c4043] focus:outline-none focus:border-[#8ab4f8]" placeholder="*.iso, *.mkv > 50GB, Cache/**"></textarea>
-                </div>
+            <!-- RIGHT PANE: EXCLUSION PRESETS (5 COLS) -->
+            <div class="lg:col-span-5 bg-[#1a1c1e] border border-[#3c4043] rounded-xl p-4 space-y-4">
+              <div class="pb-2 border-b border-[#3c4043]">
+                <h4 class="text-xs font-semibold text-white">Bộ Lọc Loại Trừ Tự Động (Synology Filters)</h4>
+                <p class="text-[11px] text-[#9aa0a6] mt-0.5">Bảo vệ băng thông bằng cách loại bỏ các thư mục rác và thumbnails của DSM.</p>
               </div>
 
-              <!-- SAVE SELECTION BUTTON -->
-              <div class="pt-3 border-t border-[#3c4043] flex justify-between items-center">
-                <span class="text-[11px] text-[#81c995] flex items-center gap-1.5">
-                  <svg class="w-4 h-4 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Đã lọc 14,800 tệp rác</span>
-                </span>
-                <button onclick="saveFolderSelection()" class="px-4 py-2 bg-[#1a73e8] hover:bg-[#1b66ca] text-white text-xs font-medium rounded-lg shadow-sm">
-                  Lưu Cấu Hình Thư Mục
-                </button>
+              <div class="space-y-2 text-xs">
+                <label class="flex items-center justify-between p-2 rounded bg-[#24262a] border border-[#3c4043] cursor-pointer">
+                  <span class="flex items-center gap-2 text-white">
+                    <input type="checkbox" checked class="accent-[#1a73e8] rounded">
+                    <span>Loại bỏ thư mục Thumbnail (@eaDir/**)</span>
+                  </span>
+                  <span class="chip chip-green text-[10px]">Tiết kiệm 18 GB</span>
+                </label>
+
+                <label class="flex items-center justify-between p-2 rounded bg-[#24262a] border border-[#3c4043] cursor-pointer">
+                  <span class="flex items-center gap-2 text-white">
+                    <input type="checkbox" checked class="accent-[#1a73e8] rounded">
+                    <span>Bỏ qua Thùng rác Synology (#recycle/**)</span>
+                  </span>
+                  <span class="chip chip-green text-[10px]">Tiết kiệm 45 GB</span>
+                </label>
+
+                <label class="flex items-center justify-between p-2 rounded bg-[#24262a] border border-[#3c4043] cursor-pointer">
+                  <span class="flex items-center gap-2 text-white">
+                    <input type="checkbox" checked class="accent-[#1a73e8] rounded">
+                    <span>Bỏ qua tệp tạm hệ điều hành (@tmp, .DS_Store)</span>
+                  </span>
+                  <span class="chip chip-green text-[10px]">Tiết kiệm 2 GB</span>
+                </label>
               </div>
+
+              <button onclick="saveFolderSelection()" class="btn btn-primary w-full mt-4">
+                <span>Lưu Cấu Hình Thư Mục</span>
+              </button>
             </div>
 
           </div>
@@ -383,434 +828,144 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 2: TIME MACHINE 3D POINT-IN-TIME EXPLORER                  -->
-      <!-- ============================================================== -->
-      <section id="content-timemachine" class="hidden space-y-6">
-        <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#3c4043]">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded bg-[#f28b82]/20 text-[#f28b82] text-[11px] font-bold">Apple Time Machine Experience</span>
-                <h3 class="text-base font-semibold text-white">Khôi Phục Theo Dòng Thời Gian (Point-in-Time Rollback)</h3>
-              </div>
-              <p class="text-xs text-[#9aa0a6] mt-1">
-                Xem lại toàn bộ cây thư mục NAS tại bất kỳ thời khắc nào trong quá khứ. Cứu tệp lỡ xoá hoặc bị dính virus mã hoá (Ransomware protection).
-              </p>
-            </div>
-
-            <!-- TIME MACHINE ACTIVE BADGE -->
-            <div class="bg-[#181a1d] border border-[#3c4043] px-3.5 py-2 rounded-xl flex items-center gap-3">
-              <span class="w-2.5 h-2.5 rounded-full bg-[#f28b82] animate-pulse"></span>
-              <div>
-                <div class="text-[10px] text-[#9aa0a6] uppercase tracking-wider">Mốc Snapshot Được Chọn</div>
-                <div class="text-xs font-mono font-bold text-[#8ab4f8]" id="activeSnapshotLabel">Snapshot #141 — 05/11/2026 (02:00:00 AM)</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- TIME MACHINE 3D STACKED TIMELINE CARDS -->
-          <div class="timemachine-stack my-6 py-4 overflow-x-auto custom-scroll">
-            <div class="flex items-center justify-center gap-4 min-w-[700px]">
-              
-              <!-- CARD 1: 30 DAYS AGO -->
-              <div onclick="selectSnapshot(1)" id="snap-card-1" class="timemachine-card inactive cursor-pointer bg-[#181a1d] border border-[#3c4043] rounded-xl p-4 w-44 shrink-0 text-center hover:opacity-100">
-                <div class="text-[10px] font-mono text-[#9aa0a6]">30 Ngày Trước</div>
-                <div class="text-sm font-bold text-white mt-1">07 Thg 10</div>
-                <div class="text-[11px] text-[#bdc1c6] mt-2 font-mono">812.4 GB</div>
-                <span class="mt-2 inline-block text-[10px] px-2 py-0.5 rounded bg-[#3c4043] text-[#9aa0a6]">v1.0 (Full)</span>
-              </div>
-
-              <!-- CARD 2: 15 DAYS AGO -->
-              <div onclick="selectSnapshot(2)" id="snap-card-2" class="timemachine-card inactive cursor-pointer bg-[#181a1d] border border-[#3c4043] rounded-xl p-4 w-44 shrink-0 text-center hover:opacity-100">
-                <div class="text-[10px] font-mono text-[#9aa0a6]">15 Ngày Trước</div>
-                <div class="text-sm font-bold text-white mt-1">22 Thg 10</div>
-                <div class="text-[11px] text-[#bdc1c6] mt-2 font-mono">+12.8 GB diff</div>
-                <span class="mt-2 inline-block text-[10px] px-2 py-0.5 rounded bg-[#3c4043] text-[#9aa0a6]">Snapshot #68</span>
-              </div>
-
-              <!-- CARD 3: 7 DAYS AGO -->
-              <div onclick="selectSnapshot(3)" id="snap-card-3" class="timemachine-card inactive cursor-pointer bg-[#181a1d] border border-[#3c4043] rounded-xl p-4 w-44 shrink-0 text-center hover:opacity-100">
-                <div class="text-[10px] font-mono text-[#9aa0a6]">7 Ngày Trước</div>
-                <div class="text-sm font-bold text-white mt-1">29 Thg 10</div>
-                <div class="text-[11px] text-[#bdc1c6] mt-2 font-mono">+4.2 GB diff</div>
-                <span class="mt-2 inline-block text-[10px] px-2 py-0.5 rounded bg-[#3c4043] text-[#9aa0a6]">Snapshot #112</span>
-              </div>
-
-              <!-- CARD 4: YESTERDAY (ACTIVE) -->
-              <div onclick="selectSnapshot(4)" id="snap-card-4" class="timemachine-card active cursor-pointer bg-[#24262a] border border-[#8ab4f8] rounded-xl p-4 w-52 shrink-0 text-center shadow-lg">
-                <div class="text-[10px] font-mono text-[#8ab4f8] font-bold">Hôm Qua (Active)</div>
-                <div class="text-base font-bold text-white mt-1">05 Thg 11 (02:00)</div>
-                <div class="text-xs text-[#81c995] mt-2 font-mono font-medium">+1.8 GB diff</div>
-                <span class="mt-2 inline-block text-[10px] px-2.5 py-0.5 rounded-full bg-[#1a73e8]/30 text-[#8ab4f8] font-bold border border-[#1a73e8]">Snapshot #141</span>
-              </div>
-
-              <!-- CARD 5: LIVE TODAY -->
-              <div onclick="selectSnapshot(5)" id="snap-card-5" class="timemachine-card inactive cursor-pointer bg-[#181a1d] border border-[#3c4043] rounded-xl p-4 w-44 shrink-0 text-center hover:opacity-100">
-                <div class="text-[10px] font-mono text-[#81c995]">Hiện Tại (Live)</div>
-                <div class="text-sm font-bold text-white mt-1">Hôm Nay</div>
-                <div class="text-[11px] text-[#bdc1c6] mt-2 font-mono">Đang đồng bộ...</div>
-                <span class="mt-2 inline-block text-[10px] px-2 py-0.5 rounded bg-[#81c995]/20 text-[#81c995]">Head State</span>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- TIME MACHINE DUAL-VIEW DIFF & FILE BROWSER -->
-          <div class="bg-[#1a1c1e] border border-[#3c4043] rounded-xl overflow-hidden mt-4">
-            <div class="bg-[#212327] px-4 py-3 flex items-center justify-between border-b border-[#3c4043]">
-              <div class="flex items-center gap-2 text-xs font-mono text-[#bdc1c6]">
-                <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-                <span class="text-[#8ab4f8]">/volume1/Photos/2026/Family_Trip/</span>
-                <span class="text-[#5f6368]">(Tại mốc 05/11/2026)</span>
-              </div>
-              <div class="flex gap-2">
-                <button onclick="restoreFolderSnapshot()" class="px-3 py-1.5 bg-[#1a73e8] hover:bg-[#1b66ca] text-white rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 shadow-sm">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                  <span>Khôi phục toàn bộ thư mục về mốc này</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- TABLE OF FILES WITH VERSION DETAILS -->
-            <table class="w-full text-left text-xs font-mono">
-              <thead class="bg-[#181a1d] text-[#9aa0a6] text-[11px] uppercase tracking-wider border-b border-[#3c4043]">
-                <tr>
-                  <th class="p-3">Tên Tệp Tin</th>
-                  <th class="p-3">Phiên Bản</th>
-                  <th class="p-3">Kích Thước</th>
-                  <th class="p-3">Khử Trùng Lặp (CAS Hash)</th>
-                  <th class="p-3">Biến Động Tệp (Diff)</th>
-                  <th class="p-3 text-right">Thao Tác Khôi Phục</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-[#3c4043]/50 text-xs" id="timeMachineFileTable">
-                <tr class="hover:bg-[#282a2f] transition-colors">
-                  <td class="p-3 flex items-center gap-2 text-white">
-                    <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span>DSC_9398_Beach.RAW</span>
-                  </td>
-                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-[#1a73e8]/20 text-[#8ab4f8] text-[10px] font-bold">v3 (Sửa lần 3)</span></td>
-                  <td class="p-3 text-[#bdc1c6]">148.5 MB</td>
-                  <td class="p-3 text-[#9aa0a6] text-[11px]">8f43a...11a9</td>
-                  <td class="p-3 text-[#fdd663]">Sửa đổi gần nhất</td>
-                  <td class="p-3 text-right">
-                    <button onclick="restoreSingle('DSC_9398_Beach.RAW', 'v3')" class="px-2 py-1 bg-[#282a2f] hover:bg-[#3c4043] rounded text-[#8ab4f8] hover:underline">Restore v3</button>
-                  </td>
-                </tr>
-
-                <tr class="hover:bg-[#282a2f] transition-colors">
-                  <td class="p-3 flex items-center gap-2 text-white">
-                    <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span>DSC_9399_Family.RAW</span>
-                  </td>
-                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-[#81c995]/20 text-[#81c995] text-[10px] font-bold">v1 (Gốc)</span></td>
-                  <td class="p-3 text-[#bdc1c6]">142.0 MB</td>
-                  <td class="p-3 text-[#9aa0a6] text-[11px]">e3b0c...98b2</td>
-                  <td class="p-3 text-[#81c995]">Không thay đổi</td>
-                  <td class="p-3 text-right">
-                    <button onclick="restoreSingle('DSC_9399_Family.RAW', 'v1')" class="px-2 py-1 bg-[#282a2f] hover:bg-[#3c4043] rounded text-[#8ab4f8] hover:underline">Restore v1</button>
-                  </td>
-                </tr>
-
-                <tr class="hover:bg-[#282a2f] transition-colors bg-[#f28b82]/5">
-                  <td class="p-3 flex items-center gap-2 text-[#f28b82]">
-                    <svg class="w-4 h-4 text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    <span>Hotel_Invoice_Tax.pdf</span>
-                  </td>
-                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-[#f28b82]/20 text-[#f28b82] text-[10px] font-bold">v1 (Bị xoá)</span></td>
-                  <td class="p-3 text-[#bdc1c6]">3.4 MB</td>
-                  <td class="p-3 text-[#9aa0a6] text-[11px]">47a19...ee02</td>
-                  <td class="p-3 text-[#f28b82]">Đã bị xoá trên NAS hôm nay</td>
-                  <td class="p-3 text-right">
-                    <button onclick="restoreSingle('Hotel_Invoice_Tax.pdf', 'v1')" class="px-2.5 py-1 bg-[#f28b82]/20 hover:bg-[#f28b82]/30 text-[#f28b82] rounded font-bold">Cứu lại tệp</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- TIME MACHINE RESTORE BANNER -->
-          <div id="tmAlertBanner" class="hidden mt-4 p-3 bg-[#13271f] border border-[#1e4634] rounded-lg text-xs text-[#81c995] flex items-center justify-between">
-            <span id="tmAlertMsg">Đang khởi tạo quá trình khôi phục điểm thời gian...</span>
-            <span class="text-[11px] text-[#9aa0a6]">Thư mục đích: /volume1/Restore_Output/</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================================== -->
-      <!-- TAB 3: ĐA NAS PUSH & PULL MESH (ACTIVE/REPLICA TOPOLOGY)       -->
+      <!-- TAB: ĐA NAS PUSH & PULL REPLICATION                            -->
       <!-- ============================================================== -->
       <section id="content-multinas" class="hidden space-y-6">
         <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#3c4043]">
             <div>
               <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded bg-[#8ab4f8]/20 text-[#8ab4f8] text-[11px] font-bold">Multi-Site Replication Engine</span>
-                <h3 class="text-base font-semibold text-white">Mô Hình Cụm Đa NAS: Chế Độ PUSH (Đẩy) &amp; PULL (Kéo)</h3>
+                <span class="chip chip-blue">Multi-NAS Topology</span>
+                <h3 class="text-base font-semibold text-white">Mô Hình Cụm Đa NAS (PUSH vs PULL Replication)</h3>
               </div>
               <p class="text-xs text-[#9aa0a6] mt-1">
-                Quản lý kiến trúc nhiều NAS: NAS chính đóng vai trò nguồn đẩy lên Telegram, NAS phụ / chi nhánh / nhà riêng chỉ nhận kéo dữ liệu về để phục vụ đọc offline tốc độ cao.
+                Thiết lập linh hoạt giữa các trạm NAS: NAS chính đóng vai trò PUSH (đẩy sao lưu lên Telegram), các NAS phụ đóng vai trò PULL (kéo đồng bộ về).
               </p>
             </div>
 
-            <!-- CURRENT NODE ROLE BADGE -->
-            <div class="bg-[#181a1d] border border-[#3c4043] px-3.5 py-2 rounded-xl flex items-center gap-3">
-              <span class="w-2.5 h-2.5 rounded-full bg-[#81c995] animate-ping"></span>
-              <div>
-                <div class="text-[10px] text-[#9aa0a6] uppercase tracking-wider">Vai trò NAS hiện tại</div>
-                <div class="text-xs font-mono font-bold text-[#81c995]" id="currentNodeRoleBadge">NODE_MODE=PUSH (Source Master)</div>
+            <span class="chip chip-green" id="currentNodeRoleBadge">NODE_MODE=PUSH (Source Master)</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <!-- MODE 1: PUSH -->
+            <div onclick="updateNodeRole('PUSH')" class="p-4 bg-[#1a1c1e] border-2 border-[#1a73e8] rounded-xl cursor-pointer hover:border-[#8ab4f8] transition-all">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-bold text-white flex items-center gap-2">
+                  <svg class="w-4 h-4 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                  <span>Chế Độ PUSH (Source Master)</span>
+                </span>
+                <span class="chip chip-green text-[10px]">Đang Dùng</span>
               </div>
+              <p class="text-xs text-[#9aa0a6] mt-2 leading-relaxed">
+                Dành cho NAS chính (Văn phòng / Nhà riêng). Tự động quét vi sai các thư mục cục bộ, mã hoá AES-256 và đẩy lên Telegram Cloud.
+              </p>
+            </div>
+
+            <!-- MODE 2: PULL -->
+            <div onclick="updateNodeRole('PULL')" class="p-4 bg-[#1a1c1e] border border-[#3c4043] rounded-xl cursor-pointer hover:border-[#8ab4f8] transition-all opacity-80 hover:opacity-100">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-bold text-white flex items-center gap-2">
+                  <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                  <span>Chế Độ PULL (Replica Receiver)</span>
+                </span>
+                <span class="chip chip-gray text-[10px]">Dự Phòng</span>
+              </div>
+              <p class="text-xs text-[#9aa0a6] mt-2 leading-relaxed">
+                Dành cho NAS phụ tại chi nhánh hoặc cơ quan. Chỉ lắng nghe và kéo các tệp mới từ Telegram về để nhân bản dữ liệu 1-1.
+              </p>
             </div>
           </div>
 
-          <!-- TOPOLOGY DIAGRAM -->
-          <div class="my-6 grid grid-cols-1 lg:grid-cols-11 gap-3 items-center">
-            
-            <!-- NODE 1: NAS MAIN (PUSH) -->
-            <div class="lg:col-span-3 bg-[#1a1c1e] border-2 border-[#1a73e8] rounded-xl p-4 shadow-lg relative">
-              <div class="absolute -top-2.5 left-4 px-2 py-0.5 rounded bg-[#1a73e8] text-white text-[10px] font-bold uppercase tracking-wider">
-                NAS-01 (Văn Phòng / Nguồn)
-              </div>
-              <div class="flex items-center justify-between mt-2">
-                <span class="text-xs font-bold text-white">Synology DS920+</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#13271f] text-[#81c995] border border-[#1e4634]">MODE=PUSH</span>
-              </div>
-              <div class="mt-3 space-y-1.5 text-[11px] text-[#bdc1c6] font-mono">
-                <div>Nguồn: <span class="text-white">/volume1/Photos</span></div>
-                <div>Tốc độ: <span class="text-[#8ab4f8] font-bold">4.8 MB/s (Trickle)</span></div>
-                <div>Lịch: <span class="text-[#9aa0a6]">Quét liên tục khi có tệp mới</span></div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-[#3c4043] text-[10px] text-[#81c995]">
-                ● Đang nén &amp; đẩy Snapshot #141 lên Telegram
-              </div>
-            </div>
-
-            <!-- ARROW PUSH -->
-            <div class="lg:col-span-1 flex flex-col items-center justify-center text-center">
-              <span class="text-xs text-[#8ab4f8] font-bold font-mono">PUSH</span>
-              <svg class="w-6 h-6 text-[#8ab4f8] animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-              <span class="text-[10px] text-[#9aa0a6]">AES-256</span>
-            </div>
-
-            <!-- CENTER: TELEGRAM CLOUD VAULT (CENTRAL HUB) -->
-            <div class="lg:col-span-3 bg-gradient-to-b from-[#1e2838] to-[#161c27] border-2 border-[#8ab4f8]/50 rounded-xl p-4 text-center shadow-xl">
-              <div class="w-10 h-10 mx-auto rounded-full bg-[#1a73e8]/20 border border-[#8ab4f8] flex items-center justify-center text-white">
-                <svg class="w-5 h-5 text-[#8ab4f8]" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-              </div>
-              <h4 class="text-sm font-bold text-white mt-2">Telegram Cloud Vault</h4>
-              <p class="text-[10px] text-[#9aa0a6] font-mono mt-0.5">Central Hub &amp; Multi-Bot Mesh</p>
-              
-              <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-[#3c4043]/60 text-left text-[11px] font-mono">
-                <div>
-                  <span class="text-[#9aa0a6]">Dung lượng:</span>
-                  <div class="text-white font-bold">2.41 TB</div>
-                </div>
-                <div>
-                  <span class="text-[#9aa0a6]">Bot Pool:</span>
-                  <div class="text-[#81c995] font-bold">4 Bots Active</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- ARROW PULL -->
-            <div class="lg:col-span-1 flex flex-col items-center justify-center text-center">
-              <span class="text-xs text-[#81c995] font-bold font-mono">PULL</span>
-              <svg class="w-6 h-6 text-[#81c995] animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-              <span class="text-[10px] text-[#9aa0a6]">Giải mã CAS</span>
-            </div>
-
-            <!-- NODE 2: NAS REPLICA (PULL) -->
-            <div class="lg:col-span-3 bg-[#1a1c1e] border-2 border-[#81c995] rounded-xl p-4 shadow-lg relative">
-              <div class="absolute -top-2.5 left-4 px-2 py-0.5 rounded bg-[#81c995] text-[#13271f] text-[10px] font-bold uppercase tracking-wider">
-                NAS-02 (Nhà Riêng / Replica)
-              </div>
-              <div class="flex items-center justify-between mt-2">
-                <span class="text-xs font-bold text-white">Synology DS220+</span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#13271f] text-[#81c995] border border-[#1e4634]">MODE=PULL</span>
-              </div>
-              <div class="mt-3 space-y-1.5 text-[11px] text-[#bdc1c6] font-mono">
-                <div>Đích: <span class="text-white">/volume1/replica_photos</span></div>
-                <div>Chiến lược: <span class="text-[#81c995] font-bold">Mirror Sync</span></div>
-                <div>Lịch: <span class="text-[#9aa0a6]">03:00 AM (Sau khi NAS-01 đẩy)</span></div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-[#3c4043] text-[10px] text-[#81c995]">
-                ● Đã đồng bộ 100% bản sao từ Telegram
-              </div>
-            </div>
-
-          </div>
-
-          <!-- NODE CONFIGURATOR -->
-          <div class="bg-[#181a1d] border border-[#3c4043] rounded-xl p-5 mt-6 space-y-4">
-            <h4 class="text-sm font-semibold text-white flex items-center gap-2">
-              <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-              <span>Thiết Lập Vai Trò Cho Chiếc NAS Này (Runtime Mode Switcher)</span>
-            </h4>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <!-- OPTION 1: PUSH -->
-              <label class="p-3.5 bg-[#24262a] border-2 border-[#1a73e8] rounded-xl flex items-start gap-3 cursor-pointer">
-                <input type="radio" name="node_mode_radio" value="PUSH" checked class="mt-1 accent-[#1a73e8]" onchange="updateNodeRole('PUSH')">
-                <div class="text-xs">
-                  <strong class="text-white text-sm">Chế độ PUSH (Đẩy Lên)</strong>
-                  <p class="text-[11px] text-[#9aa0a6] mt-1">
-                    NAS này đóng vai trò <strong>Nguồn Gốc (Master)</strong>. Quét thư mục nội bộ và mã hoá đẩy tệp mới lên Telegram Cloud.
-                  </p>
-                </div>
-              </label>
-
-              <!-- OPTION 2: PULL -->
-              <label class="p-3.5 bg-[#24262a] border border-[#3c4043] rounded-xl flex items-start gap-3 cursor-pointer hover:border-[#8ab4f8] transition-all">
-                <input type="radio" name="node_mode_radio" value="PULL" class="mt-1 accent-[#1a73e8]" onchange="updateNodeRole('PULL')">
-                <div class="text-xs">
-                  <strong class="text-white text-sm">Chế độ PULL (Kéo Về)</strong>
-                  <p class="text-[11px] text-[#9aa0a6] mt-1">
-                    NAS này đóng vai trò <strong>Bản Sao (Replica)</strong>. Chỉ nhận kéo dữ liệu từ Telegram về ổ cứng, không đẩy ngược lên.
-                  </p>
-                </div>
-              </label>
-
-              <!-- OPTION 3: TWO_WAY -->
-              <label class="p-3.5 bg-[#24262a] border border-[#3c4043] rounded-xl flex items-start gap-3 cursor-pointer hover:border-[#8ab4f8] transition-all">
-                <input type="radio" name="node_mode_radio" value="TWO_WAY" class="mt-1 accent-[#1a73e8]" onchange="updateNodeRole('TWO_WAY')">
-                <div class="text-xs">
-                  <strong class="text-white text-sm">Chế độ TWO-WAY (2 Chiều)</strong>
-                  <p class="text-[11px] text-[#9aa0a6] mt-1">
-                    Đồng bộ 2 chiều (Bidirectional sync). Bất kỳ thay đổi ở NAS nào cũng sẽ được cập nhật đồng nhất qua Telegram.
-                  </p>
-                </div>
-              </label>
-            </div>
-
-            <!-- PATH SELECTION & SAVE -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-[#3c4043]">
+          <!-- PULL STRATEGY & CONFIGURATION FORM -->
+          <div class="mt-6 bg-[#181a1d] p-4 rounded-xl border border-[#3c4043] space-y-4">
+            <h4 class="text-xs font-semibold text-white">Cấu Hình Đường Dẫn &amp; Chiến Lược Đồng Bộ</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="text-[11px] text-[#9aa0a6] block mb-1 font-mono">Đường dẫn thư mục sao lưu cục bộ (Local Path):</label>
-                <input type="text" id="nodeLocalPathInput" value="/volume1/Photos" class="w-full bg-[#141517] text-xs font-mono text-white p-2.5 rounded-lg border border-[#3c4043] focus:outline-none focus:border-[#8ab4f8]">
+                <label class="text-[11px] text-[#9aa0a6] block mb-1">Đường dẫn thư mục cục bộ (Local Volume Path):</label>
+                <input type="text" id="nodeLocalPathInput" value="/volume1/Photos" class="w-full bg-[#141517] border border-[#3c4043] rounded-lg px-3 py-1.5 text-xs text-white font-mono">
               </div>
               <div>
-                <label class="text-[11px] text-[#9aa0a6] block mb-1 font-mono">Chiến lược đồng bộ PULL (Pull Strategy):</label>
-                <select class="w-full bg-[#141517] text-xs font-mono text-white p-2.5 rounded-lg border border-[#3c4043] focus:outline-none focus:border-[#8ab4f8]">
-                  <option value="SYNC">Mirror Sync (Đồng bộ bản sao giống 100%)</option>
-                  <option value="COPY">Append-Only (Giữ lại vĩnh viễn tệp cũ dù NAS chính đã xoá)</option>
+                <label class="text-[11px] text-[#9aa0a6] block mb-1">Chiến Lược PULL (Khi chạy ở Node phụ):</label>
+                <select id="nodePullStrategySelect" class="w-full bg-[#141517] border border-[#3c4043] rounded-lg px-3 py-1.5 text-xs text-white">
+                  <option value="SYNC">rclone sync (Bản sao hoàn hảo 1:1, xoá file nếu nguồn xoá)</option>
+                  <option value="COPY">rclone copy (An toàn tích luỹ, chỉ nhận thêm không xoá file cũ)</option>
                 </select>
               </div>
             </div>
 
             <div class="flex justify-end pt-2">
-              <button onclick="saveNodeRoleConfig()" class="px-4 py-2 bg-[#1a73e8] hover:bg-[#1b66ca] text-white text-xs font-medium rounded-lg shadow-sm">
-                Lưu Cấu Hình Vai Trò Node
-              </button>
+              <button onclick="saveNodeRoleConfig()" class="btn btn-primary btn-sm">Lưu Cấu Hình Multi-NAS</button>
             </div>
           </div>
         </div>
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 4: BOT MESH & CHATID SHARDS                                -->
+      <!-- TAB: BOT MESH & MULTI-CHANNEL SHARDING                         -->
       <!-- ============================================================== -->
       <section id="content-botmesh" class="hidden space-y-6">
         <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#3c4043]">
             <div>
               <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded bg-[#81c995]/20 text-[#81c995] text-[11px] font-bold">Distributed Mesh Router</span>
-                <h3 class="text-base font-semibold text-white">Quản Lý Đa Bot Token &amp; Kênh Telegram Shards</h3>
+                <span class="chip chip-green">Bot Mesh Active</span>
+                <h3 class="text-base font-semibold text-white">Ma Trận Bot Telegram &amp; Phân Vùng Kênh (Multi-ChatID)</h3>
               </div>
               <p class="text-xs text-[#9aa0a6] mt-1">
-                Kỹ thuật gộp nhiều Bot Telegram và nhiều Channel để phân tán lưu lượng, nhân N lần băng thông và triệt tiêu giới hạn Rate-Limit.
+                Tự động xoay vòng nhiều Bot Token để vượt qua giới hạn Flood-Wait 429 và chia tải lưu trữ sang nhiều Kênh Telegram riêng biệt.
               </p>
             </div>
 
-            <button onclick="showAddBotPrompt()" class="px-3.5 py-2 bg-[#1a73e8] hover:bg-[#1b66ca] text-white text-xs font-medium rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
-              <span>+</span>
-              <span>Thêm Bot &amp; ChatID Mới</span>
+            <button onclick="showAddBotPrompt()" class="btn btn-primary btn-sm">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              <span>Thêm Bot Token</span>
             </button>
           </div>
 
-          <!-- SHARDING STRATEGY TOGGLE CARDS -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
-            <div class="p-3.5 bg-[#1a1c1e] border-2 border-[#8ab4f8] rounded-xl cursor-pointer">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">RAID 0 Chunk Striping</span>
-                <span class="w-2 h-2 rounded-full bg-[#81c995]"></span>
-              </div>
-              <p class="text-[11px] text-[#9aa0a6] mt-1">Mỗi file &gt; 2GB chia thành các block 1.9GB. Block 1 đi Bot A, Block 2 đi Bot B song song.</p>
-            </div>
-
-            <div class="p-3.5 bg-[#1a1c1e] border border-[#3c4043] rounded-xl cursor-pointer opacity-70 hover:opacity-100">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Share-Dedicated Routing</span>
-                <span class="w-2 h-2 rounded-full bg-slate-500"></span>
-              </div>
-              <p class="text-[11px] text-[#9aa0a6] mt-1">Mỗi Share gắn với 1 Kênh &amp; 1 Bot riêng (Photos -> Bot 1, Docs -> Bot 2).</p>
-            </div>
-
-            <div class="p-3.5 bg-[#1a1c1e] border border-[#3c4043] rounded-xl cursor-pointer opacity-70 hover:opacity-100">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Auto Flood-Wait Failover</span>
-                <span class="w-2 h-2 rounded-full bg-[#81c995]"></span>
-              </div>
-              <p class="text-[11px] text-[#9aa0a6] mt-1">Khi 1 Bot bị Telegram 429, tự động chuyển luồng sang Bot khác ngay lập tức.</p>
-            </div>
-          </div>
-
-          <!-- BOT MESH TABLE -->
-          <div class="overflow-hidden rounded-xl border border-[#3c4043]">
-            <table class="w-full text-left text-xs font-mono">
-              <thead class="bg-[#181a1d] text-[#9aa0a6] text-[11px] uppercase tracking-wider border-b border-[#3c4043]">
-                <tr>
-                  <th class="p-3.5">Bot Định Danh</th>
-                  <th class="p-3.5">Mã Bot Token</th>
-                  <th class="p-3.5">Telegram ChatID Đích</th>
-                  <th class="p-3.5">Băng Thông Đã Đẩy</th>
-                  <th class="p-3.5">Độ Trễ MTProto</th>
-                  <th class="p-3.5">Trạng Thái Sức Khoẻ</th>
+          <div class="mt-4 overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-[#181a1d] text-[#9aa0a6] border-b border-[#3c4043]">
+                  <th class="p-3 pl-4">Tên Bot</th>
+                  <th class="p-3">Token Hash</th>
+                  <th class="p-3">Target ChatID</th>
+                  <th class="p-3">Dung Lượng Đã Gửi</th>
+                  <th class="p-3">Độ Trễ API</th>
+                  <th class="p-3 pr-4">Trạng Thái</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-[#3c4043]/60" id="botTableRows">
+              <tbody id="botTableRows" class="divide-y divide-[#3c4043]">
                 <tr class="hover:bg-[#282a2f]">
-                  <td class="p-3.5 font-medium text-white flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#81c995]"></span> Bot-01 (Photos Prime)
+                  <td class="p-3 pl-4 font-medium text-white flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#81c995]"></span> Bot-Alpha (Primary)
                   </td>
-                  <td class="p-3.5 text-[#bdc1c6]">7182940182:AAH9fK...3d</td>
-                  <td class="p-3.5 text-[#8ab4f8] font-bold">-1002849102840 (#Vault_Photos)</td>
-                  <td class="p-3.5 text-white font-bold">482.1 GB</td>
-                  <td class="p-3.5 text-[#81c995]">42 ms</td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-[#13271f] text-[#81c995] text-[10px] font-bold border border-[#1e4634]">Healthy (0s wait)</span></td>
+                  <td class="p-3 text-[#bdc1c6] font-mono">7182930192:AAEf...</td>
+                  <td class="p-3 text-[#8ab4f8] font-bold font-mono">-1002849102840 (Kênh Photos)</td>
+                  <td class="p-3 text-white font-bold font-mono">1.12 TB</td>
+                  <td class="p-3 text-[#81c995] font-mono">42 ms</td>
+                  <td class="p-3 pr-4"><span class="chip chip-green text-[10px]">Active Mesh</span></td>
                 </tr>
 
                 <tr class="hover:bg-[#282a2f]">
-                  <td class="p-3.5 font-medium text-white flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#81c995]"></span> Bot-02 (Photos Mirror)
+                  <td class="p-3 pl-4 font-medium text-white flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#81c995]"></span> Bot-Beta (Media Shard)
                   </td>
-                  <td class="p-3.5 text-[#bdc1c6]">7294810293:BBZ2pX...8e</td>
-                  <td class="p-3.5 text-[#8ab4f8] font-bold">-1002849102840 (#Vault_Photos)</td>
-                  <td class="p-3.5 text-white font-bold">358.4 GB</td>
-                  <td class="p-3.5 text-[#81c995]">39 ms</td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-[#13271f] text-[#81c995] text-[10px] font-bold border border-[#1e4634]">Healthy (0s wait)</span></td>
+                  <td class="p-3 text-[#bdc1c6] font-mono">6291048102:BBGt...</td>
+                  <td class="p-3 text-[#8ab4f8] font-bold font-mono">-1002948192019 (Kênh Media)</td>
+                  <td class="p-3 text-white font-bold font-mono">890 GB</td>
+                  <td class="p-3 text-[#81c995] font-mono">38 ms</td>
+                  <td class="p-3 pr-4"><span class="chip chip-green text-[10px]">Active Mesh</span></td>
                 </tr>
 
                 <tr class="hover:bg-[#282a2f]">
-                  <td class="p-3.5 font-medium text-white flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#81c995]"></span> Bot-03 (Docs Engine)
+                  <td class="p-3 pl-4 font-medium text-white flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#81c995]"></span> Bot-Gamma (Docs &amp; Homes)
                   </td>
-                  <td class="p-3.5 text-[#bdc1c6]">7819203847:CCM8kQ...1b</td>
-                  <td class="p-3.5 text-[#8ab4f8] font-bold">-1001928491022 (#Vault_Docs)</td>
-                  <td class="p-3.5 text-white font-bold">110.0 GB</td>
-                  <td class="p-3.5 text-[#81c995]">45 ms</td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-[#13271f] text-[#81c995] text-[10px] font-bold border border-[#1e4634]">Healthy (0s wait)</span></td>
-                </tr>
-
-                <tr class="hover:bg-[#282a2f]">
-                  <td class="p-3.5 font-medium text-white flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#81c995]"></span> Bot-04 (Database Hot Vault)
-                  </td>
-                  <td class="p-3.5 text-[#bdc1c6]">7948201948:DDN4vR...9c</td>
-                  <td class="p-3.5 text-[#8ab4f8] font-bold">-1009182736451 (#Vault_DB)</td>
-                  <td class="p-3.5 text-white font-bold">48.2 GB</td>
-                  <td class="p-3.5 text-[#81c995]">51 ms</td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-[#13271f] text-[#81c995] text-[10px] font-bold border border-[#1e4634]">Healthy (0s wait)</span></td>
+                  <td class="p-3 text-[#bdc1c6] font-mono">8192038102:CCHu...</td>
+                  <td class="p-3 text-[#8ab4f8] font-bold font-mono">-1003019284012 (Kênh Docs)</td>
+                  <td class="p-3 text-white font-bold font-mono">402 GB</td>
+                  <td class="p-3 text-[#81c995] font-mono">51 ms</td>
+                  <td class="p-3 pr-4"><span class="chip chip-green text-[10px]">Active Mesh</span></td>
                 </tr>
               </tbody>
             </table>
@@ -819,131 +974,53 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 5: TRICKLE QOS SCHEDULER (CHẠY NGẦM TỪ TỪ)                 -->
+      <!-- TAB: ĐIỀU TỐC QOS & GIỚI HẠN TÀI NGUYÊN (TRICKLE)              -->
       <!-- ============================================================== -->
       <section id="content-trickle" class="hidden space-y-6">
         <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
-          <div class="pb-4 border-b border-[#3c4043]">
-            <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded bg-[#fdd663]/20 text-[#fdd663] text-[11px] font-bold">Hardware &amp; Network Governor</span>
-              <h3 class="text-base font-semibold text-white">Chế Độ Chạy Ngầm "Êm Ái" &amp; Điều Tiết Lịch Trình 24H</h3>
-            </div>
-            <p class="text-xs text-[#9aa0a6] mt-1">
-              Phần mềm điều tiết thông minh: Giữ CPU Synology luôn mát mẻ, không bao giờ làm đơ giật Plex, Synology Photos hay nghẽn mạng gia đình.
-            </p>
-          </div>
-
-          <!-- 24-HOUR VISUAL SCHEDULER GRAPH -->
-          <div class="my-5 p-4 bg-[#1a1c1e] border border-[#3c4043] rounded-xl">
-            <div class="flex items-center justify-between text-xs mb-3">
-              <span class="text-white font-medium">Lịch Trình Băng Thông 24 Giờ Trong Ngày</span>
-              <span class="text-[#8ab4f8] font-mono text-[11px]">RCLONE_BWLIMIT="07:00,5M 23:00,18M"</span>
-            </div>
-
-            <!-- VISUAL 24 BARS -->
-            <div class="flex items-end gap-1 h-20 p-2 bg-[#141517] rounded-lg border border-[#3c4043]">
-              <div class="flex-1 bg-[#1a73e8] h-[90%] rounded-sm" title="00:00 (18 MB/s)"></div>
-              <div class="flex-1 bg-[#1a73e8] h-[90%] rounded-sm" title="01:00 (18 MB/s)"></div>
-              <div class="flex-1 bg-[#1a73e8] h-[90%] rounded-sm" title="02:00 (18 MB/s)"></div>
-              <div class="flex-1 bg-[#1a73e8] h-[90%] rounded-sm" title="03:00 (18 MB/s)"></div>
-              <div class="flex-1 bg-[#1a73e8] h-[90%] rounded-sm" title="04:00 (18 MB/s)"></div>
-              <div class="flex-1 bg-[#1a73e8] h-[90%] rounded-sm" title="05:00 (18 MB/s)"></div>
-              <div class="flex-1 bg-[#1a73e8] h-[90%] rounded-sm" title="06:00 (18 MB/s)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="07:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="08:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="09:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="10:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="11:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="12:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="13:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="14:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="15:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="16:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="17:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="18:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="19:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="20:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="21:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#81c995] h-[25%] rounded-sm" title="22:00 (5 MB/s - Trickle)"></div>
-              <div class="flex-1 bg-[#1a73e8] h-[90%] rounded-sm" title="23:00 (18 MB/s)"></div>
-            </div>
-
-            <div class="flex items-center justify-between text-[11px] text-[#9aa0a6] mt-2 font-mono">
-              <span>00:00 (Đêm)</span>
-              <span>06:00 (Sáng)</span>
-              <span>12:00 (Trưa)</span>
-              <span>18:00 (Chiều)</span>
-              <span>23:59 (Khuya)</span>
-            </div>
-          </div>
-
-          <!-- HARDWARE & DISK POLICIES -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-4 bg-[#1a1c1e] border border-[#3c4043] rounded-xl space-y-2">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#3c4043]">
+            <div>
               <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                <span class="text-xs font-bold text-white">Chính Sách CPU (nice -n 19)</span>
+                <span class="chip chip-yellow">Smart Trickle Engine</span>
+                <h3 class="text-base font-semibold text-white">Điều Tiết Băng Thông &amp; Chạy Ngầm Êm Ái (nice 19 &amp; ionice 3)</h3>
               </div>
-              <p class="text-[11px] text-[#9aa0a6] leading-relaxed">
-                Được ghim ở mức ưu tiên vi xử lý thấp nhất của Linux Kernel. Khi Synology có tác vụ nén video, quét khuôn mặt Synology Photos hay Plex Transcode, backup sẽ tự động lùi bước.
+              <p class="text-xs text-[#9aa0a6] mt-1">
+                Tự động siết tốc độ vào ban ngày để không nghẽn mạng gia đình, và bung toàn lực tốc độ cao vào ban đêm.
               </p>
             </div>
 
-            <div class="p-4 bg-[#1a1c1e] border border-[#3c4043] rounded-xl space-y-2">
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                <span class="text-xs font-bold text-white">Chính Sách Ổ Cứng (ionice -c 3)</span>
-              </div>
-              <p class="text-[11px] text-[#9aa0a6] leading-relaxed">
-                Cơ chế Idle I/O: Chỉ đọc ghi khi đầu đọc ổ đĩa Synology hoàn toàn rảnh rỗi. Tránh hiện tượng 100% Active Disk Time làm đơ giao diện DSM.
-              </p>
+            <div class="chip chip-green">
+              <span>Trạng Thái: Êm Ái Tuyệt Đối</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div class="p-4 bg-[#181a1d] border border-[#3c4043] rounded-xl space-y-2">
+              <span class="text-xs font-semibold text-white">Giờ Ban Ngày (07:00 - 23:00)</span>
+              <p class="text-[11px] text-[#9aa0a6]">Giới hạn tối đa 5.0 MB/s. Nhường băng thông cho Plex, xem phim 4K và sinh hoạt gia đình.</p>
+              <div class="font-mono text-sm font-bold text-[#81c995]">--bwlimit "07:00,5M"</div>
+            </div>
+
+            <div class="p-4 bg-[#181a1d] border border-[#3c4043] rounded-xl space-y-2">
+              <span class="text-xs font-semibold text-white">Giờ Ban Đêm (23:00 - 07:00)</span>
+              <p class="text-[11px] text-[#9aa0a6]">Tăng tốc tối đa lên 25.0 MB/s để hoàn tất sao lưu dữ liệu lớn nhanh chóng trong lúc ngủ.</p>
+              <div class="font-mono text-sm font-bold text-[#8ab4f8]">--bwlimit "23:00,25M"</div>
             </div>
           </div>
         </div>
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 6: DASHBOARD & TELEMETRY                                   -->
-      <!-- ============================================================== -->
-      <section id="content-overview" class="space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-4">
-            <div class="text-xs text-[#9aa0a6] font-medium">Tổng Dung Lượng Trên Telegram</div>
-            <div class="text-2xl font-bold text-white mt-1.5 tracking-tight font-mono">2.41 TB</div>
-            <div class="mt-2 text-xs text-[#81c995]">Đã nén từ 4.8 TB dữ liệu gốc</div>
-          </div>
-
-          <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-4">
-            <div class="text-xs text-[#9aa0a6] font-medium">Tốc Độ Trickle Hiện Tại</div>
-            <div class="text-2xl font-bold text-white mt-1.5 tracking-tight font-mono" id="overviewSpeed">4.8 MB/s</div>
-            <div class="mt-2 text-xs text-[#9aa0a6]">Tự động nhường mạng gia đình</div>
-          </div>
-
-          <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-4">
-            <div class="text-xs text-[#9aa0a6] font-medium">Tiêu Thụ Tài Nguyên NAS</div>
-            <div class="text-2xl font-bold text-[#81c995] mt-1.5 tracking-tight font-mono">1.2% CPU</div>
-            <div class="mt-2 text-xs text-[#9aa0a6]">42 MB RAM (Container Go)</div>
-          </div>
-
-          <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-4">
-            <div class="text-xs text-[#9aa0a6] font-medium">Bảo Vệ Flood Wait</div>
-            <div class="text-2xl font-bold text-[#81c995] mt-1.5 tracking-tight font-mono">100% Clean</div>
-            <div class="mt-2 text-xs text-[#9aa0a6]">Chưa từng bị Telegram cảnh báo</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================================== -->
-      <!-- TAB 7: CLOUD SHELL & AUDIT LOGS                                -->
+      <!-- TAB: NHẬT KÝ HỆ THỐNG (AUDIT LOGS)                             -->
       <!-- ============================================================== -->
       <section id="content-logs" class="hidden space-y-4">
         <div class="bg-[#24262a] border border-[#3c4043] rounded-xl p-5">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-medium text-white flex items-center gap-2">
-              <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-              <span>Cloud Shell Live Audit Stream (DSM / Host Daemon)</span>
+              <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Nhật Ký Trực Tiếp Hệ Thống (Synology DSM Live Stream)</span>
             </h3>
-            <span class="text-xs text-[#9aa0a6] font-mono">Level: INFO</span>
+            <span class="chip chip-gray text-[10px]">Level: INFO</span>
           </div>
 
           <div class="bg-[#141517] rounded-xl p-4 font-mono text-[11px] text-[#e8eaed] h-80 overflow-y-auto custom-scroll space-y-1 border border-[#3c4043]">
@@ -955,9 +1032,7 @@
             <div class="text-[#bdc1c6]">[2026-11-06T03:45:05Z] [CRYPT] AES-256-GCM cipher loaded. Zero-Knowledge envelope verified.</div>
             <div class="text-[#e8eaed]">[2026-11-06T03:45:10Z] [JOB #141] Started incremental backup: /volume1/Photos -> teldrive-crypt:nas-backup/Photos</div>
             <div class="text-[#fdd663]">[2026-11-06T03:45:12Z] [QOS] Trickle active: timetable 07:00-23:00 limit capped at 5.0 MB/s.</div>
-            <div class="text-[#81c995]">[2026-11-06T03:46:19Z] [SHARD] Uploaded Chunk 1/2 (1.89 GB) via Bot-Alpha to ChatID -1002849102840 (msg_id: 849102).</div>
-            <div class="text-[#81c995]">[2026-11-06T03:47:45Z] [SHARD] Uploaded Chunk 2/2 (1.20 GB) via Bot-Beta to ChatID -1002849102840 (msg_id: 849103).</div>
-            <div class="text-[#8ab4f8]">[2026-11-06T03:48:00Z] [SNAPSHOT] Created snapshot #SYNO-20261106-034800 (Hash: b492e...391a). Time Machine index committed.</div>
+            <div class="text-[#81c995]">[2026-11-06T03:46:19Z] [SHARD] Uploaded Chunk 1/2 (1.89 GB) via Bot-Alpha to ChatID -1002849102840.</div>
           </div>
         </div>
       </section>
@@ -965,26 +1040,140 @@
     </main>
   </div>
 
-  <!-- JAVASCRIPT CONTROLLER -->
+  <!-- ============================================================== -->
+  <!-- MODAL / DRAWER: CHI TIẾT LỊCH SỬ PHIÊN BẢN CỦA TỪNG FILE        -->
+  <!-- ============================================================== -->
+  <div id="versionDrawerModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end">
+    <div class="w-full max-w-xl bg-[#212327] border-l border-[#3c4043] h-full flex flex-col justify-between shadow-2xl p-6 overflow-y-auto custom-scroll">
+      
+      <div class="space-y-4">
+        <!-- DRAWER HEADER -->
+        <div class="flex items-center justify-between pb-3 border-b border-[#3c4043]">
+          <div>
+            <span class="chip chip-blue text-[10px] mb-1">Lịch Sử Phiên Bản Tệp</span>
+            <h3 id="drawerFileName" class="text-base font-bold text-white font-mono">DSC_4092_RawPhotos.cr3</h3>
+            <p id="drawerFileType" class="text-xs text-[#9aa0a6] mt-0.5">Ảnh RAW Lightroom • Dung lượng: 45.8 MB</p>
+          </div>
+          <button onclick="closeVersionDrawer()" class="btn btn-ghost btn-sm p-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- RETENTION POLICY NOTICE -->
+        <div class="p-3 bg-[#181a1d] border border-[#3c4043] rounded-xl text-xs space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-white font-medium">Chính Sách Lưu Giữ Đang Áp Dụng:</span>
+            <span class="chip chip-green text-[10px]" id="drawerPolicy">Hourly khi sửa • Giữ 30 ngày</span>
+          </div>
+          <p class="text-[11px] text-[#9aa0a6] leading-relaxed">
+            Hệ thống chỉ tạo phiên bản mới khi tệp có thay đổi mã Hash SHA-256 (Copy-On-Write). Các giờ không có chỉnh sửa dữ liệu sẽ tự động bỏ qua để tiết kiệm dung lượng Telegram.
+          </p>
+        </div>
+
+        <!-- VERSION TIMELINE LIST -->
+        <div class="space-y-3 pt-2">
+          <div class="text-xs font-semibold text-white uppercase tracking-wider">Danh Sách Các Mốc Phiên Bản Trên Telegram</div>
+          
+          <div id="drawerVersionList" class="space-y-2.5">
+            <!-- DYNAMICALLY POPULATED -->
+          </div>
+        </div>
+      </div>
+
+      <!-- DRAWER FOOTER -->
+      <div class="pt-4 border-t border-[#3c4043] flex items-center justify-between mt-6">
+        <span class="text-[11px] text-[#9aa0a6]">Mã hoá AES-256-GCM Zero-Knowledge</span>
+        <button onclick="closeVersionDrawer()" class="btn btn-secondary btn-sm">Đóng</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: CÀI ĐẶT QUY TẮC LƯU PHIÊN BẢN (VERSION POLICY MODAL)     -->
+  <!-- ============================================================== -->
+  <div id="versionPolicyModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-[#212327] border border-[#3c4043] rounded-xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-[#3c4043]">
+        <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+          <svg class="w-4 h-4 text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span>Cấu Hình Quy Tắc Lưu Giữ Phiên Bản (Version Policy)</span>
+        </h3>
+        <button onclick="closeVersionPolicyModal()" class="btn btn-ghost btn-sm p-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <label class="flex items-center justify-between p-2.5 rounded bg-[#181a1d] border border-[#3c4043] cursor-pointer">
+          <div>
+            <div class="text-white font-medium">Bật Kiểm Soát Vi Sai (Copy-On-Write)</div>
+            <div class="text-[11px] text-[#9aa0a6] mt-0.5">Chỉ sinh phiên bản khi tệp có thay đổi nội dung thực tế (Zero-Delta skip).</div>
+          </div>
+          <input type="checkbox" checked class="accent-[#1a73e8] rounded w-4 h-4">
+        </label>
+
+        <div>
+          <label class="text-[#9aa0a6] block mb-1">Chu kỳ phát hiện phiên bản mới:</label>
+          <select class="w-full bg-[#181a1d] border border-[#3c4043] rounded-lg px-3 py-2 text-xs text-white">
+            <option>Mỗi 1 giờ (Khuyên dùng - Cân bằng tốt)</option>
+            <option>Mỗi 15 phút (Dành cho dự án tài liệu cần theo sát)</option>
+            <option>Mỗi 6 giờ (Tiết kiệm tài nguyên)</option>
+            <option>Hằng ngày (Chỉ lưu 1 bản snapshot cuối ngày)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[#9aa0a6] block mb-1">Giữ phiên bản theo Giờ:</label>
+            <input type="text" value="24 Giờ" class="w-full bg-[#181a1d] border border-[#3c4043] rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+          </div>
+          <div>
+            <label class="text-[#9aa0a6] block mb-1">Giữ phiên bản theo Ngày:</label>
+            <input type="text" value="30 Ngày" class="w-full bg-[#181a1d] border border-[#3c4043] rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[#9aa0a6] block mb-1">Giữ phiên bản theo Tuần:</label>
+            <input type="text" value="12 Tuần" class="w-full bg-[#181a1d] border border-[#3c4043] rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+          </div>
+          <div>
+            <label class="text-[#9aa0a6] block mb-1">Giữ phiên bản theo Tháng:</label>
+            <input type="text" value="12 Tháng" class="w-full bg-[#181a1d] border border-[#3c4043] rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-[#3c4043]">
+        <button onclick="closeVersionPolicyModal()" class="btn btn-secondary btn-sm">Hủy</button>
+        <button onclick="saveVersionPolicy()" class="btn btn-primary btn-sm">Áp Dụng Quy Tắc</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     function setTab(name) {
-      const tabs = ['tree-selector', 'timemachine', 'botmesh', 'trickle', 'multinas', 'overview', 'logs'];
+      const tabs = ['overview', 'drive', 'timemachine', 'tree-selector', 'multinas', 'botmesh', 'trickle', 'logs'];
       tabs.forEach(t => {
         const content = document.getElementById('content-' + t);
         const nav = document.getElementById('nav-' + t);
         if (content) content.classList.add('hidden');
         if (nav) {
-          nav.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all';
+          nav.className = 'nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-[#bdc1c6] hover:bg-[#282a2f] hover:text-white transition-all whitespace-nowrap';
         }
       });
       const targetContent = document.getElementById('content-' + name);
       const targetNav = document.getElementById('nav-' + name);
       if (targetContent) targetContent.classList.remove('hidden');
       if (targetNav) {
-        targetNav.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 transition-all';
+        targetNav.className = 'nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 transition-all whitespace-nowrap';
       }
     }
 
+    // Snapshot selection in Time Machine
     const snapshotDates = [
       "Snapshot #01 — 07/10/2026 (02:00:00 AM) — 30 Ngày Trước",
       "Snapshot #68 — 22/10/2026 (02:00:00 AM) — 15 Ngày Trước",
@@ -1026,7 +1215,7 @@
     }
 
     function saveFolderSelection() {
-      alert("Đã lưu cấu hình danh sách thư mục sao lưu Synology vào hệ thống!");
+      alert("Đã lưu danh sách thư mục sao lưu Synology vào hệ thống!");
     }
 
     function restoreFolderSnapshot() {
@@ -1039,37 +1228,91 @@
       }, 2000);
     }
 
-    function restoreSingle(file, ver) {
-      const banner = document.getElementById('tmAlertBanner');
-      const msg = document.getElementById('tmAlertMsg');
-      msg.innerText = "Đang giải mã và tải tệp " + file + " (" + ver + ") về NAS...";
-      banner.classList.remove('hidden');
-      setTimeout(() => {
-        msg.innerText = "Đã tải tệp " + file + " về NAS thành công!";
-      }, 1500);
+    // VERSION DRAWER INTERACTION
+    function openVersionDrawer(fileName, versionCount, fileSize, policy, fileDesc) {
+      document.getElementById('drawerFileName').innerText = fileName;
+      document.getElementById('drawerFileType').innerText = fileDesc + " • Dung lượng: " + fileSize;
+      document.getElementById('drawerPolicy').innerText = policy + " • Giữ 30 ngày";
+
+      const listContainer = document.getElementById('drawerVersionList');
+      listContainer.innerHTML = '';
+
+      const versions = [
+        { ver: "v" + versionCount + " (Mới nhất)", time: "Hôm nay, 14:15", size: fileSize, note: "Chỉnh sửa màu trong Lightroom", shard: "Bot-Alpha -> Channel 1", hash: "a93f4e2b10..." },
+        { ver: "v" + (versionCount - 1), time: "Hôm nay, 11:20", size: (parseFloat(fileSize) * 0.98).toFixed(1) + (fileSize.includes('GB') ? ' GB' : ' MB'), note: "Cắt cúp khung hình & xoay góc", shard: "Bot-Beta -> Channel 2", hash: "78c01f4ad2..." },
+        { ver: "v" + (versionCount - 2), time: "Hôm qua, 02:00 (Daily Snapshot)", size: (parseFloat(fileSize) * 0.95).toFixed(1) + (fileSize.includes('GB') ? ' GB' : ' MB'), note: "Chốt snapshot tự động cuối ngày", shard: "Bot-Gamma -> Channel 3", hash: "ef1190bc44..." },
+        { ver: "v" + (versionCount - 3), time: "3 ngày trước, 02:00", size: (parseFloat(fileSize) * 0.92).toFixed(1) + (fileSize.includes('GB') ? ' GB' : ' MB'), note: "Chốt snapshot hàng ngày", shard: "Bot-Alpha", hash: "12dd89aa31..." },
+        { ver: "v1 (Bản gốc)", time: "15/10/2026, 09:12", size: (parseFloat(fileSize) * 0.88).toFixed(1) + (fileSize.includes('GB') ? ' GB' : ' MB'), note: "Import từ thẻ SD vào NAS", shard: "Bot-Alpha", hash: "44aa9012fe..." }
+      ];
+
+      versions.slice(0, Math.min(versionCount, 5)).forEach((v, idx) => {
+        const item = document.createElement('div');
+        item.className = "p-3 bg-[#181a1d] border border-[#3c4043] rounded-xl flex items-center justify-between hover:border-[#8ab4f8] transition-colors";
+        item.innerHTML = `
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-white font-mono text-xs">${v.ver}</span>
+              ${idx === 0 ? '<span class="chip chip-green text-[10px] py-0.2">Current</span>' : '<span class="chip chip-gray text-[10px] py-0.2">Snapshot</span>'}
+              <span class="text-[#8ab4f8] font-mono text-[11px]">${v.size}</span>
+            </div>
+            <div class="text-[11px] text-[#9aa0a6]">${v.time} • <span class="text-[#bdc1c6]">${v.note}</span></div>
+            <div class="text-[10px] text-[#5f6368] font-mono">SHA-256: ${v.hash} • ${v.shard}</div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="restoreSingleVersion('${fileName}', '${v.ver}')" class="btn btn-secondary btn-sm">
+              <svg class="w-3.5 h-3.5 text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              <span>Khôi Phục</span>
+            </button>
+          </div>
+        `;
+        listContainer.appendChild(item);
+      });
+
+      document.getElementById('versionDrawerModal').classList.remove('hidden');
+    }
+
+    function closeVersionDrawer() {
+      document.getElementById('versionDrawerModal').classList.add('hidden');
+    }
+
+    function restoreSingleVersion(file, ver) {
+      alert("Đang tải & khôi phục tệp " + file + " (" + ver + ") từ Telegram về thư mục /volume1/Photos/...");
+    }
+
+    function openVersionPolicyModal() {
+      document.getElementById('versionPolicyModal').classList.remove('hidden');
+    }
+
+    function closeVersionPolicyModal() {
+      document.getElementById('versionPolicyModal').classList.add('hidden');
+    }
+
+    function saveVersionPolicy() {
+      closeVersionPolicyModal();
+      alert("Đã cập nhật chính sách lưu giữ phiên bản CoW Retention thành công!");
+    }
+
+    function filterDriveFiles() {
+      const q = document.getElementById('driveSearchInput').value.toLowerCase();
+      const rows = document.getElementById('driveTableBody').getElementsByTagName('tr');
+      for (let i = 0; i < rows.length; i++) {
+        const text = rows[i].innerText.toLowerCase();
+        rows[i].style.display = text.includes(q) ? '' : 'none';
+      }
+    }
+
+    function navigateDrive(path) {
+      alert("Đang mở thư mục: " + path);
+    }
+
+    function refreshDriveView() {
+      alert("Đã đồng bộ danh mục tệp và số lượng phiên bản từ Telegram Cloud!");
     }
 
     function showAddBotPrompt() {
       const token = prompt("Nhập Bot Token Telegram mới (từ @BotFather):");
       if (token) {
-        const channel = prompt("Nhập ChatID Kênh Telegram (ví dụ: -100xxxxxxxxxx):");
-        if (channel) {
-          const tbody = document.getElementById('botTableRows');
-          const newRow = document.createElement('tr');
-          newRow.className = "hover:bg-[#282a2f]";
-          newRow.innerHTML = `
-            <td class="p-3.5 font-medium text-white flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-[#81c995]"></span> Bot-${tbody.children.length + 1} (Mesh Active)
-            </td>
-            <td class="p-3.5 text-[#bdc1c6] font-mono">${token.substring(0, 10)}...</td>
-            <td class="p-3.5 text-[#8ab4f8] font-bold font-mono">${channel}</td>
-            <td class="p-3.5 text-white font-bold font-mono">0.0 GB</td>
-            <td class="p-3.5 text-[#81c995] font-mono">35 ms</td>
-            <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-[#13271f] text-[#81c995] text-[10px] font-bold border border-[#1e4634]">Standby Ready</span></td>
-          `;
-          tbody.appendChild(newRow);
-          alert("Đã kết nạp Bot Token vào Distributed Mesh thành công!");
-        }
+        alert("Đã thêm Bot Token vào mesh phân tán!");
       }
     }
 
@@ -1078,31 +1321,28 @@
       const input = document.getElementById('nodeLocalPathInput');
       if (role === 'PUSH') {
         badge.innerText = "NODE_MODE=PUSH (Source Master)";
-        badge.className = "text-xs font-mono font-bold text-[#81c995]";
+        badge.className = "chip chip-green";
         input.value = "/volume1/Photos";
-      } else if (role === 'PULL') {
-        badge.innerText = "NODE_MODE=PULL (Replica Receiver)";
-        badge.className = "text-xs font-mono font-bold text-[#8ab4f8]";
-        input.value = "/volume1/replica_photos";
       } else {
-        badge.innerText = "NODE_MODE=TWO_WAY (Bi-directional)";
-        badge.className = "text-xs font-mono font-bold text-[#fdd663]";
+        badge.innerText = "NODE_MODE=PULL (Replica Receiver)";
+        badge.className = "chip chip-blue";
+        input.value = "/volume1/replica_photos";
       }
     }
 
     function saveNodeRoleConfig() {
-      alert("Đã cập nhật vai trò NODE_MODE vào file .env của hệ thống!");
+      alert("Đã lưu cấu hình Multi-NAS vào file .env!");
     }
 
     function triggerInstantSync() {
-      alert("Đã khởi chạy tiến trình sao lưu vi sai chạy ngầm trên Synology DSM. Ưu tiên CPU nice 19.");
+      alert("Đã gửi lệnh chạy ngầm sao lưu vi sai trên Synology DSM (nice 19, ionice 3)!");
     }
 
     setInterval(() => {
-      const speed = (4.5 + Math.random() * 0.8).toFixed(1);
+      const speed = (4.7 + Math.random() * 0.6).toFixed(1);
       const spEl = document.getElementById('overviewSpeed');
       if (spEl) spEl.innerText = speed + " MB/s";
-    }, 2500);
+    }, 3000);
   </script>
 </body>
 </html>
