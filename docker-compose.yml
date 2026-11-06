@@ -32,6 +32,18 @@ services:
     networks:
       - teldrive_net
 
+  # SynoTele Vault Pro Web Management UI
+  dashboard:
+    image: nginx:alpine
+    container_name: teldrive_dashboard
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-8088}:80"
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro
+    networks:
+      - teldrive_net
+
   # Optional: Containerized Rclone automated backup runner
   # Run with: docker compose --profile backup up -d
   rclone-backup:
@@ -46,8 +58,8 @@ services:
       - TZ=${TIMEZONE:-Asia/Ho_Chi_Minh}
       - CRON_SCHEDULE=${BACKUP_CRON:-0 2 * * *}
       - RCLONE_REMOTE=${RCLONE_DEST_REMOTE:-teldrive-crypt:nas-backup}
-      - RCLONE_BWLIMIT=${RCLONE_BWLIMIT:-15M}
-      - RCLONE_TRANSFERS=${RCLONE_TRANSFERS:-4}
+      - RCLONE_BWLIMIT=${RCLONE_BWLIMIT:-07:00,5M 23:00,18M}
+      - RCLONE_TRANSFERS=${RCLONE_TRANSFERS:-2}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
     volumes:
@@ -59,7 +71,7 @@ services:
     command:
       - |
         echo "$$CRON_SCHEDULE /bin/sh /container_backup.sh >> /logs/cron.log 2>&1" > /etc/crontabs/root
-        echo "=== [Rclone Backup Daemon Started] ==="
+        echo "=== [Rclone Backup Daemon Started (Trickle Mode)] ==="
         echo "Schedule: $$CRON_SCHEDULE"
         echo "Destination: $$RCLONE_REMOTE"
         crond -f -l 2

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Host-level Rclone Backup Runner
-# Run directly on Synology DSM Task Scheduler, TrueNAS, or Linux cron
+# Host-level Rclone Backup Runner (Synology DSM / TrueNAS / Linux)
+# Optimized for "Trickle Mode" (Chạy ngầm êm ái, nhường CPU & Disk cho NAS)
 # ==============================================================================
 set -euo pipefail
 
@@ -32,7 +32,7 @@ fi
 
 START_TIME=$(date +%s)
 echo "=================================================================" | tee -a "$LOG_FILE"
-echo "  🚀 Starting Telegram NAS Backup at $(date)" | tee -a "$LOG_FILE"
+echo "  🚀 Starting Telegram NAS Backup (Trickle Mode) at $(date)" | tee -a "$LOG_FILE"
 echo "  Source:      ${NAS_SOURCE_PATH:-/volume1/data}" | tee -a "$LOG_FILE"
 echo "  Destination: ${RCLONE_DEST_REMOTE:-teldrive-crypt:nas-backup}" | tee -a "$LOG_FILE"
 echo "=================================================================" | tee -a "$LOG_FILE"
@@ -54,19 +54,44 @@ if [ ! -f "$RCLONE_CONF" ]; then
     exit 1
 fi
 
+# 2. Setup Low Priority / Trickle execution for Synology DSM
+# nice -n 19: Lowest CPU priority (yields to DSM, Plex, Photos)
+# ionice -c 3: Idle I/O priority (only uses disk when system is idle)
+PRIORITY_PREFIX=""
+if command -v nice >/dev/null 2>&1; then
+    PRIORITY_PREFIX="nice -n 19"
+fi
+if command -v ionice >/dev/null 2>&1; then
+    PRIORITY_PREFIX="$PRIORITY_PREFIX ionice -c 3"
+fi
+
+# 3. Smart Bandwidth Throttling Timetable:
+# Default: 5MB/s during the day (07:00-23:00) so family internet is never laggy,
+# and 18MB/s during the night (23:00-07:00) when everyone is asleep.
+BWLIMIT_CONFIG="${RCLONE_BWLIMIT:-07:00,5M 23:00,18M}"
+
+echo "  Priority Command: ${PRIORITY_PREFIX:-Default}" | tee -a "$LOG_FILE"
+echo "  Bandwidth Rule:   $BWLIMIT_CONFIG" | tee -a "$LOG_FILE"
+
 set +e
-rclone sync "${NAS_SOURCE_PATH:-/volume1/data}" "${RCLONE_DEST_REMOTE:-teldrive-crypt:nas-backup}" \
+$PRIORITY_PREFIX rclone sync "${NAS_SOURCE_PATH:-/volume1/data}" "${RCLONE_DEST_REMOTE:-teldrive-crypt:nas-backup}" \
     --config "$RCLONE_CONF" \
     --fast-list \
-    --transfers "${RCLONE_TRANSFERS:-4}" \
-    --checkers 8 \
-    --bwlimit "${RCLONE_BWLIMIT:-15M}" \
+    --transfers "${RCLONE_TRANSFERS:-2}" \
+    --checkers 4 \
+    --bwlimit "$BWLIMIT_CONFIG" \
+    --tpslimit 4 \
+    --tpslimit-burst 6 \
     --exclude "@eaDir/**" \
+    --exclude "@SynoResource/**" \
+    --exclude "@tmp/**" \
+    --exclude "#recycle/**" \
+    --exclude ".SynologyWorkingDirectory/**" \
     --exclude ".DS_Store" \
     --exclude "Thumbs.db" \
-    --exclude "@SynoResource/**" \
     --exclude "*.tmp" \
-    --retries 3 \
+    --retries 5 \
+    --low-level-retries 10 \
     --stats 1m \
     --log-file "$LOG_FILE" \
     --log-level INFO
@@ -77,11 +102,11 @@ END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))
 
 if [ $EXIT_CODE -eq 0 ]; then
-    SUCCESS_MSG="✅ *NAS Backup to Telegram SUCCESS*%0A- Thời gian chạy: ${DURATION}s%0A- Đích: ${RCLONE_DEST_REMOTE:-teldrive-crypt:nas-backup}%0A- Log: backup_${TIMESTAMP}.log"
+    SUCCESS_MSG="✅ *Synology Backup to Telegram SUCCESS*%0A- Thời gian chạy: ${DURATION}s%0A- Đích: ${RCLONE_DEST_REMOTE:-teldrive-crypt:nas-backup}%0A- Log: backup_${TIMESTAMP}.log"
     echo "Backup completed successfully in ${DURATION}s." | tee -a "$LOG_FILE"
     send_telegram_alert "$SUCCESS_MSG"
 else
-    FAIL_MSG="❌ *NAS Backup to Telegram FAILED*%0A- Exit code: ${EXIT_CODE}%0A- Thời gian chạy: ${DURATION}s%0A- Kiểm tra log: backup_${TIMESTAMP}.log"
+    FAIL_MSG="❌ *Synology Backup to Telegram FAILED*%0A- Exit code: ${EXIT_CODE}%0A- Thời gian chạy: ${DURATION}s%0A- Kiểm tra log: backup_${TIMESTAMP}.log"
     echo "Backup failed with exit code ${EXIT_CODE}." | tee -a "$LOG_FILE"
     send_telegram_alert "$FAIL_MSG"
 fi
