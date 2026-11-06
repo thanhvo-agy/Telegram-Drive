@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: teldrive_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-teldrive}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Please set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-teldrive}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-teldrive} -d ${POSTGRES_DB:-teldrive}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - teldrive_net
+
+  teldrive:
+    image: ghcr.io/tgdrive/teldrive:2
+    container_name: teldrive_server
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${TELDRIVE_PORT:-8080}:8080"
+    volumes:
+      - ./config.toml:/config.toml:ro
+      - ./data:/data
+    networks:
+      - teldrive_net
+
+  # Optional: Containerized Rclone automated backup runner
+  # Run with: docker compose --profile backup up -d
+  rclone-backup:
+    image: rclone/rclone:latest
+    container_name: teldrive_rclone_cron
+    restart: unless-stopped
+    profiles:
+      - backup
+    depends_on:
+      - teldrive
+    environment:
+      - TZ=${TIMEZONE:-Asia/Ho_Chi_Minh}
+      - CRON_SCHEDULE=${BACKUP_CRON:-0 2 * * *}
+      - RCLONE_REMOTE=${RCLONE_DEST_REMOTE:-teldrive-crypt:nas-backup}
+      - RCLONE_BWLIMIT=${RCLONE_BWLIMIT:-15M}
+      - RCLONE_TRANSFERS=${RCLONE_TRANSFERS:-4}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+    volumes:
+      - ${NAS_SOURCE_PATH:-/mnt/nas/data}:/source_data:ro
+      - ./rclone/rclone.conf:/config/rclone/rclone.conf:ro
+      - ./logs:/logs
+      - ./scripts/container_backup.sh:/container_backup.sh:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "$$CRON_SCHEDULE /bin/sh /container_backup.sh >> /logs/cron.log 2>&1" > /etc/crontabs/root
+        echo "=== [Rclone Backup Daemon Started] ==="
+        echo "Schedule: $$CRON_SCHEDULE"
+        echo "Destination: $$RCLONE_REMOTE"
+        crond -f -l 2
+    networks:
+      - teldrive_net
+
+volumes:
+  postgres_data:
+    name: teldrive_postgres_data
+
+networks:
+  teldrive_net:
+    name: teldrive_network

@@ -1,0 +1,34 @@
+# ==============================================================================
+# Teldrive v2 Configuration Template (config.toml)
+# Copy this file to config.toml and update the values.
+# ==============================================================================
+
+[db]
+# PostgreSQL connection string matching POSTGRES_* settings in .env
+data-source = "postgres://teldrive:replace_with_a_secure_password_here@postgres:5432/teldrive?sslmode=disable"
+pool-size = 10
+
+[jwt]
+# Secret key used for JWT signing. Generate with: openssl rand -hex 32
+secret = "generate_random_32_hex_jwt_secret"
+
+# Whitelist Telegram username(s) allowed to log in (without '@')
+allowed-users = ["your_telegram_username"]
+
+[server]
+port = 8080
+
+[tg]
+# Telegram Developer credentials obtained from https://my.telegram.org
+app-id = 12345678
+app-hash = "your_telegram_app_hash_here"
+
+# Auto sync time with NTP to avoid MTProto time drift issues
+ntp = true
+rate-limit = true
+
+[tg.uploads]
+# Chunk size for uploads in bytes (Default is ~2GB: 2000000000)
+# Teldrive automatically splits files exceeding Telegram limits.
+chunk-size = 2000000000
+threads = 4

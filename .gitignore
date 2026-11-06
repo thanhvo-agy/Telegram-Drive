@@ -1,20 +1,22 @@
-# Node
-node_modules/
-dist/
-.DS_Store
+# Environment and configuration secrets
 .env
+config.toml
 
-# Rust
-/app/src-tauri/target/
-/app/src-tauri/gen/
-**/*.rs.bk
+# Persistent storage & Database
+postgres_data/
+data/
+storage.db*
 
-# Editors
+# Rclone active config and credentials
+rclone/rclone.conf
+rclone/*.log
+
+# Logs
+logs/
+*.log
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
 .vscode/
 .idea/
-
-# Misc
-CompiledApps/
-*.log
-Error.html
-**/LatestError.html
