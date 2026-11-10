@@ -28,14 +28,116 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnCloseModal').addEventListener('click', closeModal);
   document.getElementById('btnCancelRestore').addEventListener('click', closeModal);
 
-  window.openRestoreModal = (snapID, path) => {
-    document.getElementById('modalSnapID').value = snapID;
-    document.getElementById('modalTargetPath').value = path;
+  // Destination Presets
+  const btnPresetRestoreDir = document.getElementById('btnPresetRestoreDir');
+  const btnPresetOriginalDir = document.getElementById('btnPresetOriginalDir');
+  if (btnPresetRestoreDir) {
+    btnPresetRestoreDir.addEventListener('click', () => {
+      document.getElementById('modalDestPath').value = '/volume1/restored_data';
+    });
+  }
+  if (btnPresetOriginalDir) {
+    btnPresetOriginalDir.addEventListener('click', () => {
+      document.getElementById('modalDestPath').value = window.cfgSourcePath || '/volume1/data';
+    });
+  }
+
+  window.openRestoreModal = async (targetSnapID, path) => {
+    const snapSelect = document.getElementById('modalSnapSelect');
+    snapSelect.innerHTML = '';
+
+    // Ensure activeSnapshots is loaded
+    if (!activeSnapshots || activeSnapshots.length === 0) {
+      try {
+        const res = await fetch('/api/snapshots');
+        if (res.ok) activeSnapshots = await res.json();
+      } catch (e) {}
+    }
+
+    if (activeSnapshots && activeSnapshots.length > 0) {
+      snapSelect.innerHTML = activeSnapshots.map(s => {
+        const d = new Date(s.created_at);
+        const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        return `<option value="${s.snapshot_id}">${dateStr} &bull; ${s.snapshot_id} (${s.total_files} files, ${formatBytes(s.total_bytes)})</option>`;
+      }).join('');
+    } else {
+      snapSelect.innerHTML = `<option value="${targetSnapID || ''}">${targetSnapID || 'No snapshots found'}</option>`;
+    }
+
+    if (targetSnapID) {
+      snapSelect.value = targetSnapID;
+    }
+
+    document.getElementById('modalTargetPath').value = path || '/';
+
+    const updateSnapMeta = () => {
+      const selectedID = snapSelect.value;
+      const found = (activeSnapshots || []).find(s => s.snapshot_id === selectedID);
+      const metaEl = document.getElementById('modalSnapMeta');
+      if (found) {
+        metaEl.innerHTML = `<span>Mốc sao lưu: <strong>${new Date(found.created_at).toLocaleString()}</strong></span> <span>&bull;</span> <span>Dung lượng: ${formatBytes(found.total_bytes)}</span> <span>&bull;</span> <span>Delta: ${formatBytes(found.uploaded_bytes)}</span>`;
+      } else {
+        metaEl.innerHTML = `<span>Snapshot ID: <code>${selectedID}</code></span>`;
+      }
+    };
+    snapSelect.onchange = updateSnapMeta;
+    updateSnapMeta();
+
+    // Check version history if path is a file (has extension)
+    const vContainer = document.getElementById('modalVersionHistoryContainer');
+    const vList = document.getElementById('modalVersionList');
+    if (path && !path.endsWith('/') && path.includes('.')) {
+      try {
+        const res = await fetch(`/api/file/history?path=${encodeURIComponent(path)}`);
+        if (res.ok) {
+          const versions = await res.json();
+          if (versions && versions.length > 0) {
+            vContainer.style.display = 'block';
+            vList.innerHTML = versions.map((v, idx) => {
+              const isSelected = v.snapshot_id === snapSelect.value;
+              const d = new Date(v.created_at);
+              const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+              return `
+                <div class="version-item" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 4px; border: 1px solid ${isSelected ? 'var(--info)' : 'var(--border-subtle)'}; background: ${isSelected ? 'rgba(88,166,255,0.1)' : 'var(--bg-surface)'};">
+                  <div>
+                    <div style="font-weight: 600; color: ${isSelected ? 'var(--info)' : 'var(--text-main)'}; font-size: 11px;">
+                      Phiên bản ${versions.length - idx} ${idx === 0 ? '(Mới nhất)' : ''}
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">
+                      ${dateStr} &bull; ${formatBytes(v.size)} &bull; ${v.snapshot_id}
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-sm ${isSelected ? 'btn-accent' : ''}" style="padding: 2px 8px; font-size: 11px;" onclick="window.selectRestoreVersion('${v.snapshot_id}', '${path}')">
+                    ${isSelected ? 'Đang chọn' : 'Chọn mốc này'}
+                  </button>
+                </div>
+              `;
+            }).join('');
+          } else {
+            vContainer.style.display = 'none';
+          }
+        } else {
+          vContainer.style.display = 'none';
+        }
+      } catch (e) {
+        vContainer.style.display = 'none';
+      }
+    } else {
+      vContainer.style.display = 'none';
+    }
+
     modal.classList.add('open');
   };
 
+  window.selectRestoreVersion = (snapID, path) => {
+    const snapSelect = document.getElementById('modalSnapSelect');
+    snapSelect.value = snapID;
+    if (snapSelect.onchange) snapSelect.onchange();
+    window.openRestoreModal(snapID, path);
+  };
+
   document.getElementById('btnConfirmRestore').addEventListener('click', async () => {
-    const snapID = document.getElementById('modalSnapID').value;
+    const snapID = document.getElementById('modalSnapSelect').value;
     const path = document.getElementById('modalTargetPath').value;
     const dest = document.getElementById('modalDestPath').value;
 
@@ -50,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       closeModal();
-      alert('Restore task initiated in background! Check Overview tab for progress.');
+      alert(`Restore task for snapshot ${snapID} initiated! Files will be reassembled at ${dest}.`);
     } catch (err) {
       alert('Restore error: ' + err.message);
     }
@@ -161,11 +263,29 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('/api/snapshots');
       if (!res.ok) return;
       activeSnapshots = await res.json();
+      const fsSelect = document.getElementById('fsSnapshotSelect');
+
       if (activeSnapshots.length === 0) {
         document.getElementById('fsTableBody').innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-dim);">No snapshots exist yet. Run backup first.</td></tr>';
+        if (fsSelect) fsSelect.innerHTML = '<option value="">No snapshots found</option>';
         return;
       }
+
+      if (fsSelect) {
+        fsSelect.innerHTML = activeSnapshots.map(s => {
+          const d = new Date(s.created_at);
+          const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          return `<option value="${s.snapshot_id}">${dateStr} &bull; ${s.snapshot_id}</option>`;
+        }).join('');
+
+        fsSelect.onchange = () => {
+          currentSnapshotID = fsSelect.value;
+          loadDirectory(currentSnapshotID, currentFolderPath);
+        };
+      }
+
       currentSnapshotID = activeSnapshots[0].snapshot_id;
+      if (fsSelect) fsSelect.value = currentSnapshotID;
       loadDirectory(currentSnapshotID, '');
     } catch (err) {
       console.error('File station load error:', err);

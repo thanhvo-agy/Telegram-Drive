@@ -66,6 +66,7 @@ func (s *Server) Start(port int) error {
 	mux.HandleFunc("/api/snapshots/", s.handleSnapshotDetail)
 	mux.HandleFunc("/api/backup/trigger", s.handleTriggerBackup)
 	mux.HandleFunc("/api/restore", s.handleTriggerRestore)
+	mux.HandleFunc("/api/file/history", s.handleFileHistory)
 	mux.HandleFunc("/api/config", s.handleConfig)
 	mux.HandleFunc("/api/bots", s.handleBots)
 	mux.HandleFunc("/api/events", s.handleSSE)
@@ -258,6 +259,21 @@ func (s *Server) handleSnapshotDiff(w http.ResponseWriter, r *http.Request) {
 		"snapshot_b": snapB,
 		"diffs":      diffs,
 	})
+}
+
+func (s *Server) handleFileHistory(w http.ResponseWriter, r *http.Request) {
+	relPath := r.URL.Query().Get("path")
+	if relPath == "" {
+		http.Error(w, "query param 'path' required", http.StatusBadRequest)
+		return
+	}
+
+	history, err := s.engine.GetFileHistory(relPath)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	jsonResponse(w, history)
 }
 
 func (s *Server) handleTriggerBackup(w http.ResponseWriter, r *http.Request) {

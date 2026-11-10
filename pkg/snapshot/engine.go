@@ -122,6 +122,43 @@ func (e *Engine) GetLatestSnapshot() (*SnapshotManifest, error) {
 	return e.GetSnapshot(list[0].SnapshotID)
 }
 
+// FileVersion represents a single historical version of a file across snapshots
+type FileVersion struct {
+	SnapshotID string    `json:"snapshot_id"`
+	CreatedAt  time.Time `json:"created_at"`
+	Size       int64     `json:"size"`
+	ModTime    int64     `json:"mod_time"`
+	FileHash   string    `json:"file_hash"`
+	ChunkCount int       `json:"chunk_count"`
+}
+
+// GetFileHistory retrieves all historical versions of a specific file path across all snapshots
+func (e *Engine) GetFileHistory(relPath string) ([]FileVersion, error) {
+	summaries, err := e.ListSnapshots()
+	if err != nil {
+		return nil, err
+	}
+
+	var versions []FileVersion
+	for _, sum := range summaries {
+		m, err := e.GetSnapshot(sum.SnapshotID)
+		if err != nil {
+			continue
+		}
+		if entry, exists := m.Files[relPath]; exists {
+			versions = append(versions, FileVersion{
+				SnapshotID: m.SnapshotID,
+				CreatedAt:  m.CreatedAt,
+				Size:       entry.Size,
+				ModTime:    entry.ModTime,
+				FileHash:   entry.FileHash,
+				ChunkCount: len(entry.Chunks),
+			})
+		}
+	}
+	return versions, nil
+}
+
 // shouldExclude checks if relative path matches any exclusion patterns
 func (e *Engine) shouldExclude(relPath string) bool {
 	for _, pattern := range e.cfg.Excludes {

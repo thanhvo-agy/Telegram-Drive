@@ -519,3 +519,12 @@ body {
   fill: none;
   flex-shrink: 0;
 }
+
+.version-item {
+  transition: all 0.15s ease;
+}
+
+.version-item:hover {
+  border-color: var(--accent) !important;
+  background-color: var(--bg-hover) !important;
+}

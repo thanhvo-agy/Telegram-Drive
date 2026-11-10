@@ -144,12 +144,16 @@
 
         <!-- Right Pane: File Table -->
         <div class="table-pane">
-          <div class="table-toolbar">
+          <div class="table-toolbar" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div class="breadcrumb-trail" id="fsBreadcrumb">/</div>
-            <button class="btn btn-sm btn-accent" id="btnRestoreCurrentFolder">
-              <svg class="icon" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-              Restore Current Folder
-            </button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 11px; color: var(--text-dim); font-weight: 600; text-transform: uppercase;">Mốc thời gian:</span>
+              <select id="fsSnapshotSelect" class="form-input" style="width: auto; padding: 4px 10px; font-size: 11px; cursor: pointer;"></select>
+              <button class="btn btn-sm btn-accent" id="btnRestoreCurrentFolder">
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                Khôi phục Thư mục này
+              </button>
+            </div>
           </div>
           <div class="table-container">
             <table class="data-table">
@@ -265,33 +269,70 @@
 
   </main>
 
-  <!-- Restore Modal -->
+  <!-- Point-in-Time Restore Modal -->
   <div class="modal-backdrop" id="restoreModal">
-    <div class="modal-box">
+    <div class="modal-box" style="width: 560px; max-width: 95vw;">
       <div class="modal-header">
-        <span>Point-in-Time Restore</span>
-        <button class="btn btn-sm" id="btnCloseModal" style="border: none; background: transparent;"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg class="icon" viewBox="0 0 24 24" style="color: var(--info);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>Khôi phục Dữ liệu theo Mốc Thời gian (Point-in-Time Restore)</span>
+        </div>
+        <button class="btn btn-sm" id="btnCloseModal" style="border: none; background: transparent; cursor: pointer;">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Snapshot</label>
-          <input type="text" class="form-input" id="modalSnapID" readonly>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+        <!-- Snapshot / Date Picker -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0;" for="modalSnapSelect">Chọn Mốc Thời Gian Khôi Phục (Snapshot Date & Time)</label>
+            <span class="chip chip-info" style="font-size: 11px;">Time Machine</span>
+          </div>
+          <select class="form-input" id="modalSnapSelect" style="font-size: 12px; cursor: pointer; padding: 8px 12px; background-color: var(--bg-app);"></select>
+          <div id="modalSnapMeta" style="margin-top: 6px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 8px;"></div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Target File / Folder</label>
-          <input type="text" class="form-input" id="modalTargetPath" readonly>
+
+        <!-- Multi-Version History (Shown when single file is selected) -->
+        <div id="modalVersionHistoryContainer" style="display: none; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px; background-color: var(--bg-app);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0; color: var(--text-main);">Lịch sử các phiên bản tệp này</label>
+            <span style="font-size: 11px; color: var(--text-dim);">Bấm mốc để chọn khôi phục</span>
+          </div>
+          <div id="modalVersionList" style="display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto; padding-right: 4px;"></div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Restore Destination on NAS</label>
+
+        <!-- Target Cloud Path -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Đường dẫn tệp / thư mục nguồn (Cloud Path)</label>
+          <input type="text" class="form-input" id="modalTargetPath" readonly style="background-color: var(--bg-surface-elevated); color: var(--info); font-weight: 500;">
+        </div>
+
+        <!-- Restore Destination on NAS -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0;">Đích đến khôi phục trên NAS</label>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="btn btn-sm" id="btnPresetRestoreDir" style="padding: 2px 8px; font-size: 11px;">Mặc định</button>
+              <button type="button" class="btn btn-sm" id="btnPresetOriginalDir" style="padding: 2px 8px; font-size: 11px;">Ghi đè gốc</button>
+            </div>
+          </div>
           <input type="text" class="form-input" id="modalDestPath" value="/volume1/restored_data">
         </div>
-        <div style="font-size: 11px; color: var(--text-dim);">
-          Chunks will be fetched from Telegram, verified by SHA-256 checksum, decrypted with AES-256-GCM, and reassembled.
+
+        <!-- Security & Reassembly Verification Notice -->
+        <div style="font-size: 12px; color: var(--text-muted); background-color: rgba(31, 111, 235, 0.08); border: 1px solid rgba(88, 166, 255, 0.2); border-radius: var(--radius-sm); padding: 8px 12px; display: flex; gap: 8px; align-items: flex-start;">
+          <svg class="icon" viewBox="0 0 24 24" style="color: var(--info); margin-top: 2px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <div>
+            Các chunk được tải song song qua Multi-Bot Mesh, đối chiếu mã băm SHA-256 từng chunk, giải mã AES-256-GCM tại chỗ trên RAM và ghi trực tiếp vào ổ đĩa.
+          </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn" id="btnCancelRestore">Cancel</button>
-        <button class="btn btn-accent" id="btnConfirmRestore">Start Restore</button>
+        <button class="btn" id="btnCancelRestore">Hủy bỏ</button>
+        <button class="btn btn-accent" id="btnConfirmRestore" style="background-color: var(--accent); color: #fff;">
+          <svg class="icon" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+          Bắt đầu Khôi phục
+        </button>
       </div>
     </div>
   </div>
