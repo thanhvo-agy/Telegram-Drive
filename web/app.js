@@ -710,6 +710,68 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Import / Export JSON Configuration Handlers
+  const inputImportFile = document.getElementById('inputImportConfigFile');
+  const triggerImport = () => {
+    if (inputImportFile) {
+      inputImportFile.value = '';
+      inputImportFile.click();
+    }
+  };
+
+  const btnTriggerImport = document.getElementById('btnTriggerImportConfig');
+  if (btnTriggerImport) btnTriggerImport.addEventListener('click', triggerImport);
+
+  const btnBottomImport = document.getElementById('btnBottomTriggerImport');
+  if (btnBottomImport) btnBottomImport.addEventListener('click', triggerImport);
+
+  if (inputImportFile) {
+    inputImportFile.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const raw = evt.target.result;
+          const parsed = JSON.parse(raw);
+
+          const botCount = Array.isArray(parsed.bot_tokens) ? parsed.bot_tokens.length : 0;
+          const conf = confirm(
+            `Xác nhận nạp cấu hình từ tệp [${file.name}]:\n\n` +
+            `• Tên nút NAS: ${parsed.node_name || 'Mặc định'}\n` +
+            `• Telegram Channel ID: ${parsed.channel_id || 'Chưa thiết lập'}\n` +
+            `• Số lượng Bot Tokens: ${botCount} bot\n` +
+            `• Thư mục nguồn: ${parsed.source_path || '/volume1/data'}\n\n` +
+            `Bạn có muốn áp dụng cấu hình này ngay lập tức?`
+          );
+          if (!conf) return;
+
+          const res = await fetch('/api/config/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: raw
+          });
+
+          if (!res.ok) {
+            alert('Lỗi nạp cấu hình: ' + (await res.text()));
+            return;
+          }
+
+          const respData = await res.json();
+          alert(`Thành công: ${respData.message || 'Cấu hình JSON đã được nạp!'}\nCụm ${respData.bot_count || botCount} Bot và Kênh [${respData.channel_id}] đã sẵn sàng hoạt động.`);
+
+          loadSettings();
+          refreshStatus();
+          refreshBots();
+        } catch (err) {
+          alert('Tệp JSON không hợp lệ hoặc lỗi định dạng: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
+
   // Quick Go To Settings button from Banner
   const btnGoToSettings = document.getElementById('btnGoToSettings');
   if (btnGoToSettings) {

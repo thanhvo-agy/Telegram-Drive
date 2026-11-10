@@ -140,7 +140,7 @@ func main() {
 		return
 
 	case "config":
-		handleConfig(configPath)
+		handleConfig(configPath, args)
 		return
 
 	case "backup", "sync":
@@ -238,8 +238,54 @@ func setupEngine(configPath string) (*config.Config, *snapshot.Engine, *restore.
 	return cfg, engine, restorer, tgClient, throttler
 }
 
-func handleConfig(configPath string) {
+func handleConfig(configPath string, args []string) {
 	target := config.FindConfigFile(configPath)
+
+	if len(args) > 0 {
+		sub := args[0]
+		switch sub {
+		case "export":
+			exportPath := "tgdrive-config.json"
+			if len(args) > 1 {
+				exportPath = args[1]
+			}
+			cfg, err := config.Load(target)
+			if err != nil {
+				fmt.Printf("[FATAL] Could not load config to export from %s: %v\n", target, err)
+				os.Exit(1)
+			}
+			if err := cfg.Save(exportPath); err != nil {
+				fmt.Printf("[FATAL] Failed to export config to %s: %v\n", exportPath, err)
+				os.Exit(1)
+			}
+			fmt.Printf("[SUCCESS] Configuration exported successfully to: %s\n", exportPath)
+			fmt.Printf("Contains %d bot tokens, Channel ID: %s, Node: %s\n", len(cfg.BotTokens), cfg.ChannelID, cfg.NodeName)
+			return
+
+		case "import":
+			if len(args) < 2 {
+				fmt.Println("[ERROR] Usage: tgdrive config import <path_to_config.json>")
+				os.Exit(1)
+			}
+			importPath := args[1]
+			imported, err := config.Load(importPath)
+			if err != nil {
+				fmt.Printf("[FATAL] Failed to read import file %s: %v\n", importPath, err)
+				os.Exit(1)
+			}
+			if err := imported.Save(target); err != nil {
+				fmt.Printf("[FATAL] Failed to save imported config to %s: %v\n", target, err)
+				os.Exit(1)
+			}
+			fmt.Printf("[SUCCESS] Configuration imported successfully from %s to %s!\n", importPath, target)
+			fmt.Printf("Node Name:   %s (%s)\n", imported.NodeName, imported.NodeMode)
+			fmt.Printf("Source Path: %s\n", imported.SourcePath)
+			fmt.Printf("Bot Mesh:    %d active bot(s)\n", len(imported.BotTokens))
+			fmt.Printf("Channel ID:  %s\n", imported.ChannelID)
+			return
+		}
+	}
+
 	if _, err := os.Stat(target); err == nil {
 		fmt.Printf("[INFO] Configuration file exists at: %s\n", target)
 		cfg, _ := config.Load(target)
@@ -248,6 +294,8 @@ func handleConfig(configPath string) {
 		fmt.Printf("Bots Count:  %d token(s) configured\n", len(cfg.BotTokens))
 		fmt.Printf("Channel ID:  %s\n", cfg.ChannelID)
 		fmt.Printf("Schedule:    %s\n", cfg.BandwidthSchedule)
+		fmt.Println("\nTip: Run 'tgdrive config export [path.json]' to export configuration for other machines.")
+		fmt.Println("     Run 'tgdrive config import <path.json>' to import configuration from a file.")
 		return
 	}
 

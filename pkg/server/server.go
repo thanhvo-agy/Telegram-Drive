@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -71,6 +72,8 @@ func (s *Server) Start(port int) error {
 	mux.HandleFunc("/api/restore", s.handleTriggerRestore)
 	mux.HandleFunc("/api/file/history", s.handleFileHistory)
 	mux.HandleFunc("/api/config", s.handleConfig)
+	mux.HandleFunc("/api/config/export", s.handleConfigExport)
+	mux.HandleFunc("/api/config/import", s.handleConfigImport)
 	mux.HandleFunc("/api/bots", s.handleBots)
 	mux.HandleFunc("/api/telegram/test", s.handleTelegramTest)
 	mux.HandleFunc("/api/events", s.handleSSE)
@@ -537,6 +540,96 @@ func (s *Server) handleConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+}
+
+func (s *Server) handleConfigExport(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	s.mu.RLock()
+	exportCfg := *s.cfg
+	s.mu.RUnlock()
+
+	nodeName := exportCfg.NodeName
+	if nodeName == "" {
+		nodeName = "tgdrive"
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"tgdrive-config-%s.json\"", nodeName))
+
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "  ")
+	_ = enc.Encode(exportCfg)
+}
+
+func (s *Server) handleConfigImport(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var imported config.Config
+	var bodyReader io.Reader = r.Body
+
+	if strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data") {
+		if err := r.ParseMultipartForm(10 << 20); err == nil {
+			file, _, err := r.FormFile("config_file")
+			if err == nil {
+				defer file.Close()
+				bodyReader = file
+			}
+		}
+	}
+
+	if err := json.NewDecoder(bodyReader).Decode(&imported); err != nil {
+		http.Error(w, fmt.Sprintf("Invalid JSON configuration: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	if len(imported.BotTokens) == 0 && imported.ChannelID == "" {
+		http.Error(w, "Imported configuration has no Bot Tokens or Channel ID", http.StatusBadRequest)
+		return
+	}
+
+	s.mu.Lock()
+	*s.cfg = imported
+
+	if s.cfg.SourcePath == "" {
+		s.cfg.SourcePath = "/volume1/data"
+	}
+	if s.cfg.ChunkSize <= 0 {
+		s.cfg.ChunkSize = 51380224
+	}
+
+	if s.cfg.BandwidthSchedule != "" {
+		if th, err := qos.ParseBandwidthSchedule(s.cfg.BandwidthSchedule); err == nil {
+			s.throttler = th
+		}
+	}
+
+	_ = s.cfg.Save("")
+
+	if len(s.cfg.BotTokens) > 0 && s.cfg.ChannelID != "" {
+		if tgClient, err := telegram.NewClient(s.cfg.BotTokens, s.cfg.ChannelID, s.throttler); err == nil {
+			s.tgClient = tgClient
+			if eng, err := snapshot.NewEngine(s.cfg, tgClient); err == nil {
+				s.engine = eng
+				s.restorer = restore.NewRestorer(s.cfg, eng, tgClient)
+			}
+		}
+	}
+	s.mu.Unlock()
+
+	jsonResponse(w, map[string]interface{}{
+		"ok":         true,
+		"message":    "Cấu hình đã được nhập và kích hoạt thành công!",
+		"node_name":  s.cfg.NodeName,
+		"bot_count":  len(s.cfg.BotTokens),
+		"channel_id": s.cfg.ChannelID,
+	})
 }
 
 func (s *Server) handleTelegramTest(w http.ResponseWriter, r *http.Request) {
