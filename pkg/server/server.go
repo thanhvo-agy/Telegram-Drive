@@ -16,17 +16,19 @@ import (
 	"github.com/thanhvo-agy/Telegram-Drive/pkg/restore"
 	"github.com/thanhvo-agy/Telegram-Drive/pkg/snapshot"
 	"github.com/thanhvo-agy/Telegram-Drive/pkg/telegram"
+	"github.com/thanhvo-agy/Telegram-Drive/pkg/webdav"
 	"github.com/thanhvo-agy/Telegram-Drive/web"
 )
 
 // Server represents the embedded web dashboard server
 type Server struct {
-	cfg        *config.Config
-	engine     *snapshot.Engine
-	restorer   *restore.Restorer
-	tgClient   *telegram.Client
-	throttler  *qos.BandwidthThrottler
-	httpServer *http.Server
+	cfg          *config.Config
+	engine       *snapshot.Engine
+	restorer     *restore.Restorer
+	tgClient     *telegram.Client
+	throttler    *qos.BandwidthThrottler
+	httpServer   *http.Server
+	webdavServer *webdav.Server
 
 	mu          sync.RWMutex
 	isBackingUp bool
@@ -83,11 +85,41 @@ func (s *Server) Start(port int) error {
 		WriteTimeout: 60 * time.Second,
 	}
 
+	// Co-host WebDAV server on port 8089 if enabled in configuration
+	if s.cfg.WebDAV.Enabled {
+		wdPort := s.cfg.WebDAV.Port
+		if wdPort <= 0 {
+			wdPort = 8089
+		}
+		wdCache := int64(s.cfg.WebDAV.CacheSizeMB / 49)
+		if wdCache <= 0 {
+			wdCache = 4
+		}
+		wdCfg := webdav.ServerConfig{
+			Addr:        s.cfg.WebDAV.Addr,
+			Port:        wdPort,
+			ReadOnly:    true,
+			CacheSize:   wdCache,
+			Username:    s.cfg.WebDAV.Username,
+			Password:    s.cfg.WebDAV.Password,
+			IdleTimeout: 60 * time.Second,
+		}
+		if wdSrv, err := webdav.NewServer(wdCfg, s.engine, s.tgClient, s.cfg.EncryptionKey); err == nil {
+			s.webdavServer = wdSrv
+			go func() {
+				_ = wdSrv.Start(context.Background())
+			}()
+		}
+	}
+
 	return s.httpServer.ListenAndServe()
 }
 
 // Stop gracefully shuts down the server
 func (s *Server) Stop(ctx context.Context) error {
+	if s.webdavServer != nil {
+		_ = s.webdavServer.Shutdown(ctx)
+	}
 	if s.httpServer != nil {
 		return s.httpServer.Shutdown(ctx)
 	}
@@ -278,17 +310,26 @@ func (s *Server) handleFileHistory(w http.ResponseWriter, r *http.Request) {
 	jsonResponse(w, history)
 }
 
-func (s *Server) handleTriggerBackup(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+// IsBackingUp returns true if a backup snapshot is currently in progress
+func (s *Server) IsBackingUp() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.isBackingUp
+}
 
+// LastBackupEvent returns the most recent backup progress event
+func (s *Server) LastBackupEvent() *snapshot.ProgressEvent {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.lastBackup
+}
+
+// TriggerBackup starts a backup snapshot in the background if not already running
+func (s *Server) TriggerBackup() error {
 	s.mu.Lock()
 	if s.isBackingUp {
 		s.mu.Unlock()
-		http.Error(w, "Backup is already in progress", http.StatusConflict)
-		return
+		return fmt.Errorf("backup is already in progress")
 	}
 	s.isBackingUp = true
 	s.mu.Unlock()
@@ -312,6 +353,20 @@ func (s *Server) handleTriggerBackup(w http.ResponseWriter, r *http.Request) {
 			s.broadcastSSE("backup_complete", true)
 		}
 	}()
+
+	return nil
+}
+
+func (s *Server) handleTriggerBackup(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := s.TriggerBackup(); err != nil {
+		http.Error(w, "Backup is already in progress", http.StatusConflict)
+		return
+	}
 
 	jsonResponse(w, map[string]string{"status": "started"})
 }

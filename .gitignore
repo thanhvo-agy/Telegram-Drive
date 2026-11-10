@@ -12,7 +12,7 @@ rclone/rclone.conf
 rclone/*.log
 
 # Compiled binaries
-bin/
+# bin/
 
 # Logs
 logs/
@@ -25,3 +25,4 @@ Thumbs.db
 .idea/
 __pycache__/
 *.pyc
+.agents/

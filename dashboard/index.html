@@ -1045,12 +1045,12 @@
             <span class="text-[#8ab4f8] font-mono text-[11px]">Đang kiểm tra với máy chủ Telegram...</span>
           </div>
           <div id="quickTestSuccess" class="hidden text-[#81c995] text-[11px] space-y-0.5">
-            <div>✅ Bot xác thực: <strong id="quickResBotName">@MyNasBackupBot</strong></div>
-            <div>✅ Kênh đích: <strong id="quickResChatTitle">NAS_Private_Vault</strong></div>
-            <div>🛡️ Mã hoá AES-256 Zero-Knowledge: <strong>Kích hoạt</strong></div>
+            <div>[OK] Bot xác thực: <strong id="quickResBotName">@MyNasBackupBot</strong></div>
+            <div>[OK] Kênh đích: <strong id="quickResChatTitle">NAS_Private_Vault</strong></div>
+            <div>[SECURE] Mã hoá AES-256 Zero-Knowledge: <strong>Kích hoạt</strong></div>
           </div>
           <div id="quickTestError" class="hidden text-[#f28b82] text-[11px]">
-            ❌ Lỗi: <span id="quickResErrorMsg">Token không hợp lệ</span>
+            [FAIL] Lỗi: <span id="quickResErrorMsg">Token không hợp lệ</span>
           </div>
         </div>
       </div>
@@ -1450,7 +1450,7 @@
 
     async function triggerInstantSync() {
       const btn = document.getElementById('btnSyncNow');
-      btn.innerHTML = `<span class="animate-spin">🔄</span> <span>Đang Quét...</span>`;
+      btn.innerHTML = `<span class="animate-spin"></span> <span>Đang Quét...</span>`;
       try {
         await fetch('/api/backup', { method: 'POST' });
       } catch (err) {}
@@ -1538,7 +1538,7 @@
       } catch (e) {}
 
       closeQuickSetupModal();
-      alert("✅ Đã lưu cấu hình! SynoTele Vault Daemon đang chạy ngầm trên NAS với Token & Chat ID của bạn.");
+      alert("[OK] Đã lưu cấu hình! SynoTele Vault Daemon đang chạy ngầm trên NAS với Token & Chat ID của bạn.");
       triggerInstantSync();
     }
 
@@ -1547,20 +1547,20 @@
       setInspectorTab('console');
       const side = document.getElementById('sideConsoleLog');
       side.innerHTML += `
-        <div class="text-[#8ab4f8] pt-1 border-t border-[#2a2c30]">📱 [TELEGRAM] User sent: <strong>${cmd}</strong></div>
+        <div class="text-[#8ab4f8] pt-1 border-t border-[#2a2c30]">[PHONE] [TELEGRAM] User sent: <strong>${cmd}</strong></div>
       `;
       if (cmd === '/status') {
         side.innerHTML += `
-          <div class="text-[#81c995]">🤖 [BOT REPLY] Status: OK | Speed: 5.0 MB/s | Files: 42,109 | Free Disk: 2.1 TB</div>
+          <div class="text-[#81c995]">[BOT] [BOT REPLY] Status: OK | Speed: 5.0 MB/s | Files: 42,109 | Free Disk: 2.1 TB</div>
         `;
       } else if (cmd === '/backup') {
         side.innerHTML += `
-          <div class="text-[#81c995]">🤖 [BOT REPLY] 🚀 Sao lưu ngầm đã được kích hoạt!</div>
+          <div class="text-[#81c995]">[BOT] [BOT REPLY] [LAUNCH] Sao lưu ngầm đã được kích hoạt!</div>
         `;
         triggerInstantSync();
       } else if (cmd.startsWith('/speed')) {
         side.innerHTML += `
-          <div class="text-[#fdd663]">🤖 [BOT REPLY] ⚡ Đã điều chỉnh tốc độ Trickle QoS thành công!</div>
+          <div class="text-[#fdd663]">[BOT] [BOT REPLY] [FAST] Đã điều chỉnh tốc độ Trickle QoS thành công!</div>
         `;
       }
       side.scrollTop = side.scrollHeight;

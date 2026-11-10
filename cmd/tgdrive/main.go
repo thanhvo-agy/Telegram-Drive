@@ -38,7 +38,10 @@ COMMANDS:
    ls                  List files and folders within a snapshot
    diff                Compare differences between two snapshots
    prune               Enforce Time Machine retention policy
+   reindex             Disaster recovery: reconstruct local snapshot index from Telegram
+   mount [snapshot_id] Mount virtual WebDAV drive (port 8089) for Windows/macOS/DSM
    test-bot            Verify connectivity of Telegram Bot Mesh and Channel
+   bot                 Run interactive 2-way Telegram Bot remote control listener
    serve               Start embedded micro web dashboard and REST API
    config              Initialize or inspect configuration
    version             Display version information
@@ -52,6 +55,9 @@ EXAMPLES:
    tgdrive restore snap-20261110-020000 photos/trip.jpg /volume1/restore
    tgdrive ls snap-20261110-020000 /
    tgdrive diff snap-20261109-020000 snap-20261110-020000
+   tgdrive reindex
+   tgdrive mount
+   tgdrive mount snap-20261110-020000 --port 8089
    tgdrive serve --port 8088
 `, Version, BuildArch)
 }
@@ -62,18 +68,65 @@ func main() {
 		os.Exit(1)
 	}
 
-	cmd := os.Args[1]
-	args := os.Args[2:]
+	var globalConfigPath string
+	var globalPort int
+	var cmd string
+	var args []string
 
-	configPath := flag.String("config", "", "Custom path to tgdrive.json")
-	serverPort := flag.Int("port", 0, "Port for web server")
+	rawArgs := os.Args[1:]
+	for i := 0; i < len(rawArgs); i++ {
+		arg := rawArgs[i]
+		if arg == "--config" || arg == "-config" {
+			if i+1 < len(rawArgs) {
+				globalConfigPath = rawArgs[i+1]
+				i++
+				continue
+			}
+		} else if strings.HasPrefix(arg, "--config=") || strings.HasPrefix(arg, "-config=") {
+			parts := strings.SplitN(arg, "=", 2)
+			globalConfigPath = parts[1]
+			continue
+		} else if arg == "--port" || arg == "-port" {
+			if i+1 < len(rawArgs) {
+				fmt.Sscanf(rawArgs[i+1], "%d", &globalPort)
+				i++
+				continue
+			}
+		} else if strings.HasPrefix(arg, "--port=") || strings.HasPrefix(arg, "-port=") {
+			parts := strings.SplitN(arg, "=", 2)
+			fmt.Sscanf(parts[1], "%d", &globalPort)
+			continue
+		} else if cmd == "" && !strings.HasPrefix(arg, "-") {
+			cmd = arg
+		} else if cmd == "" && (arg == "-v" || arg == "--version" || arg == "-h" || arg == "--help") {
+			cmd = arg
+		} else {
+			args = append(args, arg)
+		}
+	}
+
+	if cmd == "" {
+		printUsage()
+		os.Exit(1)
+	}
+
+	configPath := globalConfigPath
+	serverPort := globalPort
 
 	// Parse flags for subcommands that accept them
-	if cmd == "serve" || cmd == "backup" || cmd == "sync" || cmd == "config" {
-		fs := flag.NewFlagSet(cmd, flag.ExitOnError)
-		configPath = fs.String("config", "", "Custom path to tgdrive.json")
-		serverPort = fs.Int("port", 0, "Port for web server")
-		_ = fs.Parse(args)
+	if cmd == "serve" || cmd == "backup" || cmd == "sync" || cmd == "config" || cmd == "bot" {
+		fs := flag.NewFlagSet(cmd, flag.ContinueOnError)
+		fsConfig := fs.String("config", "", "Custom path to tgdrive.json")
+		fsPort := fs.Int("port", 0, "Port for web server")
+		if err := fs.Parse(args); err == flag.ErrHelp {
+			return
+		}
+		if *fsConfig != "" {
+			configPath = *fsConfig
+		}
+		if *fsPort != 0 {
+			serverPort = *fsPort
+		}
 		args = fs.Args()
 	}
 
@@ -87,39 +140,61 @@ func main() {
 		return
 
 	case "config":
-		handleConfig(*configPath)
+		handleConfig(configPath)
 		return
 
 	case "backup", "sync":
-		handleBackup(*configPath)
+		handleBackup(configPath)
 		return
 
 	case "snapshots", "list":
-		handleListSnapshots(*configPath)
+		handleListSnapshots(configPath)
 		return
 
 	case "ls":
-		handleListFiles(*configPath, args)
+		handleListFiles(configPath, args)
 		return
 
 	case "diff":
-		handleDiff(*configPath, args)
+		handleDiff(configPath, args)
 		return
 
 	case "restore":
-		handleRestore(*configPath, args)
+		handleRestore(configPath, args)
 		return
 
 	case "prune":
-		handlePrune(*configPath)
+		dryRun := false
+		fs := flag.NewFlagSet("prune", flag.ContinueOnError)
+		fs.BoolVar(&dryRun, "dry-run", false, "Simulate retention pruning without deleting files")
+		cfgFlag := fs.String("config", "", "Custom path to tgdrive.json")
+		if err := fs.Parse(args); err == flag.ErrHelp {
+			return
+		}
+		if *cfgFlag != "" {
+			configPath = *cfgFlag
+		}
+		handlePrune(configPath, dryRun)
+		return
+
+	case "reindex":
+		handleReindex(configPath, args)
 		return
 
 	case "test-bot":
-		handleTestBot(*configPath)
+		handleTestBot(configPath)
+		return
+
+	case "bot":
+		handleBot(configPath, args)
+		return
+
+	case "mount":
+		handleMount(configPath, args)
 		return
 
 	case "serve":
-		handleServe(*configPath, *serverPort)
+		handleServe(configPath, serverPort)
 		return
 
 	default:
@@ -258,16 +333,30 @@ func handleListSnapshots(configPath string) {
 		return
 	}
 
-	fmt.Printf("%-24s %-20s %-8s %-12s %-12s %-10s\n", "SNAPSHOT ID", "CREATED AT", "FILES", "TOTAL SIZE", "DELTA", "NODE")
-	fmt.Println(strings.Repeat("-", 90))
+	fmt.Printf("%-24s %-20s %-8s %-12s %-12s %-10s %-18s\n", "SNAPSHOT ID", "CREATED AT", "FILES", "TOTAL SIZE", "DELTA", "NODE", "WORM STATUS")
+	fmt.Println(strings.Repeat("-", 110))
 	for _, s := range list {
-		fmt.Printf("%-24s %-20s %-8d %-12s %-12s %-10s\n",
+		wormStatus := "[OFF]"
+		if s.Tampered {
+			wormStatus = "[TAMPERED]"
+		} else if s.WORMEnabled {
+			if s.WORMLegalHold {
+				wormStatus = "[LEGAL HOLD]"
+			} else if s.WORMLocked {
+				wormStatus = fmt.Sprintf("[LOCKED: %s]", s.WORMRetainUntil.Format("2006-01-02"))
+			} else {
+				wormStatus = "[EXPIRED]"
+			}
+		}
+
+		fmt.Printf("%-24s %-20s %-8d %-12s %-12s %-10s %-18s\n",
 			s.SnapshotID,
 			s.CreatedAt.Format("2006-01-02 15:04:05"),
 			s.TotalFiles,
 			formatBytes(s.TotalBytes),
 			formatBytes(s.UploadedBytes),
 			s.NodeName,
+			wormStatus,
 		)
 	}
 }
@@ -389,8 +478,24 @@ func handleRestore(configPath string, args []string) {
 	}
 }
 
-func handlePrune(configPath string) {
-	_, engine, _, _, _ := setupEngine(configPath)
+func handlePrune(configPath string, dryRun bool) {
+	cfg, engine, _, _, _ := setupEngine(configPath)
+	if dryRun {
+		snapshots, err := engine.ListSnapshots()
+		if err != nil {
+			fmt.Printf("[FATAL] Prune dry-run failed: %v\n", err)
+			os.Exit(1)
+		}
+		plan := snapshot.CalculatePrunePlan(snapshots, cfg.Retention)
+		fmt.Printf("[INFO] Retention Evaluation (DRY-RUN):\n")
+		fmt.Printf("  Keeping: %d snapshot(s)\n", len(plan.Keep))
+		fmt.Printf("  Pruned:  %d snapshot(s)\n", len(plan.Delete))
+		for _, del := range plan.Delete {
+			fmt.Printf("   - Would delete: %s (%s)\n", del.SnapshotID, del.CreatedAt.Format("2006-01-02 15:04"))
+		}
+		return
+	}
+
 	plan, err := engine.PruneSnapshots()
 	if err != nil {
 		fmt.Printf("[FATAL] Prune failed: %v\n", err)
@@ -442,11 +547,22 @@ func handleServe(configPath string, port int) {
 	fmt.Printf("  Memory Usage: < 5 MB RAM (0 MB background when idle)\n")
 	fmt.Println("=================================================================")
 
+	var botCtrl *telegram.BotController
+	if tgClient != nil && cfg.BotControl.Enabled && len(cfg.BotTokens) > 0 {
+		botCtrl = telegram.NewBotController(cfg, tgClient, engine, srv)
+		if err := botCtrl.Start(context.Background()); err == nil {
+			fmt.Println("[OK] Telegram bot remote control listener running in background.")
+		}
+	}
+
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-sigCh
 		fmt.Println("\n[INFO] Shutting down web server...")
+		if botCtrl != nil {
+			botCtrl.Stop()
+		}
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		_ = srv.Stop(ctx)

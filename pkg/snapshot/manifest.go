@@ -45,6 +45,8 @@ type SnapshotManifest struct {
 	TelegramManifestID string               `json:"telegram_manifest_id,omitempty"`
 	Directories        []string             `json:"directories,omitempty"`
 	Files              map[string]FileEntry `json:"files"`
+	WORM               WORMMetadata         `json:"worm"`
+	Tampered           bool                 `json:"tampered,omitempty"`
 }
 
 // SnapshotSummary is a lightweight metadata view for lists & UI timelines
@@ -57,10 +59,17 @@ type SnapshotSummary struct {
 	UploadedBytes     int64     `json:"uploaded_bytes"`
 	DeduplicatedBytes int64     `json:"deduplicated_bytes"`
 	DurationSec       float64   `json:"duration_sec"`
+	WORMEnabled       bool      `json:"worm_enabled"`
+	WORMLocked        bool      `json:"worm_locked"`
+	WORMMode          WORMMode  `json:"worm_mode,omitempty"`
+	WORMRetainUntil   time.Time `json:"worm_retain_until,omitempty"`
+	WORMLegalHold     bool      `json:"worm_legal_hold,omitempty"`
+	Tampered          bool      `json:"tampered,omitempty"`
 }
 
 // Summary returns a lightweight summary of the manifest
 func (m *SnapshotManifest) Summary() SnapshotSummary {
+	now := time.Now()
 	return SnapshotSummary{
 		SnapshotID:        m.SnapshotID,
 		CreatedAt:         m.CreatedAt,
@@ -70,6 +79,12 @@ func (m *SnapshotManifest) Summary() SnapshotSummary {
 		UploadedBytes:     m.UploadedBytes,
 		DeduplicatedBytes: m.DeduplicatedBytes,
 		DurationSec:       m.DurationSec,
+		WORMEnabled:       m.WORM.Enabled,
+		WORMLocked:        m.IsWORMLocked(now),
+		WORMMode:          m.WORM.Mode,
+		WORMRetainUntil:   m.WORM.RetainUntil,
+		WORMLegalHold:     m.WORM.LegalHold,
+		Tampered:          m.Tampered,
 	}
 }
 

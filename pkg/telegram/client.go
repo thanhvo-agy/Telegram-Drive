@@ -9,12 +9,23 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/url"
+	"os"
+	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/thanhvo-agy/Telegram-Drive/pkg/qos"
 )
+
+func apiBaseURL() string {
+	if u := os.Getenv("TELEGRAM_API_URL"); u != "" {
+		return strings.TrimRight(u, "/")
+	}
+	return "https://api.telegram.org"
+}
 
 // BotStatus tracks live state and statistics of a bot in the mesh
 type BotStatus struct {
@@ -34,6 +45,7 @@ type Client struct {
 	httpClient   *http.Client
 	throttler    *qos.BandwidthThrottler
 	botIndex     uint64
+	baseURL      string
 	mu           sync.RWMutex
 	blockedBots  map[int]time.Time
 	botStats     map[int]*BotStatus
@@ -68,10 +80,14 @@ type Document struct {
 }
 
 type Message struct {
-	MessageID int64     `json:"message_id"`
-	Date      int64     `json:"date"`
-	Document  *Document `json:"document,omitempty"`
-	Caption   string    `json:"caption,omitempty"`
+	MessageID   int64                 `json:"message_id"`
+	From        *User                 `json:"from,omitempty"`
+	Chat        *Chat                 `json:"chat,omitempty"`
+	Date        int64                 `json:"date"`
+	Text        string                `json:"text,omitempty"`
+	Document    *Document             `json:"document,omitempty"`
+	Caption     string                `json:"caption,omitempty"`
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
 type TGFile struct {
@@ -237,7 +253,7 @@ func (c *Client) doUpload(ctx context.Context, botIdx int, token, filename strin
 		return nil, 0, err
 	}
 
-	reqURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendDocument", token)
+	reqURL := fmt.Sprintf("%s/bot%s/sendDocument", c.apiBaseURL(), token)
 	req, err := http.NewRequestWithContext(ctx, "POST", reqURL, body)
 	if err != nil {
 		return nil, 0, err
@@ -291,7 +307,7 @@ func (c *Client) DownloadFile(ctx context.Context, fileID string) ([]byte, error
 	}
 
 	// 1. getFile
-	getURL := fmt.Sprintf("https://api.telegram.org/bot%s/getFile?file_id=%s", token, fileID)
+	getURL := fmt.Sprintf("%s/bot%s/getFile?file_id=%s", c.apiBaseURL(), token, fileID)
 	req, err := http.NewRequestWithContext(ctx, "GET", getURL, nil)
 	if err != nil {
 		return nil, err
@@ -323,7 +339,7 @@ func (c *Client) DownloadFile(ctx context.Context, fileID string) ([]byte, error
 	}
 
 	// 2. Download bytes
-	downloadURL := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", token, fileInfo.FilePath)
+	downloadURL := fmt.Sprintf("%s/file/bot%s/%s", c.apiBaseURL(), token, fileInfo.FilePath)
 	dReq, err := http.NewRequestWithContext(ctx, "GET", downloadURL, nil)
 	if err != nil {
 		return nil, err
@@ -349,24 +365,31 @@ func (c *Client) DownloadFile(ctx context.Context, fileID string) ([]byte, error
 
 // SendAlert sends a notification message to the channel
 func (c *Client) SendAlert(ctx context.Context, text string) error {
-	_, token, err := c.pickBot()
+	token := c.PrimaryToken()
+	if token == "" {
+		var err error
+		_, token, err = c.pickBot()
+		if err != nil {
+			return err
+		}
+	}
+
+	formattedText := text
+	if !strings.Contains(formattedText, "Backup") && !strings.Contains(formattedText, "[BACKUP]") {
+		formattedText = "[BACKUP] " + formattedText
+	}
+
+	apiURL := fmt.Sprintf("%s/bot%s/sendMessage", c.apiBaseURL(), token)
+	form := url.Values{}
+	form.Set("chat_id", c.channelID)
+	form.Set("text", formattedText)
+	form.Set("parse_mode", "Markdown")
+
+	req, err := http.NewRequestWithContext(ctx, "POST", apiURL, strings.NewReader(form.Encode()))
 	if err != nil {
 		return err
 	}
-
-	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", token)
-	payload := map[string]interface{}{
-		"chat_id":    c.channelID,
-		"text":       text,
-		"parse_mode": "Markdown",
-	}
-
-	data, _ := json.Marshal(payload)
-	req, err := http.NewRequestWithContext(ctx, "POST", apiURL, bytes.NewReader(data))
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -375,6 +398,33 @@ func (c *Client) SendAlert(ctx context.Context, text string) error {
 	defer resp.Body.Close()
 
 	return nil
+}
+
+// SetBaseURL overrides the API base URL (useful for test mocks)
+func (c *Client) SetBaseURL(u string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.baseURL = u
+}
+
+// apiBaseURL returns the configured base URL or default
+func (c *Client) apiBaseURL() string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	if c.baseURL != "" {
+		return strings.TrimRight(c.baseURL, "/")
+	}
+	return apiBaseURL()
+}
+
+// PrimaryToken returns the primary bot token (index 0)
+func (c *Client) PrimaryToken() string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	if len(c.tokens) == 0 {
+		return ""
+	}
+	return c.tokens[0]
 }
 
 // GetMeshStatus returns status of all bots for the dashboard
@@ -390,9 +440,238 @@ func (c *Client) GetMeshStatus() []BotStatus {
 	return result
 }
 
+// GetUpdates retrieves incoming updates using long-polling on the primary bot token
+func (c *Client) GetUpdates(ctx context.Context, offset int64, limit int, timeout int) ([]Update, error) {
+	token := c.PrimaryToken()
+	if token == "" {
+		return nil, errors.New("no bot token available for getUpdates")
+	}
+
+	if limit <= 0 {
+		limit = 100
+	}
+
+	reqURL := fmt.Sprintf("%s/bot%s/getUpdates?offset=%d&limit=%d&timeout=%d", c.apiBaseURL(), token, offset, limit, timeout)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var tgResp apiResponse
+	if err := json.Unmarshal(respBytes, &tgResp); err != nil {
+		return nil, fmt.Errorf("unmarshal telegram response: %w", err)
+	}
+
+	if !tgResp.OK {
+		if tgResp.ErrorCode == 429 && tgResp.Parameters != nil {
+			c.markRateLimited(0, tgResp.Parameters.RetryAfter)
+			return nil, &RateLimitError{RetryAfter: tgResp.Parameters.RetryAfter}
+		}
+		return nil, fmt.Errorf("telegram getUpdates error (%d): %s", tgResp.ErrorCode, tgResp.Description)
+	}
+
+	var updates []Update
+	if len(tgResp.Result) > 0 && string(tgResp.Result) != "null" {
+		if err := json.Unmarshal(tgResp.Result, &updates); err != nil {
+			return nil, fmt.Errorf("unmarshal updates: %w", err)
+		}
+	}
+
+	return updates, nil
+}
+
+// SendMessageWithMarkup posts a message with optional inline keyboard to chatID
+func (c *Client) SendMessageWithMarkup(ctx context.Context, chatID int64, text string, markup *InlineKeyboardMarkup) (*Message, error) {
+	token := c.PrimaryToken()
+	if token == "" {
+		return nil, errors.New("no bot token available for sendMessage")
+	}
+
+	form := url.Values{}
+	form.Set("chat_id", strconv.FormatInt(chatID, 10))
+	form.Set("text", text)
+	form.Set("parse_mode", "Markdown")
+	if markup != nil {
+		b, err := json.Marshal(markup)
+		if err == nil {
+			form.Set("reply_markup", string(b))
+		}
+	}
+
+	reqURL := fmt.Sprintf("%s/bot%s/sendMessage", c.apiBaseURL(), token)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, reqURL, strings.NewReader(form.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var tgResp apiResponse
+	if err := json.Unmarshal(respBytes, &tgResp); err != nil {
+		return nil, fmt.Errorf("unmarshal telegram response: %w", err)
+	}
+
+	if !tgResp.OK {
+		// Fallback without parse_mode if entity formatting error
+		if strings.Contains(strings.ToLower(tgResp.Description), "parse") ||
+			strings.Contains(strings.ToLower(tgResp.Description), "entity") {
+			form.Del("parse_mode")
+			fallbackReq, err := http.NewRequestWithContext(ctx, http.MethodPost, reqURL, strings.NewReader(form.Encode()))
+			if err == nil {
+				fallbackReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+				if fallbackResp, err := c.httpClient.Do(fallbackReq); err == nil {
+					defer fallbackResp.Body.Close()
+					var fallbackTgResp apiResponse
+					if err := json.NewDecoder(fallbackResp.Body).Decode(&fallbackTgResp); err == nil && fallbackTgResp.OK {
+						var msg Message
+						_ = json.Unmarshal(fallbackTgResp.Result, &msg)
+						return &msg, nil
+					}
+				}
+			}
+		}
+		return nil, fmt.Errorf("telegram sendMessage error (%d): %s", tgResp.ErrorCode, tgResp.Description)
+	}
+
+	var msg Message
+	if err := json.Unmarshal(tgResp.Result, &msg); err != nil {
+		return nil, fmt.Errorf("unmarshal message: %w", err)
+	}
+
+	return &msg, nil
+}
+
+// EditMessageText modifies an existing message text and keyboard markup
+func (c *Client) EditMessageText(ctx context.Context, chatID int64, messageID int64, text string, markup *InlineKeyboardMarkup) error {
+	token := c.PrimaryToken()
+	if token == "" {
+		return errors.New("no bot token available for editMessageText")
+	}
+
+	form := url.Values{}
+	form.Set("chat_id", strconv.FormatInt(chatID, 10))
+	form.Set("message_id", strconv.FormatInt(messageID, 10))
+	form.Set("text", text)
+	form.Set("parse_mode", "Markdown")
+	if markup != nil {
+		b, err := json.Marshal(markup)
+		if err == nil {
+			form.Set("reply_markup", string(b))
+		}
+	}
+
+	reqURL := fmt.Sprintf("%s/bot%s/editMessageText", c.apiBaseURL(), token)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, reqURL, strings.NewReader(form.Encode()))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	respBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	var tgResp apiResponse
+	if err := json.Unmarshal(respBytes, &tgResp); err != nil {
+		return fmt.Errorf("unmarshal telegram response: %w", err)
+	}
+
+	if !tgResp.OK {
+		if strings.Contains(strings.ToLower(tgResp.Description), "parse") ||
+			strings.Contains(strings.ToLower(tgResp.Description), "entity") {
+			form.Del("parse_mode")
+			fallbackReq, err := http.NewRequestWithContext(ctx, http.MethodPost, reqURL, strings.NewReader(form.Encode()))
+			if err == nil {
+				fallbackReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+				if fallbackResp, err := c.httpClient.Do(fallbackReq); err == nil {
+					defer fallbackResp.Body.Close()
+					var fallbackTgResp apiResponse
+					if err := json.NewDecoder(fallbackResp.Body).Decode(&fallbackTgResp); err == nil && fallbackTgResp.OK {
+						return nil
+					}
+				}
+			}
+		}
+		return fmt.Errorf("telegram editMessageText error (%d): %s", tgResp.ErrorCode, tgResp.Description)
+	}
+
+	return nil
+}
+
+// AnswerCallbackQuery answers an inline button callback query to dismiss client spinner
+func (c *Client) AnswerCallbackQuery(ctx context.Context, callbackQueryID string, text string) error {
+	token := c.PrimaryToken()
+	if token == "" {
+		return errors.New("no bot token available for answerCallbackQuery")
+	}
+
+	form := url.Values{}
+	form.Set("callback_query_id", callbackQueryID)
+	if text != "" {
+		form.Set("text", text)
+	}
+
+	reqURL := fmt.Sprintf("%s/bot%s/answerCallbackQuery", c.apiBaseURL(), token)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, reqURL, strings.NewReader(form.Encode()))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	respBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	var tgResp apiResponse
+	if err := json.Unmarshal(respBytes, &tgResp); err != nil {
+		return fmt.Errorf("unmarshal telegram response: %w", err)
+	}
+
+	if !tgResp.OK {
+		return fmt.Errorf("telegram answerCallbackQuery error (%d): %s", tgResp.ErrorCode, tgResp.Description)
+	}
+
+	return nil
+}
+
 // TestBotPing verifies bot token connectivity with Telegram API getMe
 func TestBotPing(ctx context.Context, token string) (*User, error) {
-	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/getMe", token)
+	apiURL := fmt.Sprintf("%s/bot%s/getMe", apiBaseURL(), token)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiURL, nil)
 	if err != nil {
 		return nil, err
@@ -419,3 +698,4 @@ func TestBotPing(ctx context.Context, token string) (*User, error) {
 	}
 	return &u, nil
 }
+

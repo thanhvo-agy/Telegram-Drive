@@ -3,6 +3,7 @@ package snapshot
 import (
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/thanhvo-agy/Telegram-Drive/pkg/config"
 )
@@ -15,6 +16,11 @@ type PrunePlan struct {
 
 // CalculatePrunePlan determines which snapshots to delete based on the retention policy
 func CalculatePrunePlan(snapshots []SnapshotSummary, policy config.RetentionConfig) PrunePlan {
+	return CalculatePrunePlanAt(snapshots, policy, time.Now())
+}
+
+// CalculatePrunePlanAt determines which snapshots to delete based on the retention policy at a specific point in time
+func CalculatePrunePlanAt(snapshots []SnapshotSummary, policy config.RetentionConfig, now time.Time) PrunePlan {
 	if len(snapshots) <= 1 {
 		return PrunePlan{Keep: snapshots, Delete: nil}
 	}
@@ -30,6 +36,14 @@ func CalculatePrunePlan(snapshots []SnapshotSummary, policy config.RetentionConf
 
 	// Always keep the very latest snapshot
 	keepMap[sorted[0].SnapshotID] = true
+
+	// WORM & Tamper Lock Enforcement:
+	// Any snapshot that is WORM-locked or marked Tampered MUST be kept and NEVER deleted.
+	for _, s := range sorted {
+		if s.IsWORMLocked(now) || s.Tampered {
+			keepMap[s.SnapshotID] = true
+		}
+	}
 
 	// Hourly buckets
 	hourlyBuckets := make(map[string]bool)
