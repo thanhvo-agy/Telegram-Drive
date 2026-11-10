@@ -1,248 +1,196 @@
-# Telegram NAS Backup 🚀
-> **Giải pháp sao lưu dữ liệu NAS lên Telegram Cloud không giới hạn với Teldrive, Rclone Crypt & Docker.**
+# TeleClone Pro (tgdrive)
 
-[![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://www.docker.com/)
-[![Teldrive](https://img.shields.io/badge/Backend-Teldrive%20v2-green.svg)](https://github.com/tgdrive/teldrive)
-[![Rclone](https://img.shields.io/badge/Sync-Rclone%20Crypt-orange.svg)](https://rclone.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-Dự án này cung cấp một bộ công cụ triển khai trọn gói (*turnkey solution*) giúp bạn biến Telegram thành một **kho lưu trữ sao lưu ngoại vi (Offsite Cold Storage / Disaster Recovery)** an toàn, tự động hóa và bảo mật tuyệt đối cho các hệ thống NAS (**Synology DSM, TrueNAS, Unraid, OpenMediaVault, Proxmox, Ubuntu/Debian Server**).
+> **High-Performance, Zero-Dependency Telegram Cloud Backup Engine in the Spirit of Rclone.**
+>
+> **Single Static Binary | Zero Docker | Zero Database | 0MB RAM Idle | AES-256-GCM | Time Machine CoW Snapshots**
 
 ---
 
-## 🏗 Kiến trúc hoạt động
+## 1. Overview & Architectural Philosophy
 
-```mermaid
-flowchart LR
-    A["📁 Thư mục NAS<br>(/volume1/data)"] -->|"Đọc tệp"| B["🔐 Rclone Crypt<br>(Mã hoá AES-256)"]
-    B -->|"WebDAV Protocol"| C["⚡ Teldrive (Docker)<br>(Go Backend ~30MB RAM)"]
-    C -->|"Tự động chia nhỏ part &le; 2GB<br>Quản lý MTProto"| D[("☁️ Telegram Cloud<br>(Kênh riêng tư - Private Channel)")]
+TeleClone (`tgdrive`) is built from the ground up on the **core philosophy of Rclone**:
+* **Single Static Binary**: Written in pure Go with zero runtime dependencies. No Docker engine, no PostgreSQL, no Nginx, no Python/Node runtimes required. Just download one file and run.
+* **0 MB RAM Background**: Runs cleanly via standard Cron or Task Scheduler. Sleeps at 0MB RAM, wakes up to perform scheduled trickle synchronization, releases 100% of resources upon completion, allowing NAS hard drives to hibernate normally.
+* **Universal CPU Architecture**: Pre-compiled static binaries for `amd64` (Synology x86_64, Dell-1, Linux servers), `armv7` (Buffalo LS410D, LS220D), `armv5` (Buffalo LinkStation Quad ARM9), `arm64` (64-bit ARM / Raspberry Pi), and `darwin/arm64` (Apple Silicon Mac).
+* **Entware / Native Compatibility**: Directly deployable on any embedded Linux, Buffalo NAS, OpenWrt router, or Synology DSM.
 
-    subgraph NAS ["Máy chủ NAS / Homelab Cục Bộ"]
-        A
-        B
-        C
-    end
+---
 
-    subgraph Cloud ["Đám Mây Ngoại Vi"]
-        D
-    end
+## 2. Key Capabilities
+
+### Time Machine Multi-Version Snapshots
+* **Content-Addressable CoW Deduplication**: Files are fingerprinted via SHA-256. Unchanged files across snapshot generations are deduplicated instantly (0 bytes re-read, 0 bytes encrypted, 0 bytes uploaded).
+* **Point-in-Time Historical Recovery**: Restore any individual file, subfolder, or full snapshot to any point in history with 1 click.
+* **Encrypted Cloud Manifest**: Every snapshot generates a signed and AES-256 encrypted manifest (`snap-*.manifest.enc`) stored directly in Telegram. Even if the local NAS hardware is completely lost, all historical snapshots can be reconstructed directly from the Telegram channel.
+
+### Enterprise Security & QoS
+* **Client-Side Zero-Knowledge Encryption**: All data is encrypted locally using **AES-256-GCM** with PBKDF2-SHA256 key derivation before leaving the NAS. Telegram servers only store opaque encrypted chunks.
+* **Multi-Bot Token Mesh**: Multiplexes upload and download requests across a pool of Telegram Bot tokens in round-robin fashion, mitigating per-bot rate limits (`429 Too Many Requests`).
+* **24h Trickle QoS Scheduler**: Dynamic bandwidth limits based on time of day (e.g., `07:00,5M 23:00,18M` for daytime 5MB/s and nighttime 18MB/s) combined with automatic low process priority (`nice -n 19`) to keep NAS responsive.
+* **Smart Retention Policy**: Automated pruning rules (`keep-hourly`, `keep-daily`, `keep-weekly`, `keep-monthly`).
+
+### Commercial-Grade Embedded Dashboard
+* **Micro Web Server (<8MB RAM)**: Serves a high-density, Google Cloud Console-grade UI embedded directly within the binary.
+* **Synology File Station Explorer**: Dual-pane directory tree and file table with real-time backup state and 1-click restore.
+* **Time Machine Timeline**: Interactive snapshot scrubber with live diff inspection (Added, Modified, Deleted).
+* **100% Vector SVG Icons**: Clean typography, zero emojis.
+
+---
+
+## 3. Quickstart & Installation
+
+### Option A: 1-Line Universal Installer (Recommended)
+On Synology DSM, Buffalo NAS (Entware), OpenWrt, or Linux:
+```bash
+curl -fsSL https://raw.githubusercontent.com/thanhvo-agy/Telegram-Drive/main/scripts/install.sh | sh
 ```
 
-### ✨ Ưu điểm vượt trội
-1. **Dung lượng không giới hạn**: Lưu trữ miễn phí trên hạ tầng Telegram.
-2. **Bảo mật tuyệt đối (Zero-Knowledge)**: Mọi tệp tin, tên tệp và cấu trúc thư mục đều được mã hoá bằng thuật toán **AES-256** qua `rclone crypt` trước khi rời khỏi NAS. Phía Telegram chỉ thấy các chuỗi nhị phân mã hoá vô nghĩa.
-3. **Tự động chia nhỏ file lớn (> 2GB)**: Teldrive tự động cắt các tệp lớn thành các phần nhỏ $\le 2\text{GB}$ khi tải lên và tự động ghép nối lại khi tải xuống.
-4. **Cực kỳ nhẹ**: Container Teldrive viết bằng Go chỉ tốn $\approx 30\text{MB}$ RAM, phù hợp với cả các mẫu NAS cấu hình thấp (ARM / 1GB RAM).
-5. **Chống nghẽn mạng & Rate Limit**: Cấu hình giới hạn băng thông (`--bwlimit 15M`) và `--fast-list` giúp bảo vệ đường truyền gia đình và tránh bị Telegram khoá IP (`FLOOD_WAIT`).
-6. **Thông báo qua Telegram Bot**: Nhận báo cáo tự động qua bot cá nhân sau mỗi lần backup thành công hoặc thất bại.
+### Option B: Manual Binary Download
+Download the single static binary matching your CPU architecture:
+
+| Platform / Device | Binary Name | Architecture | Size |
+| :--- | :--- | :--- | :--- |
+| **Synology DSM / Dell-1 / x86_64 PC** | `bin/tgdrive-linux-amd64` | `x86_64` | ~7.2 MB |
+| **Buffalo LS410D / LS220D / Pi 3/4** | `bin/tgdrive-linux-armv7` | `ARMv7-a` | ~7.2 MB |
+| **Buffalo LinkStation Quad (Legacy)** | `bin/tgdrive-linux-armv5` | `ARMv5TE` | ~7.2 MB |
+| **ARM64 Servers / Apple Silicon Mac** | `bin/tgdrive-linux-arm64` | `AArch64` | ~6.8 MB |
+
+Make executable and place on your PATH:
+```bash
+chmod +x tgdrive-linux-amd64
+sudo mv tgdrive-linux-amd64 /usr/local/bin/tgdrive
+```
 
 ---
 
-## 📂 Cấu trúc dự án
+## 4. Configuration
 
+Initialize a template configuration file:
+```bash
+tgdrive config
+```
+
+This creates `tgdrive.json` (or `~/.config/tgdrive/tgdrive.json`):
+```json
+{
+  "bot_tokens": [
+    "123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ_Token1",
+    "987654321:ZYXwvuTsRQPonMlKJIhgFedCBA_Token2"
+  ],
+  "channel_id": "-1001234567890",
+  "encryption_key": "YOUR_STRONG_SECRET_PASSPHRASE",
+  "source_path": "/volume1/data",
+  "bandwidth_schedule": "07:00,5M 23:00,18M",
+  "nice_priority": 19,
+  "retention": {
+    "keep_hourly": 24,
+    "keep_daily": 7,
+    "keep_weekly": 4,
+    "keep_monthly": 12
+  },
+  "server_port": 8088,
+  "node_name": "Synology-DS920+",
+  "node_mode": "PUSH"
+}
+```
+
+---
+
+## 5. CLI Command Reference
+
+### Backup / Synchronization
+Run a point-in-time CoW snapshot backup:
+```bash
+tgdrive backup
+```
+
+### List Snapshots
+Display all historical point-in-time snapshots:
+```bash
+tgdrive snapshots
+```
+Output:
 ```text
-.
-├── docker-compose.yml           # Khai báo dịch vụ Postgres, Teldrive & Rclone Backup runner
-├── .env.example                 # Mẫu biến môi trường (Database, đường dẫn NAS, Cronjob)
-├── config.example.toml          # Mẫu cấu hình Teldrive v2 (API ID, API Hash, Allowed Users)
-├── rclone/
-│   └── rclone.example.conf      # Mẫu cấu hình Rclone WebDAV & Crypt remote
-└── scripts/
-    ├── setup.sh                 # Script tự động tạo thư mục và sinh khoá bảo mật ngẫu nhiên
-    ├── backup.sh                # Script backup chạy trên máy chủ NAS (hỗ trợ lock & log)
-    ├── restore.sh               # Script giải mã và khôi phục dữ liệu từ Telegram về NAS
-    ├── container_backup.sh      # Script backup tự động chạy ngầm trong Docker
-    └── install_cron.sh          # Hướng dẫn và cài đặt lịch chạy tự động (Cronjob)
+SNAPSHOT ID              CREATED AT           FILES    TOTAL SIZE   DELTA        NODE      
+------------------------------------------------------------------------------------------
+snap-20261110-060000     2026-11-10 06:00:00  5        142.0 MB     6.0 MB       Synology-DS920+
+snap-20261110-020000     2026-11-10 02:00:00  4        136.0 MB     136.0 MB     Synology-DS920+
 ```
 
----
-
-## ⚡ CÀI ĐẶT SIÊU TỐC 1 BƯỚC (CHỈ CẦN BOT TOKEN & CHAT ID) 🚀
-
-> [!TIP]
-> **Không cần cài đặt PostgreSQL, Teldrive hay đăng nhập số điện thoại!**
-> Bạn chỉ cần điền **Bot Token** và **Chat ID**, hệ thống tự động khởi động **TeleVault Core Daemon** siêu nhẹ (~18MB RAM) chạy ngầm êm ái trên NAS (Synology, TrueNAS, Unraid, Linux) với bảo mật **AES-256 Zero-Knowledge**.
-
-### Cách 1: Chạy lệnh Quick-Start tự động (Khuyên dùng)
+### Explore Files within a Snapshot
+Browse virtual directories at a specific moment in time:
 ```bash
-git clone https://github.com/thanhvo-agy/Telegram-Drive.git telegram-backup
-cd telegram-backup
-
-# Chạy script khởi tạo 1 bước (chỉ cần nhập Bot Token & Chat ID khi được hỏi)
-./scripts/quick_start.sh
+tgdrive ls snap-20261110-060000 documents
 ```
 
-### Cách 2: Điền vào `.env` và bật Docker
-1. Sao chép mẫu cấu hình:
-   ```bash
-   cp .env.example .env
-   ```
-2. Mở file `.env` và điền:
-   ```env
-   TELEGRAM_BOT_TOKEN=7123456789:AAH_abcXYZ...
-   TELEGRAM_CHAT_ID=-1001234567890
-   NAS_SOURCE_PATH=/volume1/Photos
-   ```
-3. Khởi động chạy ngầm:
-   ```bash
-   docker compose up -d
-   ```
-
-4. Truy cập giao diện quản trị 100% không gian màn hình:
-   👉 **`http://<IP_NAS_CỦA_BẠN>:8088`**
-5. Điều khiển từ xa qua ứng dụng Telegram trên điện thoại:
-   Nhắn tin trực tiếp cho Bot các lệnh:
-   * `/status`: Xem CPU, RAM, dung lượng NAS & số tệp đã backup
-   * `/backup`: Kích hoạt sao lưu tức thì
-   * `/speed 10`: Đổi giới hạn tốc độ thành 10 MB/s
-   * `/pause` & `/resume`: Tạm dừng hoặc tiếp tục
-
----
-
-## 🏢 Cấu hình nâng cao: Enterprise Mode (Teldrive v2 + Rclone Crypt)
-*(Dành cho nhu cầu chia nhỏ file 2GB qua giao thức MTProto người dùng)*
-1. Đăng nhập vào [my.telegram.org](https://my.telegram.org), chọn **API development tools** để lấy `app-id` (số) và `app-hash` (chuỗi ký tự).
-2. Mở ứng dụng Telegram trên điện thoại/máy tính, tạo một **Kênh riêng tư (Private Channel)** mới (ví dụ đặt tên là `NAS_Backup_Vault`).
-3. *(Khuyên dùng)* Nên dùng một tài khoản phụ (Secondary/Burner Account) để chứa dữ liệu backup.
-
----
-
-### Bước 2: Clone dự án và khởi tạo cấu hình
-SSH vào NAS hoặc máy chủ Linux của bạn:
-
+### Snapshot Diff Inspection
+Compare changes between two snapshots:
 ```bash
-git clone https://github.com/thanhvo-agy/Telegram-Drive.git telegram-backup
-cd telegram-backup
-
-# Cấp quyền và chạy script khởi tạo tự động
-chmod +x scripts/*.sh
-./scripts/setup.sh
+tgdrive diff snap-20261110-020000 snap-20261110-060000
+```
+Output:
+```text
+Comparing snap-20261110-020000 -> snap-20261110-060000 (2 changes):
+ACTION     SIZE         PATH
+----------------------------------------------------------------------
+MODIFIED   600.0 KB     documents/financial_report.xlsx
+ADDED      5.4 MB       documents/meeting_minutes_20261110.docx
 ```
 
-Script sẽ tự động:
-- Tạo các thư mục lưu trữ `data/`, `logs/`, `rclone/`.
-- Tạo `.env` và `config.toml` với mật khẩu PostgreSQL và khoá bí mật JWT ngẫu nhiên.
-
----
-
-### Bước 3: Cập nhật thông tin cấu hình
-
-1. **Cập nhật `config.toml`**:
-   Mở file `config.toml` và điền:
-   ```toml
-   [jwt]
-   allowed-users = ["username_telegram_cua_ban"] # Không có dấu @
-
-   [tg]
-   app-id = 12345678                            # Lấy từ my.telegram.org
-   app-hash = "chuoi_app_hash_cua_ban"          # Lấy từ my.telegram.org
-   ```
-
-2. **Cập nhật `.env`**:
-   Mở file `.env` và chỉnh sửa đường dẫn thư mục NAS bạn muốn sao lưu:
-   ```env
-   # Ví dụ với Synology DSM:
-   NAS_SOURCE_PATH=/volume1/data
-   ```
-
----
-
-### Bước 4: Khởi động Teldrive qua Docker
-
+### Point-in-Time Restore
+Restore an individual file:
 ```bash
-docker compose up -d
+tgdrive restore snap-20261110-060000 documents/financial_report.xlsx /volume1/restored
 ```
-
-Kiểm tra trạng thái container:
+Restore an entire folder:
 ```bash
-docker compose ps
+tgdrive restore snap-20261110-060000 documents /volume1/restored_docs
 ```
-Khi cả 2 container `teldrive_postgres` và `teldrive_server` ở trạng thái **healthy / running**, mở trình duyệt truy cập:
-👉 `http://<IP_NAS_CỦA_BẠN>:8080`
 
-- Đăng nhập bằng số điện thoại Telegram của bạn.
-- Vào phần **Settings** $\rightarrow$ chọn kênh Telegram riêng tư đã tạo ở Bước 1 làm thư mục lưu trữ mặc định.
-
----
-
-### Bước 5: Cấu hình Rclone (WebDAV & Mã hoá Crypt)
-
-1. Sao chép file cấu hình mẫu sang cấu hình chính thức:
-   ```bash
-   cp rclone/rclone.example.conf rclone/rclone.conf
-   ```
-
-2. Mã hoá mật khẩu truy cập của bạn bằng lệnh Rclone:
-   ```bash
-   # Nếu bạn cài rclone trên máy chủ:
-   rclone obscure "MatKhauChonDeMaHoa"
-   
-   # Hoặc chạy nhanh qua Docker:
-   docker run --rm rclone/rclone obscure "MatKhauChonDeMaHoa"
-   ```
-
-3. Mở `rclone/rclone.conf` và dán mật khẩu đã mã hoá vào các trường `pass` và `password`.
-
----
-
-### Bước 6: Kiểm tra sao lưu và phục hồi
-
-Chạy thử một lần sao lưu thủ công:
+### Retention Pruning
+Enforce retention rules and prune expired snapshots:
 ```bash
-./scripts/backup.sh
+tgdrive prune
 ```
-Kiểm tra file log vừa sinh ra trong thư mục `logs/`. Bạn sẽ thấy tiến trình đồng bộ từng tệp đã được mã hoá đẩy lên Telegram.
 
-Khi cần khôi phục dữ liệu về NAS:
+### Embedded Web Dashboard
+Launch the zero-dependency embedded web server:
 ```bash
-# Khôi phục toàn bộ kho lưu trữ về thư mục ./restore_output
-./scripts/restore.sh
-
-# Hoặc khôi phục một thư mục con cụ thể:
-./scripts/restore.sh teldrive-crypt:nas-backup/Photos /volume1/restore_photos
+tgdrive serve --port 8088
 ```
+Open `http://<NAS_IP>:8088` to access the full visual console.
 
 ---
 
-### Bước 7: Cài đặt lịch sao lưu tự động (Cronjob)
+## 6. Multi-NAS Topology Deployment
 
-Chạy script hỗ trợ cài đặt cron:
+### Rayma Network Topology Example:
+* **Synology (`192.168.1.23`)**: Primary storage node, running `tgdrive backup` via Synology DSM Task Scheduler.
+* **Buffalo NAS 199 (`192.168.1.199`)**: Mounted via SMB CIFS (`\\192.168.1.199\Source-0`) into `/volume1/remote_buffalo/nas199` on Synology.
+* **Buffalo NAS 198 (`192.168.1.198`)**: Mounted via SMB CIFS (`\\192.168.1.198\google-drive-inforayma`) into `/volume1/remote_buffalo/nas198`.
+* **Buffalo NAS 196 (`192.168.1.196`)**: Mounted via SMB CIFS (`\\192.168.1.196\HDD-01`) into `/volume1/remote_buffalo/nas196`.
+
+By mounting Buffalo network shares into Synology, `tgdrive` backs up all NAS units simultaneously from a single central host without running any background processes on the Buffalo devices.
+
+---
+
+## 7. Compiling from Source
+
+Prerequisites: Go 1.22+
 ```bash
-./scripts/install_cron.sh
+# Clone the repository
+git clone https://github.com/thanhvo-agy/Telegram-Drive.git
+cd Telegram-Drive
+
+# Build static binary for current machine
+go build -ldflags="-s -w" -o bin/tgdrive ./cmd/tgdrive
+
+# Cross-compile for all architectures
+bash scripts/build.sh
 ```
 
-- **Đối với Synology DSM**:
-  1. Vào **Control Panel** $\rightarrow$ **Task Scheduler** $\rightarrow$ **Create** $\rightarrow$ **Scheduled Task** $\rightarrow$ **User-defined script**.
-  2. Tab **General**: User chọn `root`.
-  3. Tab **Schedule**: Chạy hàng ngày lúc `02:00 AM`.
-  4. Tab **Task Settings**: Dán lệnh:
-     ```bash
-     /bin/bash /duong/dan/den/telegram-backup/scripts/backup.sh
-     ```
-
-- **Đối với Linux / TrueNAS Scale / Unraid**:
-  Thêm dòng sau vào crontab (`crontab -e`):
-  ```bash
-  0 2 * * * /bin/bash /duong/dan/den/telegram-backup/scripts/backup.sh >/dev/null 2>&1
-  ```
-
 ---
 
-## 🛡️ Các lưu ý sống còn khi Backup lên Telegram
+## 8. License
 
-> [!IMPORTANT]
-> **Quy tắc sao lưu 3-2-1:** Hãy coi Telegram là bản sao lưu ngoại vi thứ 3 (**Disaster Recovery / Cold Storage**). Không nên dùng Telegram làm bản lưu trữ duy nhất. Luôn giữ ít nhất 1 bản sao dữ liệu gốc trên ổ cứng NAS tại nhà.
-
-> [!CAUTION]
-> **Bật mã hoá đầu cuối (Rclone Crypt):** Tuyệt đối không đẩy tệp tin gốc chưa mã hoá lên Telegram để đảm bảo tính riêng tư tuyệt đối cho dữ liệu gia đình và công việc của bạn.
-
-> [!TIP]
-> **Giới hạn tốc độ tải lên:** Đặt `RCLONE_BWLIMIT=15M` trong `.env` nhằm tránh việc đẩy quá dồn dập khiến Telegram kích hoạt giới hạn tần suất (`FLOOD_WAIT`).
-
----
-
-## 📜 Giấy phép
-Mã nguồn mở theo giấy phép [MIT License](LICENSE).
-Teldrive là dự án mã nguồn mở phát triển bởi nhóm [tgdrive](https://github.com/tgdrive).
-Rclone là công cụ mã nguồn mở phát triển bởi [rclone](https://rclone.org).
+Licensed under the MIT License. See [LICENSE](LICENSE) for details.

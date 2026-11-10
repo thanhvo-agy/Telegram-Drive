@@ -11,6 +11,9 @@ storage.db*
 rclone/rclone.conf
 rclone/*.log
 
+# Compiled binaries
+bin/
+
 # Logs
 logs/
 *.log

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeleClone Pro - Telegram Cloud Backup Engine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+      </div>
+      <span class="brand-title">TeleClone Pro</span>
+      <span class="badge-pro" id="headerNodeBadge">NAS-NODE (PUSH)</span>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="overview">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Overview
+      </button>
+      <button class="nav-tab" data-tab="filestation">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+        File Station
+      </button>
+      <button class="nav-tab" data-tab="timemachine">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Time Machine
+      </button>
+      <button class="nav-tab" data-tab="settings">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        Topology & QoS
+      </button>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <button class="btn btn-primary" id="btnTriggerBackup">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        Backup Now
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- Overview Section -->
+    <section id="section-overview" class="content-section active">
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Storage Protected</span>
+            <svg class="icon" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+          </div>
+          <div class="metric-value" id="valTotalStorage">--</div>
+          <div class="metric-sub" id="valStorageSub">Source: --</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Time Machine Snapshots</span>
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div class="metric-value" id="valTotalSnapshots">--</div>
+          <div class="metric-sub" id="valLatestSnapshotTime">Latest: --</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Bot Token Mesh</span>
+            <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          </div>
+          <div class="metric-value" id="valBotCount">--</div>
+          <div class="metric-sub" id="valBotStatus">Rate-limit Multiplexing Active</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Active QoS Cap</span>
+            <svg class="icon" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+          </div>
+          <div class="metric-value" id="valActiveBandwidth">--</div>
+          <div class="metric-sub">Trickle Mode (Nice 19, 0MB RAM idle)</div>
+        </div>
+      </div>
+
+      <!-- Live Job State Card -->
+      <div class="timeline-card" id="cardJobState">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="chip chip-info" id="chipJobStatus">Idle</span>
+            <strong style="font-size: 13px;" id="textJobHeading">No active backup job running</strong>
+          </div>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);" id="textJobSpeed">0.0 MB/s</span>
+        </div>
+        <div style="background-color: var(--bg-surface-elevated); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 8px;">
+          <div id="barJobProgress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1f6feb, #238636); transition: width 0.3s ease;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim);">
+          <span id="textJobDetails">Next automatic run scheduled via cron</span>
+          <span id="textJobPercent">0%</span>
+        </div>
+      </div>
+
+      <!-- Bot Mesh Health Table -->
+      <div class="metric-card">
+        <div class="pane-title" style="margin-bottom: 12px;">Telegram Bot Mesh Pool Health</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Bot Token Prefix</th>
+              <th>Status</th>
+              <th>Requests Sent</th>
+              <th>Bytes Transferred</th>
+              <th>Rate Limit State</th>
+            </tr>
+          </thead>
+          <tbody id="botTableBody">
+            <tr><td colspan="5" style="text-align: center; color: var(--text-dim);">Loading Bot Mesh telemetry...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- File Station Section -->
+    <section id="section-filestation" class="content-section">
+      <div class="filestation-layout">
+        <!-- Left Pane: Virtual Folder Tree -->
+        <aside class="tree-pane">
+          <div class="pane-title">NAS Shared Folders</div>
+          <div id="fileStationTree">
+            <div class="tree-item selected" data-path="">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              <span>/ (Root)</span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right Pane: File Table -->
+        <div class="table-pane">
+          <div class="table-toolbar">
+            <div class="breadcrumb-trail" id="fsBreadcrumb">/</div>
+            <button class="btn btn-sm btn-accent" id="btnRestoreCurrentFolder">
+              <svg class="icon" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+              Restore Current Folder
+            </button>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Size</th>
+                  <th>Modified Date</th>
+                  <th>Chunks</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="fsTableBody">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-dim);">Select a folder to view files</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Time Machine Section -->
+    <section id="section-timemachine" class="content-section">
+      <div class="timeline-card">
+        <div class="pane-title" style="margin-bottom: 8px;">Point-in-Time Snapshot Timeline (Scrubber)</div>
+        <div class="timeline-scrubber" id="tmScrubber">
+          <!-- Snapshot Cards populated via JS -->
+        </div>
+      </div>
+
+      <!-- Diff / Content Viewer -->
+      <div class="metric-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div class="pane-title" id="tmDiffTitle">Snapshot File Manifest</div>
+          <div style="display: flex; gap: 8px;">
+            <span class="chip chip-success" id="chipDiffAdded">0 Added</span>
+            <span class="chip chip-warning" id="chipDiffModified">0 Modified</span>
+            <span class="chip chip-danger" id="chipDiffDeleted">0 Deleted</span>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Relative File Path</th>
+              <th>Size</th>
+              <th>SHA-256 Checksum</th>
+              <th style="text-align: right;">Restore</th>
+            </tr>
+          </thead>
+          <tbody id="tmDiffTableBody">
+            <tr><td colspan="5" style="text-align: center; color: var(--text-dim);">Select a snapshot above to inspect files</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Settings / QoS Section -->
+    <section id="section-settings" class="content-section">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <!-- Multi-NAS Topology Card -->
+        <div class="metric-card">
+          <div class="pane-title" style="margin-bottom: 12px;">Node Topology & Replication Role</div>
+          <div class="form-group">
+            <label class="form-label">Node Identifier</label>
+            <input type="text" class="form-input" id="cfgNodeName" value="Synology-DS920+">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Replication Mode</label>
+            <select class="form-input" id="cfgNodeMode">
+              <option value="PUSH">PUSH (Local NAS to Telegram Cloud)</option>
+              <option value="PULL">PULL (Central Hub pulling remote Buffalo shares)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Source Path</label>
+            <input type="text" class="form-input" id="cfgSourcePath" value="/volume1/data">
+          </div>
+          <button class="btn btn-primary" id="btnSaveTopology">Save Topology</button>
+        </div>
+
+        <!-- QoS & Retention Policy Card -->
+        <div class="metric-card">
+          <div class="pane-title" style="margin-bottom: 12px;">24h Trickle QoS & Retention Policy</div>
+          <div class="form-group">
+            <label class="form-label">Bandwidth Timetable Rule</label>
+            <input type="text" class="form-input" id="cfgBwSchedule" value="07:00,5M 23:00,18M">
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Daytime 5MB/s, Nighttime 18MB/s. 0MB RAM idle.</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Keep Hourly</label>
+              <input type="number" class="form-input" id="cfgKeepHourly" value="24">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Keep Daily</label>
+              <input type="number" class="form-input" id="cfgKeepDaily" value="7">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Keep Weekly</label>
+              <input type="number" class="form-input" id="cfgKeepWeekly" value="4">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Keep Monthly</label>
+              <input type="number" class="form-input" id="cfgKeepMonthly" value="12">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btnSaveQoS">Save QoS & Retention</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Restore Modal -->
+  <div class="modal-backdrop" id="restoreModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>Point-in-Time Restore</span>
+        <button class="btn btn-sm" id="btnCloseModal" style="border: none; background: transparent;"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Snapshot</label>
+          <input type="text" class="form-input" id="modalSnapID" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target File / Folder</label>
+          <input type="text" class="form-input" id="modalTargetPath" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Restore Destination on NAS</label>
+          <input type="text" class="form-input" id="modalDestPath" value="/volume1/restored_data">
+        </div>
+        <div style="font-size: 11px; color: var(--text-dim);">
+          Chunks will be fetched from Telegram, verified by SHA-256 checksum, decrypted with AES-256-GCM, and reassembled.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" id="btnCancelRestore">Cancel</button>
+        <button class="btn btn-accent" id="btnConfirmRestore">Start Restore</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
