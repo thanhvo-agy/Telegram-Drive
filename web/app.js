@@ -296,7 +296,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadDirectory(snapID, path) {
     currentFolderPath = path;
-    document.getElementById('fsBreadcrumb').innerText = path ? `/${path}` : '/';
+    const breadcrumbEl = document.getElementById('fsBreadcrumb');
+    if (breadcrumbEl) {
+      if (!path) {
+        breadcrumbEl.innerHTML = '<span style="font-weight: 600; color: var(--text-main);">/ (gốc)</span>';
+      } else {
+        const parts = path.split('/').filter(Boolean);
+        let html = '<a href="javascript:void(0)" onclick="window.fsNavigate(\'\')" style="color: var(--info); text-decoration: none;">/ (gốc)</a>';
+        let sub = '';
+        parts.forEach((p, idx) => {
+          sub += (sub ? '/' : '') + p;
+          const isEnd = (idx === parts.length - 1);
+          html += ' <span style="color: var(--text-dim);">&gt;</span> ';
+          if (isEnd) {
+            html += `<span style="font-weight: 600; color: var(--text-main);">${p}</span>`;
+          } else {
+            const dest = sub;
+            html += `<a href="javascript:void(0)" onclick="window.fsNavigate('${dest}')" style="color: var(--info); text-decoration: none;">${p}</a>`;
+          }
+        });
+        breadcrumbEl.innerHTML = html;
+      }
+    }
 
     try {
       const res = await fetch(`/api/snapshots/${snapID}/tree?path=${encodeURIComponent(path)}`);

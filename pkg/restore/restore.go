@@ -161,6 +161,25 @@ func (r *Restorer) RestoreDirectory(ctx context.Context, snapshotID, subDir, tar
 		TotalBytes: totalBytes,
 	}
 
+	// Recreate all directory structures (including empty directories)
+	for _, d := range m.Directories {
+		cleanD := filepath.Clean(filepath.ToSlash(d))
+		cleanD = strings.TrimPrefix(cleanD, "/")
+		if cleanSub == "" || strings.HasPrefix(cleanD, cleanSub+"/") || cleanD == cleanSub {
+			var relDest string
+			if cleanSub == "" {
+				relDest = cleanD
+			} else {
+				relDest = strings.TrimPrefix(cleanD, cleanSub)
+				relDest = strings.TrimPrefix(relDest, "/")
+			}
+			if relDest != "" {
+				fullDestDir := filepath.Join(targetDir, filepath.FromSlash(relDest))
+				_ = os.MkdirAll(fullDestDir, 0755)
+			}
+		}
+	}
+
 	for idx, fe := range targets {
 		select {
 		case <-ctx.Done():
@@ -171,6 +190,8 @@ func (r *Restorer) RestoreDirectory(ctx context.Context, snapshotID, subDir, tar
 		var relDest string
 		if cleanSub == "" {
 			relDest = fe.Path
+		} else if fe.Path == cleanSub {
+			relDest = filepath.Base(fe.Path)
 		} else {
 			relDest = strings.TrimPrefix(fe.Path, cleanSub)
 			relDest = strings.TrimPrefix(relDest, "/")

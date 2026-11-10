@@ -43,6 +43,7 @@ type SnapshotManifest struct {
 	DeduplicatedBytes  int64                `json:"deduplicated_bytes"`
 	DurationSec        float64              `json:"duration_sec"`
 	TelegramManifestID string               `json:"telegram_manifest_id,omitempty"`
+	Directories        []string             `json:"directories,omitempty"`
 	Files              map[string]FileEntry `json:"files"`
 }
 
@@ -193,16 +194,20 @@ type FileStationItem struct {
 
 // ListDirectory returns directory listing for File Station view for a specific virtual folder
 func (m *SnapshotManifest) ListDirectory(targetDir string) []FileStationItem {
-	targetDir = filepath.Clean(targetDir)
+	targetDir = filepath.Clean(filepath.ToSlash(targetDir))
 	if targetDir == "." || targetDir == "/" {
 		targetDir = ""
 	}
+	targetDir = strings.TrimPrefix(targetDir, "/")
+	targetDir = strings.TrimSuffix(targetDir, "/")
 
 	subDirs := make(map[string]time.Time)
 	var items []FileStationItem
 
+	// 1. Process files
 	for p, fe := range m.Files {
-		cleanP := filepath.Clean(p)
+		cleanP := filepath.Clean(filepath.ToSlash(p))
+		cleanP = strings.TrimPrefix(cleanP, "/")
 		var rel string
 		if targetDir == "" {
 			rel = cleanP
@@ -232,6 +237,26 @@ func (m *SnapshotManifest) ListDirectory(targetDir string) []FileStationItem {
 			if _, exists := subDirs[dirName]; !exists {
 				subDirs[dirName] = time.Unix(fe.ModTime, 0)
 			}
+		}
+	}
+
+	// 2. Process recorded directories (including empty subfolders)
+	for _, d := range m.Directories {
+		cleanD := filepath.Clean(filepath.ToSlash(d))
+		cleanD = strings.TrimPrefix(cleanD, "/")
+		var rel string
+		if targetDir == "" {
+			rel = cleanD
+		} else if strings.HasPrefix(cleanD, targetDir+"/") {
+			rel = strings.TrimPrefix(cleanD, targetDir+"/")
+		} else {
+			continue
+		}
+
+		parts := strings.Split(rel, "/")
+		dirName := parts[0]
+		if _, exists := subDirs[dirName]; !exists {
+			subDirs[dirName] = m.CreatedAt
 		}
 	}
 

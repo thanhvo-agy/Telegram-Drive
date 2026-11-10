@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -349,13 +350,31 @@ func (s *Server) handleTriggerRestore(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		ctx := context.Background()
 		var err error
-		if req.Path != "" && !strings.HasSuffix(req.Path, "/") {
+
+		m, getErr := s.engine.GetSnapshot(req.SnapshotID)
+		cleanReqPath := filepath.Clean(filepath.ToSlash(req.Path))
+		if cleanReqPath == "." || cleanReqPath == "/" {
+			cleanReqPath = ""
+		}
+
+		isFile := false
+		if getErr == nil && m != nil && cleanReqPath != "" {
+			if _, exists := m.Files[cleanReqPath]; exists {
+				isFile = true
+			}
+		}
+
+		if isFile {
 			// Restore single file
-			destFile := filepath.Join(req.TargetDir, filepath.Base(req.Path))
-			err = s.restorer.RestoreFile(ctx, req.SnapshotID, req.Path, destFile)
+			destFile := req.TargetDir
+			fi, statErr := os.Stat(req.TargetDir)
+			if (statErr == nil && fi.IsDir()) || strings.HasSuffix(req.TargetDir, "/") || filepath.Ext(req.TargetDir) == "" {
+				destFile = filepath.Join(req.TargetDir, filepath.Base(cleanReqPath))
+			}
+			err = s.restorer.RestoreFile(ctx, req.SnapshotID, cleanReqPath, destFile)
 		} else {
-			// Restore directory or full snapshot
-			err = s.restorer.RestoreDirectory(ctx, req.SnapshotID, req.Path, req.TargetDir, func(p restore.RestoreProgress) {
+			// Restore directory or full snapshot recursively
+			err = s.restorer.RestoreDirectory(ctx, req.SnapshotID, cleanReqPath, req.TargetDir, func(p restore.RestoreProgress) {
 				s.mu.Lock()
 				s.lastRestore = &p
 				s.mu.Unlock()

@@ -204,13 +204,14 @@ func (e *Engine) CreateSnapshot(ctx context.Context, cb ProgressCallback) (*Snap
 	}
 
 	var fileList []scanItem
+	var dirList []string
 	var totalSourceBytes int64
 
 	err := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil // Skip unreadable paths
 		}
-		if info.IsDir() {
+		if path == sourceDir {
 			return nil
 		}
 
@@ -221,6 +222,14 @@ func (e *Engine) CreateSnapshot(ctx context.Context, cb ProgressCallback) (*Snap
 		rel = filepath.ToSlash(rel)
 
 		if e.shouldExclude(rel) {
+			if info.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		if info.IsDir() {
+			dirList = append(dirList, rel)
 			return nil
 		}
 
@@ -240,13 +249,14 @@ func (e *Engine) CreateSnapshot(ctx context.Context, cb ProgressCallback) (*Snap
 
 	snapID := fmt.Sprintf("snap-%s", startTime.Format("20060102-150405"))
 	newManifest := &SnapshotManifest{
-		SnapshotID: snapID,
-		CreatedAt:  startTime,
-		NodeName:   e.cfg.NodeName,
-		SourcePath: sourceDir,
-		TotalFiles: len(fileList),
-		TotalBytes: totalSourceBytes,
-		Files:      make(map[string]FileEntry),
+		SnapshotID:  snapID,
+		CreatedAt:   startTime,
+		NodeName:    e.cfg.NodeName,
+		SourcePath:  sourceDir,
+		TotalFiles:  len(fileList),
+		TotalBytes:  totalSourceBytes,
+		Directories: dirList,
+		Files:       make(map[string]FileEntry),
 	}
 
 	prog := ProgressEvent{

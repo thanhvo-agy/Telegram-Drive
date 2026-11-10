@@ -136,3 +136,55 @@ func TestRetentionPruner(t *testing.T) {
 			len(plan.Keep), len(plan.Delete), len(snapshots))
 	}
 }
+
+func TestDeepNestedAndEmptyDirectories(t *testing.T) {
+	manifest := &SnapshotManifest{
+		SnapshotID: "snap-nested-test",
+		CreatedAt:  time.Now(),
+		NodeName:   "NAS-Test",
+		Directories: []string{
+			"level1",
+			"level1/level2",
+			"level1/level2/level3",
+			"empty_folder",
+		},
+		Files: map[string]FileEntry{
+			"level1/level2/level3/deep_file.txt": {
+				Path:     "level1/level2/level3/deep_file.txt",
+				Size:     4096,
+				ModTime:  1700000000,
+				FileHash: "sha256-deep",
+			},
+		},
+	}
+
+	// 1. Root level must contain level1 and empty_folder
+	rootItems := manifest.ListDirectory("")
+	if len(rootItems) != 2 {
+		t.Fatalf("Expected 2 items in root, got %d: %+v", len(rootItems), rootItems)
+	}
+
+	// 2. Listing level1 must contain level2
+	l1Items := manifest.ListDirectory("level1")
+	if len(l1Items) != 1 || !l1Items[0].IsDir || l1Items[0].Name != "level2" {
+		t.Fatalf("Expected level2 directory in level1, got %+v", l1Items)
+	}
+
+	// 3. Listing level1/level2 must contain level3
+	l2Items := manifest.ListDirectory("level1/level2")
+	if len(l2Items) != 1 || !l2Items[0].IsDir || l2Items[0].Name != "level3" {
+		t.Fatalf("Expected level3 directory in level1/level2, got %+v", l2Items)
+	}
+
+	// 4. Listing level1/level2/level3 must contain deep_file.txt
+	l3Items := manifest.ListDirectory("level1/level2/level3")
+	if len(l3Items) != 1 || l3Items[0].IsDir || l3Items[0].Name != "deep_file.txt" {
+		t.Fatalf("Expected deep_file.txt in level3, got %+v", l3Items)
+	}
+
+	// 5. Listing empty_folder must be empty
+	emptyItems := manifest.ListDirectory("empty_folder")
+	if len(emptyItems) != 0 {
+		t.Fatalf("Expected empty_folder to have 0 items, got %d", len(emptyItems))
+	}
+}
