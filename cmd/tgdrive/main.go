@@ -224,7 +224,7 @@ func handleBackup(configPath string) {
 
 	if err != nil {
 		fmt.Printf("\n[FAILED] Backup failed: %v\n", err)
-		_ = tgClient.SendAlert(ctx, fmt.Sprintf("❌ *Backup Failed on %s*: %v", cfg.NodeName, err))
+		_ = tgClient.SendAlert(ctx, fmt.Sprintf("[ALERT] *Backup Failed on %s*: %v", cfg.NodeName, err))
 		os.Exit(1)
 	}
 
@@ -412,7 +412,7 @@ func handleTestBot(configPath string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	testMsg := fmt.Sprintf("🔔 *TeleClone Bot Mesh Test*\nNode: `%s`\nTime: `%s`\nStatus: Connectivity verified.",
+	testMsg := fmt.Sprintf("[TEST] *TeleClone Bot Mesh Test*\nNode: `%s`\nTime: `%s`\nStatus: Connectivity verified.",
 		cfg.NodeName, time.Now().Format("2006-01-02 15:04:05"))
 
 	if err := tgClient.SendAlert(ctx, testMsg); err != nil {

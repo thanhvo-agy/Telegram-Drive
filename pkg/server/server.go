@@ -69,6 +69,7 @@ func (s *Server) Start(port int) error {
 	mux.HandleFunc("/api/file/history", s.handleFileHistory)
 	mux.HandleFunc("/api/config", s.handleConfig)
 	mux.HandleFunc("/api/bots", s.handleBots)
+	mux.HandleFunc("/api/telegram/test", s.handleTelegramTest)
 	mux.HandleFunc("/api/events", s.handleSSE)
 
 	// Embedded Static UI
@@ -423,8 +424,37 @@ func (s *Server) handleConfig(w http.ResponseWriter, r *http.Request) {
 		if updated.EncryptionKey != "" && updated.EncryptionKey != "********" {
 			s.cfg.EncryptionKey = updated.EncryptionKey
 		}
-		if len(updated.BotTokens) > 0 && !strings.Contains(updated.BotTokens[0], "...") {
-			s.cfg.BotTokens = updated.BotTokens
+		if updated.ChannelID != "" {
+			s.cfg.ChannelID = updated.ChannelID
+		}
+		if updated.ChunkSize > 0 {
+			s.cfg.ChunkSize = updated.ChunkSize
+		}
+		if len(updated.Excludes) > 0 {
+			s.cfg.Excludes = updated.Excludes
+		}
+		if len(updated.BotTokens) > 0 {
+			var cleanTokens []string
+			for _, t := range updated.BotTokens {
+				t = strings.TrimSpace(t)
+				if t != "" && !strings.Contains(t, "...") && !strings.Contains(t, "***") {
+					cleanTokens = append(cleanTokens, t)
+				}
+			}
+			if len(cleanTokens) > 0 {
+				s.cfg.BotTokens = cleanTokens
+			}
+		}
+
+		// Reinitialize Telegram Client and Engines if credentials exist
+		if len(s.cfg.BotTokens) > 0 && s.cfg.ChannelID != "" {
+			if tgClient, err := telegram.NewClient(s.cfg.BotTokens, s.cfg.ChannelID, s.throttler); err == nil {
+				s.tgClient = tgClient
+				if eng, err := snapshot.NewEngine(s.cfg, tgClient); err == nil {
+					s.engine = eng
+					s.restorer = restore.NewRestorer(s.cfg, eng, tgClient)
+				}
+			}
 		}
 
 		_ = s.cfg.Save("")
@@ -433,6 +463,77 @@ func (s *Server) handleConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+}
+
+func (s *Server) handleTelegramTest(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req struct {
+		Token     string   `json:"token"`
+		Tokens    []string `json:"tokens"`
+		ChannelID string   `json:"channel_id"`
+	}
+	_ = json.NewDecoder(r.Body).Decode(&req)
+
+	tokensToTest := req.Tokens
+	if req.Token != "" {
+		tokensToTest = append(tokensToTest, req.Token)
+	}
+	if len(tokensToTest) == 0 {
+		tokensToTest = s.cfg.BotTokens
+	}
+
+	type BotTestResult struct {
+		TokenPrefix string `json:"token_prefix"`
+		Username    string `json:"username"`
+		FirstName   string `json:"first_name"`
+		OK          bool   `json:"ok"`
+		Error       string `json:"error,omitempty"`
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+	defer cancel()
+
+	var results []BotTestResult
+	allOK := true
+
+	for _, tok := range tokensToTest {
+		tok = strings.TrimSpace(tok)
+		if tok == "" || strings.Contains(tok, "...") {
+			continue
+		}
+		prefix := tok
+		if len(tok) > 10 {
+			prefix = tok[:6] + "..." + tok[len(tok)-4:]
+		}
+
+		u, err := telegram.TestBotPing(ctx, tok)
+		if err != nil {
+			allOK = false
+			results = append(results, BotTestResult{
+				TokenPrefix: prefix,
+				OK:          false,
+				Error:       err.Error(),
+			})
+		} else {
+			results = append(results, BotTestResult{
+				TokenPrefix: prefix,
+				Username:    "@" + u.Username,
+				FirstName:   u.FirstName,
+				OK:          true,
+			})
+		}
+	}
+
+	jsonResponse(w, map[string]interface{}{
+		"ok":         allOK && len(results) > 0,
+		"channel_id": req.ChannelID,
+		"bots":       results,
+		"count":      len(results),
+	})
 }
 
 func (s *Server) handleBots(w http.ResponseWriter, r *http.Request) {

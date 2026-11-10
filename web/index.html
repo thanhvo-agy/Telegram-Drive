@@ -34,7 +34,7 @@
       </button>
       <button class="nav-tab" data-tab="settings">
         <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        Topology & QoS
+        Cấu hình &amp; Token
       </button>
     </nav>
 
@@ -42,13 +42,30 @@
     <div class="header-actions">
       <button class="btn btn-primary" id="btnTriggerBackup">
         <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-        Backup Now
+        Sao lưu Ngay
       </button>
     </div>
   </header>
 
   <!-- Main Container -->
   <main class="main-container">
+
+    <!-- Quick Telegram Setup Warning Banner (Auto-hidden if configured) -->
+    <div id="bannerSetupAlert" class="metric-card" style="display: none; border-color: rgba(210, 153, 34, 0.4); background-color: rgba(210, 153, 34, 0.08); margin-bottom: 16px; padding: 12px 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <svg class="icon" viewBox="0 0 24 24" style="color: var(--warning);"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <div>
+            <strong style="color: var(--text-main);">Chưa hoàn tất Cấu hình Telegram Mesh!</strong>
+            <div style="color: var(--text-muted); font-size: 11px;">Vui lòng nhập Channel ID và ít nhất 1 Bot Token trong tab Cấu hình để kích hoạt tiến trình sao lưu bảo vệ dữ liệu NAS.</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-primary" id="btnGoToSettings">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Cấu hình ngay
+        </button>
+      </div>
+    </div>
 
     <!-- Overview Section -->
     <section id="section-overview" class="content-section active">
@@ -212,57 +229,201 @@
       </div>
     </section>
 
-    <!-- Settings / QoS Section -->
+    <!-- Settings / Credentials & QoS Section -->
     <section id="section-settings" class="content-section">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <!-- Multi-NAS Topology Card -->
+        <!-- Card 1: Telegram Cloud Mesh & Bot Cluster -->
         <div class="metric-card">
-          <div class="pane-title" style="margin-bottom: 12px;">Node Topology & Replication Role</div>
-          <div class="form-group">
-            <label class="form-label">Node Identifier</label>
-            <input type="text" class="form-input" id="cfgNodeName" value="Synology-DS920+">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div class="pane-title" style="display: flex; align-items: center; gap: 8px;">
+              <svg class="icon" viewBox="0 0 24 24" style="color: var(--info);"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+              <span>Telegram Cloud & Bot Mesh Cluster</span>
+            </div>
+            <span class="chip chip-info" id="badgeMeshCount">0 Bots Active</span>
           </div>
+
+          <!-- Target Channel ID -->
           <div class="form-group">
-            <label class="form-label">Replication Mode</label>
-            <select class="form-input" id="cfgNodeMode">
-              <option value="PUSH">PUSH (Local NAS to Telegram Cloud)</option>
-              <option value="PULL">PULL (Central Hub pulling remote Buffalo shares)</option>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" style="margin-bottom: 0;">Telegram Channel / Chat ID</label>
+              <span style="font-size: 11px; color: var(--text-dim);">Kênh lưu trữ riêng tư</span>
+            </div>
+            <input type="text" class="form-input" id="cfgChannelID" placeholder="-1002345678901 hoặc @channel_username" value="">
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">
+              ID kênh Telegram riêng tư. Hãy tạo kênh mới, thêm Bot làm Quản trị viên (Admin có quyền gửi tệp).
+            </div>
+          </div>
+
+          <!-- Add Bot Token Input -->
+          <div class="form-group">
+            <label class="form-label">Thêm Telegram Bot Token vào Mesh</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" class="form-input" id="inputNewBotToken" placeholder="7123456789:AAFRqQyZ9...">
+              <button type="button" class="btn btn-primary" id="btnAddBotToken" style="white-space: nowrap;">
+                <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Thêm Bot
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Bot Mesh Table -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" style="margin-bottom: 0;">Danh sách Bot trong Mesh (Round-Robin)</label>
+              <button type="button" class="btn btn-sm" id="btnTestAllBots" style="font-size: 11px; padding: 2px 8px;">
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                Kiểm tra Kết nối Ping
+              </button>
+            </div>
+            <div style="border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); max-height: 150px; overflow-y: auto; background-color: var(--bg-app);">
+              <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border-subtle); color: var(--text-dim); text-align: left;">
+                    <th style="padding: 6px 10px;">Token Prefix</th>
+                    <th style="padding: 6px 10px;">Tên Bot</th>
+                    <th style="padding: 6px 10px;">Trạng thái</th>
+                    <th style="padding: 6px 10px; text-align: right;">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="botConfigTableBody">
+                  <tr><td colspan="4" style="text-align: center; padding: 12px; color: var(--text-dim);">Chưa có bot nào trong Mesh. Vui lòng nhập token ở trên.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="meshTestResult" style="margin-top: 6px; font-size: 11px; display: none;"></div>
+          </div>
+
+          <!-- Chunk Size -->
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Kích thước Phân mảnh Tệp (Chunk Size)</label>
+            <select class="form-input" id="cfgChunkSize">
+              <option value="20971520">20 MB (Chuẩn an toàn cho Bot Telegram Free)</option>
+              <option value="51380224" selected>49 MB (Tối đa giới hạn Bot API tiêu chuẩn - Khuyên dùng)</option>
+              <option value="2097152000">2000 MB (Dành riêng cho Local Bot API Server tự host)</option>
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Source Path</label>
-            <input type="text" class="form-input" id="cfgSourcePath" value="/volume1/data">
-          </div>
-          <button class="btn btn-primary" id="btnSaveTopology">Save Topology</button>
         </div>
 
-        <!-- QoS & Retention Policy Card -->
+        <!-- Card 2: Zero-Knowledge AES-256-GCM Military Encryption -->
         <div class="metric-card">
-          <div class="pane-title" style="margin-bottom: 12px;">24h Trickle QoS & Retention Policy</div>
-          <div class="form-group">
-            <label class="form-label">Bandwidth Timetable Rule</label>
-            <input type="text" class="form-input" id="cfgBwSchedule" value="07:00,5M 23:00,18M">
-            <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Daytime 5MB/s, Nighttime 18MB/s. 0MB RAM idle.</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div class="pane-title" style="display: flex; align-items: center; gap: 8px;">
+              <svg class="icon" viewBox="0 0 24 24" style="color: #3fb950;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>Zero-Knowledge AES-256-GCM Military Encryption</span>
+            </div>
+            <span class="chip chip-success" style="font-size: 10px;">Hardware Accelerated</span>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-group">
-              <label class="form-label">Keep Hourly</label>
+
+          <!-- Master Passphrase -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" style="margin-bottom: 0;">Khóa Mã hóa Chính (Master Passphrase)</label>
+              <button type="button" id="btnTogglePassphrase" class="btn btn-sm" style="padding: 2px 6px; font-size: 10px; background: transparent; border: none; color: var(--info);">
+                Hiện mật khẩu
+              </button>
+            </div>
+            <input type="password" class="form-input" id="cfgEncryptionKey" placeholder="Nhập mật khẩu mã hóa siêu cấp (VD: rayma123456)">
+            <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+              <div style="flex: 1; height: 4px; background: var(--bg-surface-elevated); border-radius: 2px; overflow: hidden;">
+                <div id="passStrengthBar" style="width: 100%; height: 100%; background: #3fb950;"></div>
+              </div>
+              <span id="passStrengthText" style="font-size: 10px; color: #3fb950; font-weight: 600;">AES-256-GCM (600.000 rounds PBKDF2)</span>
+            </div>
+          </div>
+
+          <!-- Encryption Notice -->
+          <div style="font-size: 11px; color: var(--text-muted); background: rgba(56, 139, 253, 0.08); border: 1px solid rgba(56, 139, 253, 0.2); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 14px;">
+            Dữ liệu của bạn được băm SHA-256 và mã hóa toàn phần bằng thuật toán AES-256-GCM ngay trên RAM của NAS trước khi gửi đi. Không có bất kỳ ai (kể cả Telegram, ISP hay bên thứ ba) có thể giải mã được nội dung nếu không có Master Passphrase này.
+          </div>
+
+          <!-- Node Topology & Source Directory -->
+          <div class="form-group">
+            <label class="form-label">Tên Nhận diện Nút NAS (Node Identifier)</label>
+            <input type="text" class="form-input" id="cfgNodeName" value="Synology-DS920+">
+          </div>
+
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" style="margin-bottom: 0;">Thư mục Dữ liệu Nguồn trên NAS</label>
+              <div style="display: flex; gap: 4px;">
+                <button type="button" class="btn btn-sm btn-preset-source" data-path="/volume1/data" style="padding: 1px 6px; font-size: 10px;">/volume1/data</button>
+                <button type="button" class="btn btn-sm btn-preset-source" data-path="/volume1/Source-0" style="padding: 1px 6px; font-size: 10px;">NAS 199</button>
+                <button type="button" class="btn btn-sm btn-preset-source" data-path="/volume1/google-drive-inforayma" style="padding: 1px 6px; font-size: 10px;">NAS 198</button>
+              </div>
+            </div>
+            <input type="text" class="form-input" id="cfgSourcePath" value="/volume1/data">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Chế độ Nhân bản (Replication Mode)</label>
+            <select class="form-input" id="cfgNodeMode">
+              <option value="PUSH" selected>PUSH (Đẩy bản sao lưu từ NAS này lên Telegram Cloud)</option>
+              <option value="PULL">PULL (Hub trung tâm tổng hợp bản sao lưu từ các NAS Buffalo khác)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Card 3: 24h Trickle QoS & Retention Policy -->
+        <div class="metric-card">
+          <div class="pane-title" style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <svg class="icon" viewBox="0 0 24 24" style="color: var(--warning);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Lập lịch Băng thông 24h & QoS Nhỏ giọt</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Quy tắc Lập lịch Băng thông (Bandwidth Schedule)</label>
+            <input type="text" class="form-input" id="cfgBwSchedule" value="07:00,5M 23:00,18M">
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">
+              Cú pháp chuẩn Rclone: Giờ hành chính 07:00-23:00 giới hạn 5 MB/s; Ban đêm 23:00-07:00 tốc độ tối đa 18 MB/s.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mức độ Ưu tiên Tiến trình (CPU Nice)</label>
+            <input type="text" class="form-input" readonly value="nice -n 19 (Ưu tiên CPU thấp nhất - không ảnh hưởng hiệu năng NAS)">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Quy tắc Loại trừ Tệp (Exclude Rules)</label>
+            <input type="text" class="form-input" id="cfgExcludes" value="@eaDir/**, #recycle/**, .DS_Store, Thumbs.db, *.tmp">
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Phân cách bằng dấu phẩy. Tự động bỏ qua file rác hệ thống Synology và macOS.</div>
+          </div>
+        </div>
+
+        <!-- Card 4: Time Machine Multi-Version Retention -->
+        <div class="metric-card">
+          <div class="pane-title" style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <svg class="icon" viewBox="0 0 24 24" style="color: var(--info);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 8 10"></polyline></svg>
+            <span>Chính sách Lưu trữ Bản sao lưu (Time Machine Retention)</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Giữ theo Giờ (Keep Hourly)</label>
               <input type="number" class="form-input" id="cfgKeepHourly" value="24">
             </div>
-            <div class="form-group">
-              <label class="form-label">Keep Daily</label>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Giữ theo Ngày (Keep Daily)</label>
               <input type="number" class="form-input" id="cfgKeepDaily" value="7">
             </div>
-            <div class="form-group">
-              <label class="form-label">Keep Weekly</label>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Giữ theo Tuần (Keep Weekly)</label>
               <input type="number" class="form-input" id="cfgKeepWeekly" value="4">
             </div>
-            <div class="form-group">
-              <label class="form-label">Keep Monthly</label>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Giữ theo Tháng (Keep Monthly)</label>
               <input type="number" class="form-input" id="cfgKeepMonthly" value="12">
             </div>
           </div>
-          <button class="btn btn-primary" id="btnSaveQoS">Save QoS & Retention</button>
+
+          <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 14px;">
+            Cơ chế CoW Delta tự động tái sử dụng các chunk dữ liệu cũ, chỉ tải lên phần tệp mới/sửa đổi. Bộ dọn dẹp (Pruner) tự động giải phóng dung lượng theo chính sách trên.
+          </div>
+
+          <button class="btn btn-primary" id="btnSaveAllConfig" style="width: 100%; padding: 10px; font-size: 13px;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            Lưu &amp; Kích hoạt Toàn bộ Cấu hình
+          </button>
         </div>
       </div>
     </section>

@@ -389,3 +389,33 @@ func (c *Client) GetMeshStatus() []BotStatus {
 	}
 	return result
 }
+
+// TestBotPing verifies bot token connectivity with Telegram API getMe
+func TestBotPing(ctx context.Context, token string) (*User, error) {
+	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/getMe", token)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var apiResp apiResponse
+	if err := json.NewDecoder(resp.Body).Decode(&apiResp); err != nil {
+		return nil, err
+	}
+	if !apiResp.OK {
+		return nil, fmt.Errorf("telegram error %d: %s", apiResp.ErrorCode, apiResp.Description)
+	}
+
+	var u User
+	if err := json.Unmarshal(apiResp.Result, &u); err != nil {
+		return nil, err
+	}
+	return &u, nil
+}

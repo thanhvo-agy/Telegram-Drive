@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
         loadLatestFileStation();
       } else if (tab.dataset.tab === 'timemachine') {
         loadTimeMachine();
+      } else if (tab.dataset.tab === 'settings') {
+        loadSettings();
       }
     });
   });
@@ -440,46 +442,266 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Settings Save Handlers
-  document.getElementById('btnSaveTopology').addEventListener('click', async () => {
-    const payload = {
-      node_name: document.getElementById('cfgNodeName').value,
-      node_mode: document.getElementById('cfgNodeMode').value,
-      source_path: document.getElementById('cfgSourcePath').value
-    };
+  // Settings & Credentials Manager
+  let configuredBotTokens = [];
+
+  async function loadSettings() {
     try {
-      const res = await fetch('/api/config', {
+      const res = await fetch('/api/config');
+      if (!res.ok) return;
+      const cfg = await res.json();
+
+      document.getElementById('cfgChannelID').value = cfg.channel_id || '';
+      document.getElementById('cfgNodeName').value = cfg.node_name || 'NAS-Node';
+      document.getElementById('cfgNodeMode').value = cfg.node_mode || 'PUSH';
+      document.getElementById('cfgSourcePath').value = cfg.source_path || '/volume1/data';
+      document.getElementById('cfgBwSchedule').value = cfg.bandwidth_schedule || '07:00,5M 23:00,18M';
+      if (document.getElementById('cfgChunkSize')) {
+        document.getElementById('cfgChunkSize').value = cfg.chunk_size || 51380224;
+      }
+      if (document.getElementById('cfgExcludes') && cfg.excludes) {
+        document.getElementById('cfgExcludes').value = cfg.excludes.join(', ');
+      }
+      if (cfg.retention) {
+        document.getElementById('cfgKeepHourly').value = cfg.retention.keep_hourly || 24;
+        document.getElementById('cfgKeepDaily').value = cfg.retention.keep_daily || 7;
+        document.getElementById('cfgKeepWeekly').value = cfg.retention.keep_weekly || 4;
+        document.getElementById('cfgKeepMonthly').value = cfg.retention.keep_monthly || 12;
+      }
+
+      configuredBotTokens = cfg.bot_tokens || [];
+      renderBotTable();
+
+      // Check setup status banner
+      const banner = document.getElementById('bannerSetupAlert');
+      if (banner) {
+        if (!cfg.channel_id || configuredBotTokens.length === 0) {
+          banner.style.display = 'block';
+        } else {
+          banner.style.display = 'none';
+        }
+      }
+    } catch (err) {
+      console.error('Settings load error:', err);
+    }
+  }
+
+  function renderBotTable() {
+    const tbody = document.getElementById('botConfigTableBody');
+    const badge = document.getElementById('badgeMeshCount');
+    if (badge) badge.innerText = `${configuredBotTokens.length} Bots Active`;
+
+    if (!configuredBotTokens || configuredBotTokens.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 12px; color: var(--text-dim);">Chưa có bot nào trong Mesh. Vui lòng nhập token ở trên.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = configuredBotTokens.map((tok, idx) => {
+      const prefix = tok.length > 10 ? tok.substring(0, 6) + '...' + tok.substring(tok.length - 4) : tok;
+      return `
+        <tr style="border-bottom: 1px solid var(--border-subtle);">
+          <td style="padding: 6px 10px; font-family: var(--font-mono);">${prefix}</td>
+          <td style="padding: 6px 10px;" id="botUser_${idx}">Bot #${idx + 1}</td>
+          <td style="padding: 6px 10px;">
+            <span class="chip chip-success" id="botStatus_${idx}">Sẵn sàng</span>
+          </td>
+          <td style="padding: 6px 10px; text-align: right;">
+            <button type="button" class="btn btn-sm" style="font-size: 10px; padding: 2px 6px;" onclick="window.testSingleBot('${tok}', ${idx})">
+              Test
+            </button>
+            <button type="button" class="btn btn-sm" style="font-size: 10px; padding: 2px 6px; color: var(--danger); margin-left: 4px;" onclick="window.removeBotToken(${idx})">
+              Xóa
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  window.removeBotToken = (idx) => {
+    configuredBotTokens.splice(idx, 1);
+    renderBotTable();
+  };
+
+  window.testSingleBot = async (tok, idx) => {
+    const statusEl = document.getElementById(`botStatus_${idx}`);
+    const userEl = document.getElementById(`botUser_${idx}`);
+    if (statusEl) {
+      statusEl.className = 'chip chip-warning';
+      statusEl.innerText = 'Ping...';
+    }
+
+    try {
+      const res = await fetch('/api/telegram/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ token: tok, channel_id: document.getElementById('cfgChannelID').value })
       });
-      if (res.ok) alert('Topology saved successfully!');
-    } catch (err) {
-      alert('Save error: ' + err.message);
+      const data = await res.json();
+      if (data.bots && data.bots[0] && data.bots[0].ok) {
+        if (statusEl) {
+          statusEl.className = 'chip chip-success';
+          statusEl.innerText = '200 OK';
+        }
+        if (userEl && data.bots[0].username) {
+          userEl.innerText = data.bots[0].username;
+        }
+      } else {
+        if (statusEl) {
+          statusEl.className = 'chip chip-danger';
+          statusEl.innerText = 'Lỗi token';
+        }
+      }
+    } catch (e) {
+      if (statusEl) {
+        statusEl.className = 'chip chip-danger';
+        statusEl.innerText = 'Lỗi mạng';
+      }
     }
+  };
+
+  // Add Bot Token
+  const btnAddBot = document.getElementById('btnAddBotToken');
+  if (btnAddBot) {
+    btnAddBot.addEventListener('click', () => {
+      const input = document.getElementById('inputNewBotToken');
+      const val = input.value.trim();
+      if (!val) {
+        alert('Vui lòng nhập Telegram Bot Token!');
+        return;
+      }
+      if (configuredBotTokens.includes(val)) {
+        alert('Token này đã có trong danh sách!');
+        return;
+      }
+      configuredBotTokens.push(val);
+      renderBotTable();
+      input.value = '';
+    });
+  }
+
+  // Test All Bots in Mesh
+  const btnTestAll = document.getElementById('btnTestAllBots');
+  if (btnTestAll) {
+    btnTestAll.addEventListener('click', async () => {
+      const resultBox = document.getElementById('meshTestResult');
+      if (resultBox) {
+        resultBox.style.display = 'block';
+        resultBox.style.color = 'var(--text-dim)';
+        resultBox.innerText = 'Đang kiểm tra kết nối tới Telegram API cho tất cả bot...';
+      }
+
+      try {
+        const res = await fetch('/api/telegram/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tokens: configuredBotTokens,
+            channel_id: document.getElementById('cfgChannelID').value
+          })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          if (resultBox) {
+            resultBox.style.color = '#3fb950';
+            resultBox.innerText = `Kiểm tra hoàn tất: Toàn bộ ${data.count} bot phản hồi 200 OK! Kênh ID: ${data.channel_id || 'Chưa điền'}`;
+          }
+        } else {
+          if (resultBox) {
+            resultBox.style.color = '#f85149';
+            resultBox.innerText = `Cảnh báo: Có lỗi kết nối token hoặc chưa có bot nào hợp lệ.`;
+          }
+        }
+      } catch (err) {
+        if (resultBox) {
+          resultBox.style.color = '#f85149';
+          resultBox.innerText = 'Lỗi kết nối kiểm tra: ' + err.message;
+        }
+      }
+    });
+  }
+
+  // Password toggle
+  const btnTogglePass = document.getElementById('btnTogglePassphrase');
+  if (btnTogglePass) {
+    btnTogglePass.addEventListener('click', () => {
+      const input = document.getElementById('cfgEncryptionKey');
+      if (input.type === 'password') {
+        input.type = 'text';
+        btnTogglePass.innerText = 'Ẩn mật khẩu';
+      } else {
+        input.type = 'password';
+        btnTogglePass.innerText = 'Hiện mật khẩu';
+      }
+    });
+  }
+
+  // Source path preset chips
+  document.querySelectorAll('.btn-preset-source').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = btn.getAttribute('data-path');
+      if (p) document.getElementById('cfgSourcePath').value = p;
+    });
   });
 
-  document.getElementById('btnSaveQoS').addEventListener('click', async () => {
-    const payload = {
-      bandwidth_schedule: document.getElementById('cfgBwSchedule').value,
-      retention: {
-        keep_hourly: parseInt(document.getElementById('cfgKeepHourly').value, 10),
-        keep_daily: parseInt(document.getElementById('cfgKeepDaily').value, 10),
-        keep_weekly: parseInt(document.getElementById('cfgKeepWeekly').value, 10),
-        keep_monthly: parseInt(document.getElementById('cfgKeepMonthly').value, 10)
+  // Save All Config
+  const btnSaveAll = document.getElementById('btnSaveAllConfig');
+  if (btnSaveAll) {
+    btnSaveAll.addEventListener('click', async () => {
+      const rawExcludes = document.getElementById('cfgExcludes').value;
+      const excludes = rawExcludes.split(',').map(s => s.trim()).filter(Boolean);
+
+      const payload = {
+        channel_id: document.getElementById('cfgChannelID').value.trim(),
+        bot_tokens: configuredBotTokens,
+        encryption_key: document.getElementById('cfgEncryptionKey').value,
+        node_name: document.getElementById('cfgNodeName').value.trim(),
+        node_mode: document.getElementById('cfgNodeMode').value,
+        source_path: document.getElementById('cfgSourcePath').value.trim(),
+        chunk_size: parseInt(document.getElementById('cfgChunkSize').value, 10) || 51380224,
+        bandwidth_schedule: document.getElementById('cfgBwSchedule').value.trim(),
+        excludes: excludes,
+        retention: {
+          keep_hourly: parseInt(document.getElementById('cfgKeepHourly').value, 10) || 24,
+          keep_daily: parseInt(document.getElementById('cfgKeepDaily').value, 10) || 7,
+          keep_weekly: parseInt(document.getElementById('cfgKeepWeekly').value, 10) || 4,
+          keep_monthly: parseInt(document.getElementById('cfgKeepMonthly').value, 10) || 12
+        }
+      };
+
+      try {
+        const res = await fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          alert('Lỗi lưu cấu hình: ' + (await res.text()));
+          return;
+        }
+        alert('Cấu hình Telegram Mesh và QoS đã được lưu và kích hoạt thành công!');
+        loadSettings();
+        refreshStatus();
+        refreshBots();
+      } catch (err) {
+        alert('Lỗi lưu cấu hình: ' + err.message);
       }
-    };
-    try {
-      const res = await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) alert('QoS & Retention saved successfully!');
-    } catch (err) {
-      alert('Save error: ' + err.message);
-    }
-  });
+    });
+  }
+
+  // Quick Go To Settings button from Banner
+  const btnGoToSettings = document.getElementById('btnGoToSettings');
+  if (btnGoToSettings) {
+    btnGoToSettings.addEventListener('click', () => {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+      const settingsTab = document.querySelector('.nav-tab[data-tab="settings"]');
+      if (settingsTab) settingsTab.classList.add('active');
+      const settingsSection = document.getElementById('section-settings');
+      if (settingsSection) settingsSection.classList.add('active');
+      loadSettings();
+    });
+  }
 
   // SSE Real-Time Stream
   function initSSE() {
@@ -518,6 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial Boot
   refreshStatus();
   refreshBots();
+  loadSettings();
   initSSE();
   setInterval(refreshStatus, 5000);
 });
